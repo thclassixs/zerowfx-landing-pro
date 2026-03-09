@@ -44,6 +44,7 @@ const allVideos = [...videos, ...videos];
                 webkit-playsinline
                 muted
                 data-src={v.src}
+                x-webkit-airplay="deny"
               >
                 <source src={v.src} type="video/mp4" />
               </video>
@@ -113,6 +114,7 @@ const allVideos = [...videos, ...videos];
   // Detect iOS for specific workarounds
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
   // ─── iOS Thumbnail Generation ───
   // iOS Safari doesn't reliably show video first frames with preload="metadata".
@@ -254,12 +256,12 @@ const allVideos = [...videos, ...videos];
     isUserInteracting = true;
   }, { passive: true });
   carousel.addEventListener('touchend', () => {
-    // Don't resume if a video is playing
+    // Don't resume if a video is playing; longer delay for iOS
     setTimeout(() => {
       if (!activeVideoCard) {
         isUserInteracting = false;
       }
-    }, 2000);
+    }, isIOS ? 3000 : 2000);
   }, { passive: true });
 
   // Listen to scroll events for infinite loop
@@ -270,6 +272,7 @@ const allVideos = [...videos, ...videos];
   // Play/pause on click — with debounce to prevent double-fire
   let clickCooldown = false;
   let activeVideoCard: Element | null = null;
+  let lastTouchTime = 0;
 
   function pauseAllVideos() {
     document.querySelectorAll('.video-card').forEach(c => {
@@ -332,12 +335,56 @@ const allVideos = [...videos, ...videos];
     const video = card.querySelector('video') as HTMLVideoElement;
     if (!video) return;
 
-    // Single click handler on the card itself
+    // iOS-specific: prevent default video element behaviors that cause flicker
+    if (isIOS) {
+      video.setAttribute('disableRemotePlayback', '');
+      video.setAttribute('x-webkit-airplay', 'deny');
+    }
+
+    // Use touchend for touch devices to avoid conflict with scroll
+    if (isTouchDevice) {
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let touchMoved = false;
+
+      card.addEventListener('touchstart', (e) => {
+        const touch = (e as TouchEvent).touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchMoved = false;
+      }, { passive: true });
+
+      card.addEventListener('touchmove', (e) => {
+        const touch = (e as TouchEvent).touches[0];
+        const dx = Math.abs(touch.clientX - touchStartX);
+        const dy = Math.abs(touch.clientY - touchStartY);
+        if (dx > 10 || dy > 10) touchMoved = true;
+      }, { passive: true });
+
+      card.addEventListener('touchend', (e) => {
+        if (touchMoved) return;
+        if ((e.target as HTMLElement).closest('.video-card-badge')) return;
+
+        // iOS debounce — longer cooldown
+        const now = Date.now();
+        if (now - lastTouchTime < (isIOS ? 600 : 400)) return;
+        lastTouchTime = now;
+
+        e.preventDefault();
+
+        if (video.paused) {
+          playVideo(card);
+        } else {
+          pauseVideo(card);
+        }
+      });
+    }
+
+    // Click handler for non-touch (desktop) — kept as fallback
     card.addEventListener('click', (e) => {
-      // Don't toggle if clicking on the badge
+      if (isTouchDevice) return; // touch devices handled above
       if ((e.target as HTMLElement).closest('.video-card-badge')) return;
 
-      // Debounce to prevent double-fire
       if (clickCooldown) return;
       clickCooldown = true;
       setTimeout(() => { clickCooldown = false; }, 300);
@@ -435,6 +482,7 @@ const allVideos = [...videos, ...videos];
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .video-carousel::-webkit-scrollbar {
     display: none;
@@ -467,12 +515,13 @@ const allVideos = [...videos, ...videos];
     aspect-ratio: 9/16;
     cursor: pointer;
     transition: border-color 0.4s ease, box-shadow 0.4s ease;
-    /* iOS: Force stable GPU compositing layer */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* iOS: Stable compositing without will-change (avoids recomposite flicker) */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    will-change: transform;
+    /* Prevent double-tap-to-zoom on iOS which causes flicker */
+    touch-action: manipulation;
   }
   .video-card:hover {
     border-color: var(--color-green);
@@ -522,13 +571,15 @@ const allVideos = [...videos, ...videos];
     height: 100%;
     object-fit: cover;
     pointer-events: none;
-    /* iOS: Prevent video flicker during scroll/recomposite */
-    -webkit-transform: translateZ(0);
-    transform: translateZ(0);
+    /* iOS: Stable layer without will-change */
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     position: relative;
     z-index: 0;
+    /* iOS: Prevent inline player controls from flashing */
+    -webkit-appearance: none;
   }
   /* Play button — floating circle, no full overlay */
   .video-play-btn {
