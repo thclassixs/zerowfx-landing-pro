@@ -7,7 +7,7 @@ const TOOL_IDS = [
   'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
   'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
   'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
-  'pivot-points-calculator','leverage-calculator','commission-calculator'
+  'pivot-points-calculator','leverage-calculator','commission-calculator','cot-strategy-calculator'
 ];
 
 export function getStaticPaths() {
@@ -15,7 +15,7 @@ export function getStaticPaths() {
     'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
     'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
     'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
-    'pivot-points-calculator','leverage-calculator','commission-calculator'
+    'pivot-points-calculator','leverage-calculator','commission-calculator','cot-strategy-calculator'
   ];
   return tools.map(tool => ({ params: { tool } }));
 }
@@ -409,6 +409,78 @@ const TOOLS = [
       const bePips=rt/(pipValPerLot*lots);
       return[{l:'One-Way Cost',v:'$'+oneway.toFixed(2)},{l:'Round-Trip Cost',v:'$'+rt.toFixed(2)},{l:'Break-Even Pips',v:bePips.toFixed(2)+' pips'},{l:'Cost per $100k',v:'$'+(comm).toFixed(2)}];
     }
+  },
+  {id:'cot-strategy-calculator',name:'COT-Strategy Calculator',icon:'line-chart',desc:'Simulate account growth based on your win rate, risk per trade, and risk:reward ratio (COT Strategy)',
+    fields:[
+      {id:'startBalance',label:'Start Balance ($)',type:'number',placeholder:'10000',step:'1',val:'10000'},
+      {id:'numTrades',label:'Number of Trades',type:'number',placeholder:'20',step:'1',val:'20'},
+      {id:'riskPct',label:'Typical Risk (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'rrRatio',label:'Risk:Reward (1:X)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'winPct',label:'Win/Loss (%)',type:'number',placeholder:'55',step:'1',val:'55'}
+    ],
+    calc:f=>{
+      const bal=parseFloat(f.startBalance),n=parseInt(f.numTrades),riskPct=parseFloat(f.riskPct),rr=parseFloat(f.rrRatio),winPct=parseFloat(f.winPct);
+      if([bal,n,riskPct,rr,winPct].some(isNaN)||bal<=0||n<=0)return null;
+      const winRate=winPct/100;
+      const totalWins=Math.round(n*winRate);
+      const totalLosses=n-totalWins;
+      // Simulate trades: distribute wins evenly among trades
+      let current=bal;
+      let peak=bal;
+      let maxDD=0;
+      let gross=0;
+      let grossLoss=0;
+      const res=[];
+      res.push({l:'Starting Balance',v:'$'+bal.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})});
+      res.push({l:'— Trade Simulation —',v:'',cls:'section'});
+      // Interleave wins and losses realistically
+      let winsLeft=totalWins;
+      let lossesLeft=totalLosses;
+      for(let i=1;i<=n;i++){
+        const riskAmt=current*(riskPct/100);
+        // Determine if this trade is a win
+        let isWin=false;
+        const remaining=n-i+1;
+        if(lossesLeft===0){isWin=true;}
+        else if(winsLeft===0){isWin=false;}
+        else{isWin=Math.random()<(winsLeft/remaining);}
+        let pnl;
+        if(isWin){
+          pnl=riskAmt*rr;
+          winsLeft--;
+          gross+=pnl;
+        }else{
+          pnl=-riskAmt;
+          lossesLeft--;
+          grossLoss+=riskAmt;
+        }
+        current+=pnl;
+        if(current>peak)peak=current;
+        const dd=peak>0?((peak-current)/peak)*100:0;
+        if(dd>maxDD)maxDD=dd;
+        if(n<=30){
+          res.push({l:'Trade #'+i+(isWin?' ✓':' ✗'),v:(pnl>=0?'+$':'−$')+Math.abs(pnl).toFixed(2)+' → $'+current.toFixed(2),cls:isWin?'positive':'negative'});
+        }
+      }
+      if(n>30){
+        res.push({l:'('+n+' trades simulated)',v:'Showing summary only',cls:''});
+      }
+      res.push({l:'— Summary —',v:'',cls:'section'});
+      const totalPnl=current-bal;
+      const returnPct=((current-bal)/bal)*100;
+      const profitFactor=grossLoss>0?(gross/grossLoss):gross>0?Infinity:0;
+      const expectancy=(totalPnl/n);
+      res.push({l:'Final Balance',v:'$'+current.toFixed(2),cls:current>=bal?'positive':'negative'});
+      res.push({l:'Total P&L',v:(totalPnl>=0?'+$':'−$')+Math.abs(totalPnl).toFixed(2),cls:totalPnl>=0?'positive':'negative'});
+      res.push({l:'Return',v:(returnPct>=0?'+':'')+returnPct.toFixed(2)+'%',cls:returnPct>=0?'positive':'negative'});
+      res.push({l:'Wins / Losses',v:totalWins+' / '+totalLosses});
+      res.push({l:'Win Rate',v:winPct.toFixed(1)+'%'});
+      res.push({l:'Profit Factor',v:profitFactor===Infinity?'∞':profitFactor.toFixed(2)});
+      res.push({l:'Avg Trade',v:(expectancy>=0?'+$':'−$')+Math.abs(expectancy).toFixed(2)});
+      res.push({l:'Max Drawdown',v:maxDD.toFixed(2)+'%',cls:'negative'});
+      res.push({l:'Risk:Reward',v:'1:'+rr.toFixed(1)});
+      return res;
+    }
   }
 ];
 
@@ -424,6 +496,7 @@ function init(){
 
 function renderTool(){
   const t=TOOLS.find(x=>x.id===activeTool);if(!t)return;
+  const isCOT=t.id==='cot-strategy-calculator';
   document.getElementById('toolHeader').innerHTML=`<div class="tool-title-row"><i data-lucide="${t.icon}"></i><h1>${t.name}</h1></div><p class="tool-desc">${t.desc}</p>`;
   const form=document.getElementById('toolForm');
   form.innerHTML=t.fields.map(f=>{
@@ -431,9 +504,45 @@ function renderTool(){
       const opts=(f.options||[]).map(o=>`<option value="${o}"${o===f.val?' selected':''}>${o}</option>`).join('');
       return`<div class="form-group"><label for="${f.id}">${f.label}</label><select id="${f.id}" class="form-control">${opts}</select></div>`;
     }
+    if(isCOT && f.type==='number'){
+      let extra='';
+      if(f.id==='rrRatio'){
+        extra=`<div class="rr-presets"><button type="button" class="rr-preset-btn" data-rr="2">RR 1:2</button><button type="button" class="rr-preset-btn" data-rr="3">RR 1:3</button></div>`;
+      }
+      return`<div class="form-group"><label for="${f.id}">${f.label}</label><div class="stepper-row"><input id="${f.id}" type="number" class="form-control stepper-input" placeholder="${f.placeholder||''}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}><button type="button" class="stepper-btn stepper-minus" data-target="${f.id}" data-step="${f.step||1}">−</button><button type="button" class="stepper-btn stepper-plus" data-target="${f.id}" data-step="${f.step||1}">+</button></div>${extra}</div>`;
+    }
     return`<div class="form-group"><label for="${f.id}">${f.label}</label><input id="${f.id}" type="${f.type}" class="form-control" placeholder="${f.placeholder||''}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}></div>`;
-  }).join('')+'<button type="submit" class="calc-btn"><i data-lucide="calculator"></i> Calculate</button>';
+  }).join('')+'<button type="submit" class="calc-btn"><i data-lucide="calculator"></i> Calculate</button>'+(isCOT?'<button type="button" class="clear-btn" id="cotClearBtn"><i data-lucide="eraser"></i> Clear all</button>':'');
   form.onsubmit=e=>{e.preventDefault();calculate(t);};
+  // Wire up COT-specific controls
+  if(isCOT){
+    form.querySelectorAll('.stepper-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const input=document.getElementById(btn.dataset.target);
+        const step=parseFloat(btn.dataset.step)||1;
+        let val=parseFloat(input.value)||0;
+        if(btn.classList.contains('stepper-plus'))val+=step;
+        else val=Math.max(0,val-step);
+        input.value=parseFloat(val.toFixed(4));
+      });
+    });
+    form.querySelectorAll('.rr-preset-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        document.getElementById('rrRatio').value=btn.dataset.rr;
+      });
+    });
+    const clearBtn=document.getElementById('cotClearBtn');
+    if(clearBtn){
+      clearBtn.addEventListener('click',()=>{
+        t.fields.forEach(f=>{
+          const el=document.getElementById(f.id);
+          if(el)el.value='0';
+        });
+        document.getElementById('toolResults').innerHTML='<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>Enter values and click Calculate</p></div>';
+        if(window.lucide)window.lucide.createIcons();
+      });
+    }
+  }
   document.getElementById('toolResults').innerHTML='<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>Enter values and click Calculate</p></div>';
   if(window.lucide)window.lucide.createIcons();
 }
@@ -800,6 +909,96 @@ document.addEventListener('DOMContentLoaded',()=>{
     .tool-desc {
       margin-left: 0;
     }
+  }
+
+  /* COT-Strategy Stepper Buttons */
+  .stepper-row {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+  }
+  .stepper-input {
+    flex: 1;
+    min-width: 0;
+  }
+  .stepper-btn {
+    width: 42px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    line-height: 1;
+    padding: 0;
+  }
+  .stepper-btn:hover {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: var(--color-green);
+    color: var(--color-green-light);
+  }
+  .stepper-btn:active {
+    transform: scale(0.95);
+  }
+  .rr-presets {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .rr-preset-btn {
+    flex: 1;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    text-align: center;
+  }
+  .rr-preset-btn:hover {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: var(--color-green);
+    color: var(--color-green-light);
+  }
+  .rr-preset-btn:active {
+    transform: scale(0.97);
+  }
+  .clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: var(--transition);
+    border: 1px solid var(--color-border-strong);
+    cursor: pointer;
+    font-family: inherit;
+    width: 100%;
+  }
+  .clear-btn:hover {
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    border-color: var(--color-text-dim);
+  }
+  .clear-btn i, .clear-btn svg {
+    width: 16px;
+    height: 16px;
   }
 </style>
 
