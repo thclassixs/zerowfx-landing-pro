@@ -68,7 +68,7 @@ import Layout from '../layouts/Layout.astro';
           <div class="search-box">
             <input type="text" id="searchInput" placeholder="Search by email, IP, or country..." />
           </div>
-          <a href="http://localhost:3001/api/admin/subscribers/export/csv" target="_blank" class="export-btn" id="exportBtn">
+          <a href="#" target="_blank" class="export-btn" id="exportBtn">
             📥 Export CSV
           </a>
         </div>
@@ -100,7 +100,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  const API = 'http://localhost:3001';
+  const API = `http://${window.location.hostname}:3001`;
   let currentPage = 1;
   let searchQuery = '';
 
@@ -119,6 +119,13 @@ import Layout from '../layouts/Layout.astro';
     (document.getElementById('loginScreen') as HTMLElement).style.display = 'none';
     (document.getElementById('dashboard') as HTMLElement).style.display = 'block';
     (document.getElementById('dashUser') as HTMLElement).textContent = username;
+    
+    // Update Export link dynamically based on the current hostname
+    const exportBtn = document.getElementById('exportBtn') as HTMLAnchorElement;
+    if (exportBtn) {
+        exportBtn.href = `${API}/api/admin/subscribers/export/csv`;
+    }
+
     loadSubscribers();
   }
 

@@ -15,7 +15,13 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:4321',
+    origin: function (origin, callback) {
+        if (!origin || origin.startsWith('http://localhost:') || origin === process.env.FRONTEND_URL) {
+            callback(null, origin || '*');
+        } else {
+            callback(null, process.env.FRONTEND_URL || 'http://localhost:4321');
+        }
+    },
     credentials: true
 }));
 app.use(express.json());
