@@ -1,0 +1,695 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout title="Zerowfx — Live Charts & Market Data">
+  <Navbar />
+
+  <main class="charts-page">
+    <!-- Hero Header -->
+    <section class="charts-hero">
+      <div class="hero-glow"></div>
+      <div class="charts-hero-inner">
+        <span class="hero-badge">
+          <i data-lucide="activity" style="width:14px;height:14px;"></i>
+          Live Market Data
+        </span>
+        <h1 class="charts-title">
+          Charts & <span class="title-accent">Market Widgets</span>
+        </h1>
+        <p class="charts-subtitle">
+          Professional-grade TradingView charts and real-time market data — fully integrated into Zerowfx. Monitor, analyze, and stay ahead of the markets.
+        </p>
+      </div>
+    </section>
+
+    <!-- Widget Sections -->
+    <div class="widgets-container">
+
+      <!-- 1. Advanced Real-Time Chart -->
+      <section class="widget-section" id="advanced-chart">
+        <div class="widget-header">
+          <div class="widget-number">01</div>
+          <div class="widget-info">
+            <h2 class="widget-title">Advanced Real-Time Chart</h2>
+            <p class="widget-desc">
+              A free and powerful chart for you to easily embed in any website. Make it yours with a ton of different customization options.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="candlestick-chart" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-advanced-chart">
+          <!-- TradingView Advanced Chart Widget -->
+          <div class="tradingview-widget-container" style="height:800px;width:100%;">
+            <div id="tradingview_advanced" style="height:100%;width:100%;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Symbol Overview -->
+      <section class="widget-section" id="symbol-overview-1">
+        <div class="widget-header">
+          <div class="widget-number">02</div>
+          <div class="widget-info">
+            <h2 class="widget-title">Symbol Overview</h2>
+            <p class="widget-desc">
+              Embed the latest quotes, plus a simple chart of a single stock. A great in-depth option for any web or mobile-geared landing pages.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="line-chart" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-symbol-overview-1">
+          <!-- TradingView Symbol Overview Widget -->
+          <div class="tradingview-widget-container" style="height:600px;width:100%;">
+            <div class="tradingview-widget-container__widget" id="symbolOverview1"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Symbol Overview (Forex Pair) -->
+      <section class="widget-section" id="symbol-overview-2">
+        <div class="widget-header">
+          <div class="widget-number">03</div>
+          <div class="widget-info">
+            <h2 class="widget-title">Symbol Overview — Forex</h2>
+            <p class="widget-desc">
+              A second symbol overview configured for forex pairs. Track your favourite currency pairs with a clean, minimal chart and live quotes.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="repeat" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-symbol-overview-2">
+          <!-- TradingView Symbol Overview Widget (Forex) -->
+          <div class="tradingview-widget-container" style="height:600px;width:100%;">
+            <div class="tradingview-widget-container__widget" id="symbolOverview2"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Market Summary -->
+      <section class="widget-section" id="market-summary">
+        <div class="widget-header">
+          <div class="widget-number">04</div>
+          <div class="widget-info">
+            <div class="title-row">
+              <h2 class="widget-title">Market Summary</h2>
+              <span class="new-badge">NEW</span>
+            </div>
+            <p class="widget-desc">
+              Why settle for just numbers? This watchlist visualizes multiple symbols at once. Create custom tabs for specific assets or let the widget automatically display the day's hottest and coldest movers.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="layout-grid" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-market-summary">
+          <!-- TradingView Market Summary / Watchlist Widget -->
+          <div class="tradingview-widget-container" style="height:700px;width:100%;">
+            <div class="tradingview-widget-container__widget" id="marketSummary"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Stock Market -->
+      <section class="widget-section" id="stock-market">
+        <div class="widget-header">
+          <div class="widget-number">05</div>
+          <div class="widget-info">
+            <h2 class="widget-title">Stock Market</h2>
+            <p class="widget-desc">
+              See the top five gaining, losing, and most active stocks for the day. It updates based on current market activity — so you'll always see the most relevant stocks.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="trending-up" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-stock-market">
+          <!-- TradingView Hotlists Widget -->
+          <div class="tradingview-widget-container" style="height:700px;width:100%;">
+            <div class="tradingview-widget-container__widget" id="stockMarket"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. Market Overview -->
+      <section class="widget-section" id="market-overview">
+        <div class="widget-header">
+          <div class="widget-number">06</div>
+          <div class="widget-info">
+            <h2 class="widget-title">Market Overview</h2>
+            <p class="widget-desc">
+              Built for when you need to take a macro look at the markets. This widget works particularly well on homepages and dashboards for a bird's-eye view.
+            </p>
+          </div>
+          <div class="widget-icon-wrap">
+            <i data-lucide="globe" style="width:24px;height:24px;"></i>
+          </div>
+        </div>
+        <div class="widget-frame" id="tv-market-overview">
+          <!-- TradingView Market Overview Widget -->
+          <div class="tradingview-widget-container" style="height:700px;width:100%;">
+            <div class="tradingview-widget-container__widget" id="marketOverview"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<!-- TradingView Widget Scripts -->
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function () {
+
+  // Detect current theme
+  function getTVColorTheme() {
+    return document.documentElement.classList.contains('theme-clean-white') ? 'light' : 'dark';
+  }
+
+  var colorTheme = getTVColorTheme();
+
+  // ── 1. Advanced Real-Time Chart ──
+  var advScript = document.createElement('script');
+  advScript.src = 'https://s3.tradingview.com/tv.js';
+  advScript.onload = function () {
+    new TradingView.widget({
+      container_id: 'tradingview_advanced',
+      autosize: true,
+      symbol: 'FX:EURUSD',
+      interval: '60',
+      timezone: 'Etc/UTC',
+      theme: colorTheme,
+      style: '1',
+      locale: 'en',
+      toolbar_bg: colorTheme === 'dark' ? '#141618' : '#ffffff',
+      enable_publishing: false,
+      allow_symbol_change: true,
+      hide_side_toolbar: false,
+      withdateranges: true,
+      details: true,
+      studies: ['MASimple@tv-basicstudies'],
+      backgroundColor: colorTheme === 'dark' ? '#0f1114' : '#ffffff',
+      gridColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+    });
+  };
+  document.getElementById('tv-advanced-chart').appendChild(advScript);
+
+  // ── 2. Symbol Overview (Stock) ──
+  var so1Script = document.createElement('script');
+  so1Script.type = 'text/javascript';
+  so1Script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+  so1Script.async = true;
+  so1Script.textContent = JSON.stringify({
+    symbols: [
+      ["Apple", "AAPL|1D"],
+      ["Google", "GOOGL|1D"],
+      ["Microsoft", "MSFT|1D"]
+    ],
+    chartOnly: false,
+    width: "100%",
+    height: "100%",
+    locale: "en",
+    colorTheme: colorTheme,
+    autosize: true,
+    showVolume: true,
+    showMA: false,
+    hideDateRanges: false,
+    hideMarketStatus: false,
+    hideSymbolLogo: false,
+    scalePosition: "right",
+    scaleMode: "Normal",
+    fontFamily: "Inter, -apple-system, sans-serif",
+    fontSize: "10",
+    noTimeScale: false,
+    valuesTracking: "1",
+    changeMode: "price-and-percent",
+    chartType: "area",
+    lineWidth: 2,
+    lineType: 0,
+    dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
+  });
+  document.getElementById('symbolOverview1').appendChild(so1Script);
+
+  // ── 3. Symbol Overview (Forex) ──
+  var so2Script = document.createElement('script');
+  so2Script.type = 'text/javascript';
+  so2Script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js';
+  so2Script.async = true;
+  so2Script.textContent = JSON.stringify({
+    symbols: [
+      ["EUR/USD", "FX:EURUSD|1D"],
+      ["GBP/USD", "FX:GBPUSD|1D"],
+      ["USD/JPY", "FX:USDJPY|1D"],
+      ["XAU/USD", "OANDA:XAUUSD|1D"]
+    ],
+    chartOnly: false,
+    width: "100%",
+    height: "100%",
+    locale: "en",
+    colorTheme: colorTheme,
+    autosize: true,
+    showVolume: true,
+    showMA: false,
+    hideDateRanges: false,
+    hideMarketStatus: false,
+    hideSymbolLogo: false,
+    scalePosition: "right",
+    scaleMode: "Normal",
+    fontFamily: "Inter, -apple-system, sans-serif",
+    fontSize: "10",
+    noTimeScale: false,
+    valuesTracking: "1",
+    changeMode: "price-and-percent",
+    chartType: "area",
+    lineWidth: 2,
+    lineType: 0,
+    dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
+  });
+  document.getElementById('symbolOverview2').appendChild(so2Script);
+
+  // ── 4. Market Summary (Watchlist) ──
+  var msScript = document.createElement('script');
+  msScript.type = 'text/javascript';
+  msScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js';
+  msScript.async = true;
+  msScript.textContent = JSON.stringify({
+    width: "100%",
+    height: "100%",
+    symbolsGroups: [
+      {
+        name: "Forex",
+        originalName: "Forex",
+        symbols: [
+          { name: "FX:EURUSD", displayName: "EUR/USD" },
+          { name: "FX:GBPUSD", displayName: "GBP/USD" },
+          { name: "FX:USDJPY", displayName: "USD/JPY" },
+          { name: "FX:AUDUSD", displayName: "AUD/USD" },
+          { name: "FX:USDCAD", displayName: "USD/CAD" }
+        ]
+      },
+      {
+        name: "Indices",
+        originalName: "Indices",
+        symbols: [
+          { name: "FOREXCOM:SPXUSD", displayName: "S&P 500" },
+          { name: "FOREXCOM:NSXUSD", displayName: "NASDAQ" },
+          { name: "FOREXCOM:DJI", displayName: "Dow Jones" },
+          { name: "INDEX:DEU40", displayName: "DAX" },
+          { name: "INDEX:NKY", displayName: "Nikkei 225" }
+        ]
+      },
+      {
+        name: "Commodities",
+        originalName: "Commodities",
+        symbols: [
+          { name: "OANDA:XAUUSD", displayName: "Gold" },
+          { name: "OANDA:XAGUSD", displayName: "Silver" },
+          { name: "TVC:USOIL", displayName: "Crude Oil" },
+          { name: "NYMEX:NG1!", displayName: "Natural Gas" }
+        ]
+      },
+      {
+        name: "Crypto",
+        originalName: "Crypto",
+        symbols: [
+          { name: "BINANCE:BTCUSDT", displayName: "BTC/USDT" },
+          { name: "BINANCE:ETHUSDT", displayName: "ETH/USDT" },
+          { name: "BINANCE:SOLUSDT", displayName: "SOL/USDT" }
+        ]
+      }
+    ],
+    showSymbolLogo: true,
+    isTransparent: true,
+    colorTheme: colorTheme,
+    locale: "en"
+  });
+  document.getElementById('marketSummary').appendChild(msScript);
+
+  // ── 5. Stock Market (Hotlists) ──
+  var smScript = document.createElement('script');
+  smScript.type = 'text/javascript';
+  smScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js';
+  smScript.async = true;
+  smScript.textContent = JSON.stringify({
+    colorTheme: colorTheme,
+    dateRange: "12M",
+    exchange: "US",
+    showChart: true,
+    locale: "en",
+    largeChartUrl: "",
+    isTransparent: true,
+    showSymbolLogo: true,
+    showFloatingTooltip: true,
+    width: "100%",
+    height: "100%",
+    plotLineColorGrowing: "rgba(34,197,94,1)",
+    plotLineColorFalling: "rgba(239,68,68,1)",
+    gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+    scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+    belowLineFillColorGrowing: "rgba(34,197,94,0.05)",
+    belowLineFillColorFalling: "rgba(239,68,68,0.05)"
+  });
+  document.getElementById('stockMarket').appendChild(smScript);
+
+  // ── 6. Market Overview ──
+  var moScript = document.createElement('script');
+  moScript.type = 'text/javascript';
+  moScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
+  moScript.async = true;
+  moScript.textContent = JSON.stringify({
+    colorTheme: colorTheme,
+    dateRange: "12M",
+    showChart: true,
+    locale: "en",
+    largeChartUrl: "",
+    isTransparent: true,
+    showSymbolLogo: true,
+    showFloatingTooltip: true,
+    width: "100%",
+    height: "100%",
+    plotLineColorGrowing: "rgba(34,197,94,1)",
+    plotLineColorFalling: "rgba(239,68,68,1)",
+    gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+    scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+    belowLineFillColorGrowing: "rgba(34,197,94,0.05)",
+    belowLineFillColorFalling: "rgba(239,68,68,0.05)",
+    tabs: [
+      {
+        title: "Forex",
+        symbols: [
+          { s: "FX:EURUSD", d: "EUR/USD" },
+          { s: "FX:GBPUSD", d: "GBP/USD" },
+          { s: "FX:USDJPY", d: "USD/JPY" },
+          { s: "FX:AUDUSD", d: "AUD/USD" },
+          { s: "FX:USDCHF", d: "USD/CHF" },
+          { s: "FX:USDCAD", d: "USD/CAD" }
+        ],
+        originalTitle: "Forex"
+      },
+      {
+        title: "Indices",
+        symbols: [
+          { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
+          { s: "FOREXCOM:NSXUSD", d: "NASDAQ" },
+          { s: "FOREXCOM:DJI", d: "Dow Jones" },
+          { s: "INDEX:DEU40", d: "DAX" },
+          { s: "INDEX:NKY", d: "Nikkei 225" }
+        ],
+        originalTitle: "Indices"
+      },
+      {
+        title: "Commodities",
+        symbols: [
+          { s: "OANDA:XAUUSD", d: "Gold" },
+          { s: "OANDA:XAGUSD", d: "Silver" },
+          { s: "TVC:USOIL", d: "Crude Oil" },
+          { s: "NYMEX:NG1!", d: "Natural Gas" }
+        ],
+        originalTitle: "Commodities"
+      },
+      {
+        title: "Crypto",
+        symbols: [
+          { s: "BINANCE:BTCUSDT", d: "BTC/USDT" },
+          { s: "BINANCE:ETHUSDT", d: "ETH/USDT" },
+          { s: "BINANCE:SOLUSDT", d: "SOL/USDT" }
+        ],
+        originalTitle: "Crypto"
+      }
+    ]
+  });
+  document.getElementById('marketOverview').appendChild(moScript);
+
+});
+</script>
+
+<style>
+  /* ── Page Layout ── */
+  .charts-page {
+    padding-top: 64px;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .charts-hero {
+    position: relative;
+    padding: 80px 24px 60px;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, var(--color-green-glow) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .charts-hero-inner {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+    z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: var(--color-green-glow);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 100px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-green-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+  }
+
+  .charts-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+
+  .title-accent {
+    background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .charts-subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── Widget Container ── */
+  .widgets-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+
+  /* ── Widget Section ── */
+  .widget-section {
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    transition:
+      border-color 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+
+  .widget-section:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* ── Widget Header ── */
+  .widget-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 28px 32px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .widget-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--color-green);
+    background: var(--color-green-glow);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: 8px;
+    padding: 6px 10px;
+    line-height: 1;
+    letter-spacing: 1px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .widget-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .widget-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 6px;
+    letter-spacing: -0.2px;
+  }
+
+  .new-badge {
+    display: inline-block;
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 3px 8px;
+    background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+    color: #000;
+    border-radius: 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-bottom: 6px;
+  }
+
+  .widget-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    max-width: 640px;
+  }
+
+  .widget-icon-wrap {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-green);
+  }
+
+  /* ── Widget Frame ── */
+  .widget-frame {
+    padding: 0;
+    min-height: 400px;
+    background: var(--color-bg-secondary);
+  }
+
+  .widget-frame .tradingview-widget-container {
+    border-radius: 0;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .charts-hero {
+      padding: 60px 20px 40px;
+    }
+
+    .widgets-container {
+      padding: 0 12px 60px;
+      gap: 36px;
+    }
+
+    .widget-header {
+      flex-wrap: wrap;
+      padding: 20px 20px;
+      gap: 12px;
+    }
+
+    .widget-icon-wrap {
+      display: none;
+    }
+
+    .widget-title {
+      font-size: 1.1rem;
+    }
+
+    .widget-desc {
+      font-size: 0.85rem;
+    }
+
+    .widget-frame {
+      min-height: 320px;
+    }
+
+    .widget-frame .tradingview-widget-container {
+      height: 500px !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .widget-header {
+      padding: 16px;
+    }
+
+    .widget-number {
+      font-size: 0.7rem;
+      padding: 4px 8px;
+    }
+  }
+
+  /* ── Clean White Theme Overrides ── */
+  :global(html.theme-clean-white) .charts-hero {
+    background: linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%);
+  }
+
+  :global(html.theme-clean-white) .hero-glow {
+    opacity: 0.3;
+  }
+
+  :global(html.theme-clean-white) .widget-section {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  :global(html.theme-clean-white) .widget-section:hover {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+  }
+
+  :global(html.theme-clean-white) .widget-frame {
+    background: #ffffff;
+  }
+</style>
