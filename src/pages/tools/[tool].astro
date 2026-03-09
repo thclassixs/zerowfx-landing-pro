@@ -7,7 +7,7 @@ const TOOL_IDS = [
   'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
   'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
   'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
-  'pivot-points-calculator','leverage-calculator','commission-calculator','cot-strategy-calculator'
+  'pivot-points-calculator','leverage-calculator','commission-calculator','zero-strategy-calculator'
 ];
 
 export function getStaticPaths() {
@@ -15,7 +15,7 @@ export function getStaticPaths() {
     'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
     'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
     'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
-    'pivot-points-calculator','leverage-calculator','commission-calculator','cot-strategy-calculator'
+    'pivot-points-calculator','leverage-calculator','commission-calculator','zero-strategy-calculator'
   ];
   return tools.map(tool => ({ params: { tool } }));
 }
@@ -410,7 +410,7 @@ const TOOLS = [
       return[{l:'One-Way Cost',v:'$'+oneway.toFixed(2)},{l:'Round-Trip Cost',v:'$'+rt.toFixed(2)},{l:'Break-Even Pips',v:bePips.toFixed(2)+' pips'},{l:'Cost per $100k',v:'$'+(comm).toFixed(2)}];
     }
   },
-  {id:'cot-strategy-calculator',name:'COT-Strategy Calculator',icon:'line-chart',desc:'Simulate account growth based on your win rate, risk per trade, and risk:reward ratio (COT Strategy)',
+  {id:'zero-strategy-calculator',name:'ZERO-Strategy Calculator',icon:'line-chart',desc:'Simulate account growth based on your win rate, risk per trade, and risk:reward ratio (ZERO Strategy)',
     fields:[
       {id:'startBalance',label:'Start Balance ($)',type:'number',placeholder:'10000',step:'1',val:'10000'},
       {id:'numTrades',label:'Number of Trades',type:'number',placeholder:'20',step:'1',val:'20'},
@@ -496,7 +496,7 @@ function init(){
 
 function renderTool(){
   const t=TOOLS.find(x=>x.id===activeTool);if(!t)return;
-  const isCOT=t.id==='cot-strategy-calculator';
+  const isCOT=t.id==='zero-strategy-calculator';
   document.getElementById('toolHeader').innerHTML=`<div class="tool-title-row"><i data-lucide="${t.icon}"></i><h1>${t.name}</h1></div><p class="tool-desc">${t.desc}</p>`;
   const form=document.getElementById('toolForm');
   form.innerHTML=t.fields.map(f=>{
@@ -911,7 +911,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }
   }
 
-  /* COT-Strategy Stepper Buttons */
+  /* ZERO-Strategy Stepper Buttons */
   .stepper-row {
     display: flex;
     gap: 6px;
