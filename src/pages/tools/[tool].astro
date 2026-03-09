@@ -1,0 +1,819 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+
+const TOOL_IDS = [
+  'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
+  'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
+  'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
+  'pivot-points-calculator','leverage-calculator','commission-calculator'
+];
+
+export function getStaticPaths() {
+  const tools = [
+    'pip-calculator','pip-value-calculator','lot-size-calculator','margin-calculator',
+    'position-size-calculator','profit-calculator','risk-calculator','sl-tp-calculator',
+    'spread-calculator','swap-calculator','drawdown-calculator','fibonacci-calculator',
+    'pivot-points-calculator','leverage-calculator','commission-calculator'
+  ];
+  return tools.map(tool => ({ params: { tool } }));
+}
+
+const { tool } = Astro.params;
+const currentTool = TOOL_IDS.includes(tool) ? tool : TOOL_IDS[0];
+
+// Generate a nice title from the tool slug
+const toolTitle = currentTool.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+---
+
+<Layout title={`${toolTitle} - Zerowfx`} description={`Free forex ${toolTitle.toLowerCase()}: calculate pips, lot size, margin, position size, profit, risk, fibonacci, pivot points and more.`}>
+  <Navbar />
+  <main class="tools-page">
+    <div class="tools-container">
+      <aside class="tools-sidebar" id="toolsSidebar">
+        <div class="sidebar-header">
+          <i data-lucide="calculator" class="sidebar-icon"></i>
+          <h2>Trading Tools</h2>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+      </aside>
+      <section class="tools-content">
+        <div class="tool-panel" id="toolPanel">
+          <div class="tool-header" id="toolHeader"></div>
+          <div class="tool-body">
+            <form class="tool-form" id="toolForm"></form>
+            <div class="tool-results" id="toolResults">
+              <div class="results-placeholder">
+                <i data-lucide="bar-chart-3"></i>
+                <p>Results will appear here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<div id="activeToolData" data-tool={currentTool} style="display:none;"></div>
+
+<script is:inline>
+const PAIRS = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','NZD/USD','USD/CAD','EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CAD','EUR/CHF','GBP/AUD','GBP/CAD','GBP/CHF','AUD/CAD','AUD/CHF','AUD/NZD','NZD/CAD','NZD/CHF','NZD/JPY','CAD/JPY','CAD/CHF','CHF/JPY','XAU/USD','XAG/USD'];
+const ACCS = ['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD'];
+
+// Approximate exchange rates for conversion (when live rates unavailable)
+const APPROX_RATES = {
+  'USD':1,'EUR':1.08,'GBP':1.27,'JPY':0.0067,'CHF':1.13,'AUD':0.65,'NZD':0.61,'CAD':0.74
+};
+
+// Shared helper: get pip value per standard lot in USD for any pair
+// Formula: Pip Value = (One Pip / Quote Rate to USD) × Contract Size
+function getPipValue(pair, lots) {
+  lots = lots || 1;
+  const isJpy = pair.includes('JPY');
+  const isXau = pair.startsWith('XAU');
+  const isXag = pair.startsWith('XAG');
+  const pipSize = isJpy ? 0.01 : 0.0001;
+  const contractSize = isXau ? 100 : isXag ? 5000 : 100000;
+  const quote = pair.split('/')[1];
+  // Convert pip to USD: pip × contractSize, then convert from quote currency to USD
+  let pipValueUSD = pipSize * contractSize;
+  if (quote !== 'USD') {
+    // Convert from quote currency to USD
+    const quoteToUSD = APPROX_RATES[quote] || 1;
+    pipValueUSD = pipValueUSD * quoteToUSD;
+  }
+  return pipValueUSD * lots;
+}
+
+// Get pip value in account currency
+function getPipValueInAcc(pair, lots, accCurrency) {
+  const pipUSD = getPipValue(pair, lots);
+  if (accCurrency === 'USD') return pipUSD;
+  const accToUSD = APPROX_RATES[accCurrency] || 1;
+  return pipUSD / accToUSD;
+}
+
+const TOOLS = [
+  {id:'pip-calculator',name:'Pip Calculator',icon:'trending-up',desc:'Calculate pips between entry and exit prices',
+    fields:[
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'entry',label:'Entry Price',type:'number',placeholder:'1.08500',step:'0.00001'},
+      {id:'exit',label:'Exit Price',type:'number',placeholder:'1.09000',step:'0.00001'}
+    ],
+    calc:f=>{
+      const pair=f.pair,entry=parseFloat(f.entry),exit=parseFloat(f.exit);
+      if(isNaN(entry)||isNaN(exit))return null;
+      const isJpy=pair.includes('JPY');
+      const pipSize=isJpy?0.01:0.0001;
+      const pips=((exit-entry)/pipSize);
+      const dir=pips>=0?'Buy (Long)':'Sell (Short)';
+      return[{l:'Pips',v:pips.toFixed(1)},{l:'Direction',v:dir},{l:'Pip Size',v:pipSize},{l:'Price Difference',v:(exit-entry).toFixed(5)}];
+    }
+  },
+  {id:'pip-value-calculator',name:'Pip Value Calculator',icon:'dollar-sign',desc:'Calculate how much 1 pip is worth in your account currency',
+    fields:[
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'},
+      {id:'acc',label:'Account Currency',type:'select',options:ACCS,val:'USD'}
+    ],
+    calc:f=>{
+      const lots=parseFloat(f.lots);if(isNaN(lots))return null;
+      const isJpy=f.pair.includes('JPY');const pipSize=isJpy?0.01:0.0001;
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const contractSize=isXau?100:isXag?5000:100000;
+      const units=lots*contractSize;
+      const pipVal=getPipValueInAcc(f.pair, lots, f.acc);
+      const symbol=f.acc==='USD'?'$':f.acc+' ';
+      return[{l:'Pip Value',v:symbol+pipVal.toFixed(2)},{l:'Units',v:units.toLocaleString()},{l:'Pip Size',v:pipSize},{l:'Lot Size',v:lots+' lot(s)'},{l:'Contract Size',v:contractSize.toLocaleString()+' units/lot'}];
+    }
+  },
+  {id:'lot-size-calculator',name:'Lot Size Calculator',icon:'layers',desc:'Calculate correct lot size based on account balance, risk %, and stop loss pips',
+    fields:[
+      {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
+      {id:'risk',label:'Risk Percentage (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'slPips',label:'Stop Loss (Pips)',type:'number',placeholder:'50',step:'1'},
+      {id:'pipVal',label:'Pip Value per Lot ($)',type:'number',placeholder:'10',step:'0.01',val:'10'}
+    ],
+    calc:f=>{
+      const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips),pv=parseFloat(f.pipVal);
+      if([b,r,sl,pv].some(isNaN)||sl===0||pv===0)return null;
+      const riskAmt=b*(r/100);const lots=riskAmt/(sl*pv);
+      return[{l:'Lot Size',v:lots.toFixed(2)},{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'Units',v:Math.round(lots*100000).toLocaleString()},{l:'Mini Lots',v:(lots*10).toFixed(2)},{l:'Micro Lots',v:(lots*100).toFixed(2)}];
+    }
+  },
+  {id:'margin-calculator',name:'Margin Calculator',icon:'lock',desc:'Calculate required margin for any position based on lot size, leverage, and price',
+    fields:[
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'},
+      {id:'price',label:'Current Price',type:'number',placeholder:'1.08500',step:'0.00001'},
+      {id:'leverage',label:'Leverage',type:'select',options:['1:10','1:20','1:30','1:50','1:100','1:200','1:500','1:1000'],val:'1:100'}
+    ],
+    calc:f=>{
+      const lots=parseFloat(f.lots),price=parseFloat(f.price),lev=parseInt(f.leverage.split(':')[1]);
+      if(isNaN(lots)||isNaN(price)||isNaN(lev)||lev===0)return null;
+      const units=lots*100000;const notional=units*price;const margin=notional/lev;
+      return[{l:'Required Margin',v:'$'+margin.toFixed(2)},{l:'Notional Value',v:'$'+notional.toFixed(2)},{l:'Leverage',v:f.leverage},{l:'Units',v:units.toLocaleString()}];
+    }
+  },
+  {id:'position-size-calculator',name:'Position Size Calculator',icon:'target',desc:'Calculate optimal trade size based on account balance, risk %, and stop loss',
+    fields:[
+      {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
+      {id:'risk',label:'Risk Percentage (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'slPips',label:'Stop Loss (Pips)',type:'number',placeholder:'50',step:'1'},
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'}
+    ],
+    calc:f=>{
+      const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips);
+      if([b,r,sl].some(isNaN)||sl===0)return null;
+      const pipValPerLot=getPipValue(f.pair, 1);
+      const riskAmt=b*(r/100);
+      const lots=riskAmt/(sl*pipValPerLot);
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const contractSize=isXau?100:isXag?5000:100000;
+      const units=Math.round(lots*contractSize);
+      return[{l:'Position Size',v:lots.toFixed(2)+' lots'},{l:'Units',v:units.toLocaleString()},{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'Pip Value',v:'$'+pipValPerLot.toFixed(2)+'/lot'}];
+    }
+  },
+  {id:'profit-calculator',name:'Profit Calculator',icon:'badge-dollar-sign',desc:'Calculate profit or loss based on entry price, exit price, and lot size',
+    fields:[
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'direction',label:'Direction',type:'select',options:['Buy','Sell'],val:'Buy'},
+      {id:'entry',label:'Entry Price',type:'number',placeholder:'1.08500',step:'0.00001'},
+      {id:'exit',label:'Exit Price',type:'number',placeholder:'1.09000',step:'0.00001'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'}
+    ],
+    calc:f=>{
+      const entry=parseFloat(f.entry),exit=parseFloat(f.exit),lots=parseFloat(f.lots);
+      if([entry,exit,lots].some(isNaN))return null;
+      const isJpy=f.pair.includes('JPY');const pipSize=isJpy?0.01:0.0001;
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const contractSize=isXau?100:isXag?5000:100000;
+      let priceDiff=exit-entry;if(f.direction==='Sell')priceDiff=-priceDiff;
+      const pips=priceDiff/pipSize;
+      // Profit = price diff × lots × contract size (then convert from quote to USD if needed)
+      const quote=f.pair.split('/')[1];
+      let profit=priceDiff*lots*contractSize;
+      if(quote!=='USD'){
+        const quoteToUSD=APPROX_RATES[quote]||1;
+        profit=profit*quoteToUSD;
+      }
+      return[{l:'Profit/Loss',v:(profit>=0?'+$':'−$')+Math.abs(profit).toFixed(2),cls:profit>=0?'positive':'negative'},{l:'Pips',v:pips.toFixed(1)},{l:'Direction',v:f.direction},{l:'Lot Size',v:lots}];
+    }
+  },
+  {id:'risk-calculator',name:'Risk Calculator',icon:'shield-alert',desc:'Calculate risk amount and risk-to-reward ratio',
+    fields:[
+      {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
+      {id:'risk',label:'Risk Percentage (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'slPips',label:'Stop Loss (Pips)',type:'number',placeholder:'50',step:'1'},
+      {id:'tpPips',label:'Take Profit (Pips)',type:'number',placeholder:'100',step:'1'}
+    ],
+    calc:f=>{
+      const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips),tp=parseFloat(f.tpPips);
+      if([b,r,sl].some(isNaN))return null;
+      const riskAmt=b*(r/100);const rr=!isNaN(tp)&&sl!==0?(tp/sl):0;const reward=riskAmt*rr;
+      const res=[{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'% of Balance',v:r.toFixed(1)+'%'}];
+      if(rr>0){res.push({l:'Risk:Reward',v:'1:'+rr.toFixed(2)});res.push({l:'Potential Reward',v:'$'+reward.toFixed(2)});}
+      return res;
+    }
+  },
+  {id:'sl-tp-calculator',name:'Stop Loss & Take Profit',icon:'arrow-down-up',desc:'Calculate SL/TP levels and risk-to-reward ratio',
+    fields:[
+      {id:'entry',label:'Entry Price',type:'number',placeholder:'1.08500',step:'0.00001'},
+      {id:'direction',label:'Direction',type:'select',options:['Buy','Sell'],val:'Buy'},
+      {id:'slPips',label:'Stop Loss (Pips)',type:'number',placeholder:'50',step:'1'},
+      {id:'tpPips',label:'Take Profit (Pips)',type:'number',placeholder:'100',step:'1'},
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'}
+    ],
+    calc:f=>{
+      const entry=parseFloat(f.entry),slP=parseFloat(f.slPips),tpP=parseFloat(f.tpPips);
+      if([entry,slP,tpP].some(isNaN))return null;
+      const isJpy=f.pair.includes('JPY');const pip=isJpy?0.01:0.0001;
+      const isBuy=f.direction==='Buy';
+      const sl=isBuy?entry-slP*pip:entry+slP*pip;const tp=isBuy?entry+tpP*pip:entry-tpP*pip;
+      const rr=slP!==0?(tpP/slP):0;
+      return[{l:'Stop Loss Price',v:sl.toFixed(5),cls:'negative'},{l:'Take Profit Price',v:tp.toFixed(5),cls:'positive'},{l:'Risk:Reward',v:'1:'+rr.toFixed(2)},{l:'SL Distance',v:slP+' pips'},{l:'TP Distance',v:tpP+' pips'}];
+    }
+  },
+  {id:'spread-calculator',name:'Spread Cost Calculator',icon:'arrow-left-right',desc:'Calculate spread cost in your account currency for any lot size',
+    fields:[
+      {id:'spread',label:'Spread (Pips)',type:'number',placeholder:'1.5',step:'0.1'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'},
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'}
+    ],
+    calc:f=>{
+      const spread=parseFloat(f.spread),lots=parseFloat(f.lots);
+      if([spread,lots].some(isNaN))return null;
+      // Spread Cost = Spread (pips) × Pip Value per lot × lots
+      const pipValPerLot=getPipValue(f.pair, 1);
+      const cost=spread*pipValPerLot*lots;
+      const miniCost=spread*getPipValue(f.pair, 0.1);
+      const microCost=spread*getPipValue(f.pair, 0.01);
+      return[{l:'Spread Cost',v:'$'+cost.toFixed(2)},{l:'Per Mini Lot',v:'$'+miniCost.toFixed(2)},{l:'Per Micro Lot',v:'$'+microCost.toFixed(2)},{l:'Spread',v:spread+' pips'}];
+    }
+  },
+  {id:'swap-calculator',name:'Swap Calculator',icon:'repeat',desc:'Calculate overnight swap/rollover fees for holding positions',
+    fields:[
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'direction',label:'Direction',type:'select',options:['Buy (Long)','Sell (Short)'],val:'Buy (Long)'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'},
+      {id:'swapRate',label:'Swap Rate (points)',type:'number',placeholder:'-3.5',step:'0.01'},
+      {id:'days',label:'Days Held',type:'number',placeholder:'1',step:'1',val:'1'}
+    ],
+    calc:f=>{
+      const lots=parseFloat(f.lots),rate=parseFloat(f.swapRate),days=parseFloat(f.days);
+      if([lots,rate,days].some(isNaN))return null;
+      const isJpy=f.pair.includes('JPY');const pointVal=isJpy?100000*0.001:100000*0.00001;
+      const daily=rate*pointVal*lots;const total=daily*days;
+      const wed=days>=3?daily*3:0;
+      return[{l:'Daily Swap',v:(daily>=0?'+$':'−$')+Math.abs(daily).toFixed(2),cls:daily>=0?'positive':'negative'},{l:'Total Swap ('+days+' days)',v:(total>=0?'+$':'−$')+Math.abs(total).toFixed(2),cls:total>=0?'positive':'negative'},{l:'Triple Wednesday',v:(wed>=0?'+$':'−$')+Math.abs(wed).toFixed(2)},{l:'Swap Rate',v:rate+' points'}];
+    }
+  },
+  {id:'drawdown-calculator',name:'Drawdown Calculator',icon:'trending-down',desc:'Calculate account drawdown, recovery needed, and consecutive loss impact',
+    fields:[
+      {id:'balance',label:'Starting Balance ($)',type:'number',placeholder:'10000',step:'1'},
+      {id:'lossPercent',label:'Loss Per Trade (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
+      {id:'consecutiveLosses',label:'Consecutive Losses',type:'number',placeholder:'5',step:'1',val:'5'}
+    ],
+    calc:f=>{
+      const bal=parseFloat(f.balance),lossPct=parseFloat(f.lossPercent),n=parseInt(f.consecutiveLosses);
+      if([bal,lossPct,n].some(isNaN)||bal===0)return null;
+      // Simulate consecutive losses
+      let current=bal;
+      const results=[];
+      results.push({l:'Starting Balance',v:'$'+bal.toFixed(2)});
+      results.push({l:'— After Each Loss —',v:'',cls:'section'});
+      for(let i=1;i<=n;i++){
+        current=current*(1-lossPct/100);
+        results.push({l:'After Loss #'+i,v:'$'+current.toFixed(2),cls:'negative'});
+      }
+      results.push({l:'— Summary —',v:'',cls:'section'});
+      const totalLoss=bal-current;
+      const ddPct=(totalLoss/bal)*100;
+      const recovPct=(totalLoss/current)*100;
+      results.push({l:'Final Balance',v:'$'+current.toFixed(2)});
+      results.push({l:'Total Drawdown',v:ddPct.toFixed(2)+'%',cls:'negative'});
+      results.push({l:'Total Loss',v:'$'+totalLoss.toFixed(2),cls:'negative'});
+      results.push({l:'Recovery Needed',v:recovPct.toFixed(2)+'%',cls:'warning'});
+      return results;
+    }
+  },
+  {id:'fibonacci-calculator',name:'Fibonacci Calculator',icon:'git-branch',desc:'Calculate Fibonacci retracement and extension levels',
+    fields:[
+      {id:'direction',label:'Trend',type:'select',options:['Uptrend','Downtrend'],val:'Uptrend'},
+      {id:'high',label:'High Price',type:'number',placeholder:'1.10000',step:'0.00001'},
+      {id:'low',label:'Low Price',type:'number',placeholder:'1.05000',step:'0.00001'}
+    ],
+    calc:f=>{
+      let high=parseFloat(f.high),low=parseFloat(f.low);
+      if([high,low].some(isNaN))return null;
+      const diff=high-low;const levels=[0,0.236,0.382,0.5,0.618,0.786,1];
+      const exts=[1.0,1.382,1.618,2.0,2.618];const dec=high>100?2:5;
+      const isUp=f.direction==='Uptrend';
+      const res=[];
+      res.push({l:'— Retracement Levels —',v:'',cls:'section'});
+      levels.forEach(lv=>{
+        const price=isUp?high-diff*lv:low+diff*lv;
+        res.push({l:(lv*100).toFixed(1)+'%',v:price.toFixed(dec)});
+      });
+      res.push({l:'— Extension Levels —',v:'',cls:'section'});
+      exts.forEach(lv=>{
+        const price=isUp?high+diff*(lv-1):low-diff*(lv-1);
+        res.push({l:(lv*100).toFixed(1)+'%',v:price.toFixed(dec)});
+      });
+      return res;
+    }
+  },
+  {id:'pivot-points-calculator',name:'Pivot Points Calculator',icon:'navigation',desc:'Calculate Standard, Fibonacci, Camarilla, and Woodie pivot points',
+    fields:[
+      {id:'high',label:'Previous High',type:'number',placeholder:'1.10000',step:'0.00001'},
+      {id:'low',label:'Previous Low',type:'number',placeholder:'1.05000',step:'0.00001'},
+      {id:'close',label:'Previous Close',type:'number',placeholder:'1.08000',step:'0.00001'},
+      {id:'method',label:'Method',type:'select',options:['Standard','Fibonacci','Camarilla','Woodie'],val:'Standard'}
+    ],
+    calc:f=>{
+      const h=parseFloat(f.high),l=parseFloat(f.low),c=parseFloat(f.close);
+      if([h,l,c].some(isNaN))return null;
+      const dec=h>100?2:5;const r=[];
+      if(f.method==='Standard'){
+        const p=(h+l+c)/3;
+        r.push({l:'R3',v:(2*p-2*l+h).toFixed(dec),cls:'positive'});
+        r.push({l:'R2',v:(p+(h-l)).toFixed(dec),cls:'positive'});
+        r.push({l:'R1',v:(2*p-l).toFixed(dec),cls:'positive'});
+        r.push({l:'Pivot',v:p.toFixed(dec),cls:'section'});
+        r.push({l:'S1',v:(2*p-h).toFixed(dec),cls:'negative'});
+        r.push({l:'S2',v:(p-(h-l)).toFixed(dec),cls:'negative'});
+        r.push({l:'S3',v:(2*p-2*h+l).toFixed(dec),cls:'negative'});
+      } else if(f.method==='Fibonacci'){
+        const p=(h+l+c)/3;const d=h-l;
+        r.push({l:'R3',v:(p+d*1.0).toFixed(dec),cls:'positive'});
+        r.push({l:'R2',v:(p+d*0.618).toFixed(dec),cls:'positive'});
+        r.push({l:'R1',v:(p+d*0.382).toFixed(dec),cls:'positive'});
+        r.push({l:'Pivot',v:p.toFixed(dec),cls:'section'});
+        r.push({l:'S1',v:(p-d*0.382).toFixed(dec),cls:'negative'});
+        r.push({l:'S2',v:(p-d*0.618).toFixed(dec),cls:'negative'});
+        r.push({l:'S3',v:(p-d*1.0).toFixed(dec),cls:'negative'});
+      } else if(f.method==='Camarilla'){
+        const d=h-l;
+        r.push({l:'R4',v:(c+d*1.1/2).toFixed(dec),cls:'positive'});
+        r.push({l:'R3',v:(c+d*1.1/4).toFixed(dec),cls:'positive'});
+        r.push({l:'R2',v:(c+d*1.1/6).toFixed(dec),cls:'positive'});
+        r.push({l:'R1',v:(c+d*1.1/12).toFixed(dec),cls:'positive'});
+        r.push({l:'Pivot',v:((h+l+c)/3).toFixed(dec),cls:'section'});
+        r.push({l:'S1',v:(c-d*1.1/12).toFixed(dec),cls:'negative'});
+        r.push({l:'S2',v:(c-d*1.1/6).toFixed(dec),cls:'negative'});
+        r.push({l:'S3',v:(c-d*1.1/4).toFixed(dec),cls:'negative'});
+        r.push({l:'S4',v:(c-d*1.1/2).toFixed(dec),cls:'negative'});
+      } else {
+        const p=(h+l+2*c)/4;
+        r.push({l:'R3',v:(h+2*(p-l)).toFixed(dec),cls:'positive'});
+        r.push({l:'R2',v:(p+(h-l)).toFixed(dec),cls:'positive'});
+        r.push({l:'R1',v:(2*p-l).toFixed(dec),cls:'positive'});
+        r.push({l:'Pivot',v:p.toFixed(dec),cls:'section'});
+        r.push({l:'S1',v:(2*p-h).toFixed(dec),cls:'negative'});
+        r.push({l:'S2',v:(p-(h-l)).toFixed(dec),cls:'negative'});
+        r.push({l:'S3',v:(l-2*(h-p)).toFixed(dec),cls:'negative'});
+      }
+      return r;
+    }
+  },
+  {id:'leverage-calculator',name:'Leverage Calculator',icon:'zap',desc:'Calculate margin requirements and buying power for different leverage ratios',
+    fields:[
+      {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
+      {id:'leverage',label:'Leverage',type:'select',options:['1:10','1:20','1:30','1:50','1:100','1:200','1:500','1:1000'],val:'1:100'},
+      {id:'price',label:'Asset Price',type:'number',placeholder:'1.08500',step:'0.00001'}
+    ],
+    calc:f=>{
+      const bal=parseFloat(f.balance),lev=parseInt(f.leverage.split(':')[1]),price=parseFloat(f.price);
+      if([bal,lev,price].some(isNaN)||price===0)return null;
+      const power=bal*lev;const maxUnits=Math.floor(power/price);const maxLots=(maxUnits/100000);
+      const marginPerLot=(100000*price)/lev;
+      return[{l:'Buying Power',v:'$'+power.toLocaleString()},{l:'Max Position',v:maxLots.toFixed(2)+' lots'},{l:'Max Units',v:maxUnits.toLocaleString()},{l:'Margin per Lot',v:'$'+marginPerLot.toFixed(2)},{l:'Leverage Ratio',v:f.leverage}];
+    }
+  },
+  {id:'commission-calculator',name:'Commission Calculator',icon:'receipt',desc:'Calculate trading commissions, round-trip costs, and break-even pips',
+    fields:[
+      {id:'commission',label:'Commission per Lot ($)',type:'number',placeholder:'7',step:'0.01',val:'7'},
+      {id:'lots',label:'Lot Size',type:'number',placeholder:'1.00',step:'0.01',val:'1'},
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'},
+      {id:'roundTrip',label:'Round Trip',type:'select',options:['Yes','No'],val:'Yes'}
+    ],
+    calc:f=>{
+      const comm=parseFloat(f.commission),lots=parseFloat(f.lots);
+      if([comm,lots].some(isNaN))return null;
+      const oneway=comm*lots;const rt=f.roundTrip==='Yes'?oneway*2:oneway;
+      // Break-even pips = round-trip commission / pip value
+      const pipValPerLot=getPipValue(f.pair, 1);
+      const bePips=rt/(pipValPerLot*lots);
+      return[{l:'One-Way Cost',v:'$'+oneway.toFixed(2)},{l:'Round-Trip Cost',v:'$'+rt.toFixed(2)},{l:'Break-Even Pips',v:bePips.toFixed(2)+' pips'},{l:'Cost per $100k',v:'$'+(comm).toFixed(2)}];
+    }
+  }
+];
+
+// Get active tool from the data attribute (set by Astro server-side)
+let activeTool = document.getElementById('activeToolData')?.dataset.tool || TOOLS[0].id;
+
+function init(){
+  const nav=document.getElementById('sidebarNav');
+  nav.innerHTML=TOOLS.map(t=>`<a href="/tools/${t.id}" class="sidebar-btn${t.id===activeTool?' active':''}" data-tool="${t.id}"><i data-lucide="${t.icon}"></i><span>${t.name}</span></a>`).join('');
+  renderTool();
+  if(window.lucide)window.lucide.createIcons();
+}
+
+function renderTool(){
+  const t=TOOLS.find(x=>x.id===activeTool);if(!t)return;
+  document.getElementById('toolHeader').innerHTML=`<div class="tool-title-row"><i data-lucide="${t.icon}"></i><h1>${t.name}</h1></div><p class="tool-desc">${t.desc}</p>`;
+  const form=document.getElementById('toolForm');
+  form.innerHTML=t.fields.map(f=>{
+    if(f.type==='select'){
+      const opts=(f.options||[]).map(o=>`<option value="${o}"${o===f.val?' selected':''}>${o}</option>`).join('');
+      return`<div class="form-group"><label for="${f.id}">${f.label}</label><select id="${f.id}" class="form-control">${opts}</select></div>`;
+    }
+    return`<div class="form-group"><label for="${f.id}">${f.label}</label><input id="${f.id}" type="${f.type}" class="form-control" placeholder="${f.placeholder||''}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}></div>`;
+  }).join('')+'<button type="submit" class="calc-btn"><i data-lucide="calculator"></i> Calculate</button>';
+  form.onsubmit=e=>{e.preventDefault();calculate(t);};
+  document.getElementById('toolResults').innerHTML='<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>Enter values and click Calculate</p></div>';
+  if(window.lucide)window.lucide.createIcons();
+}
+
+function calculate(t){
+  const vals={};t.fields.forEach(f=>{
+    const el=document.getElementById(f.id);vals[f.id]=el?el.value:'';
+  });
+  const res=t.calc(vals);
+  const panel=document.getElementById('toolResults');
+  if(!res){panel.innerHTML='<div class="results-placeholder error"><i data-lucide="alert-circle"></i><p>Please fill in all required fields</p></div>';if(window.lucide)window.lucide.createIcons();return;}
+  panel.innerHTML='<div class="results-grid">'+res.map(r=>{
+    if(r.cls==='section')return`<div class="result-section">${r.l}</div>`;
+    return`<div class="result-item${r.cls?' '+r.cls:''}"><span class="result-label">${r.l}</span><span class="result-value">${r.v}</span></div>`;
+  }).join('')+'</div>';
+  panel.classList.add('has-results');
+  if(window.lucide)window.lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded',init);
+
+// Mobile sidebar toggle
+document.addEventListener('DOMContentLoaded',()=>{
+  const sb=document.getElementById('toolsSidebar');
+  document.querySelector('.tools-content')?.addEventListener('click',()=>{if(window.innerWidth<900)sb.classList.remove('open');});
+});
+</script>
+
+<style is:global>
+  .tools-page {
+    padding-top: 80px;
+    min-height: 100vh;
+    background: var(--color-bg);
+  }
+  .tools-container {
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* Sidebar */
+  .tools-sidebar {
+    position: sticky;
+    top: 88px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .sidebar-header h2 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+  .sidebar-icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-green);
+  }
+  .sidebar-nav {
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: var(--transition);
+    text-align: left;
+    width: 100%;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    text-decoration: none;
+  }
+  .sidebar-btn i, .sidebar-btn svg {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+  .sidebar-btn:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+  }
+  .sidebar-btn.active {
+    background: rgba(34, 197, 94, 0.08);
+    color: var(--color-green-light);
+    border-color: var(--color-border-strong);
+    font-weight: 600;
+  }
+
+  /* Content */
+  .tool-panel {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .tool-header {
+    padding: 28px 32px 20px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .tool-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .tool-title-row i, .tool-title-row svg {
+    width: 28px;
+    height: 28px;
+    color: var(--color-green);
+  }
+  .tool-title-row h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+  .tool-desc {
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
+    margin-left: 40px;
+  }
+  .tool-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  /* Form */
+  .tool-form {
+    padding: 28px 32px;
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .form-group label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-control {
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-bg-elevated);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: var(--transition);
+    outline: none;
+    width: 100%;
+  }
+  .form-control:focus {
+    border-color: var(--color-green);
+    box-shadow: 0 0 0 3px var(--color-green-glow);
+  }
+  select.form-control {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+  select.form-control option {
+    background: var(--color-bg-card);
+    color: var(--color-text);
+  }
+  .calc-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    background: var(--color-green);
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
+    transition: var(--transition);
+    margin-top: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .calc-btn:hover {
+    background: var(--color-green-dark);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-1px);
+  }
+  .calc-btn i, .calc-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Results */
+  .tool-results {
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+  .results-placeholder {
+    text-align: center;
+    color: var(--color-text-dim);
+  }
+  .results-placeholder i, .results-placeholder svg {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 12px;
+    opacity: 0.3;
+  }
+  .results-placeholder.error {
+    color: var(--color-red);
+  }
+  .results-placeholder.error i, .results-placeholder.error svg {
+    opacity: 0.7;
+  }
+  .results-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .result-item:hover {
+    border-color: var(--color-border-strong);
+  }
+  .result-label {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+  .result-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+  .result-item.positive .result-value {
+    color: var(--color-green-light);
+  }
+  .result-item.negative .result-value {
+    color: var(--color-red);
+  }
+  .result-item.warning .result-value {
+    color: var(--color-gold-light);
+  }
+  .result-section {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--color-green);
+    padding: 12px 4px 4px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* Mobile toggle button */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--color-green);
+    color: #fff;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(34,197,94,0.4);
+    border: none;
+    cursor: pointer;
+  }
+
+  @media (max-width: 900px) {
+    .tools-container {
+      grid-template-columns: 1fr;
+      padding: 16px;
+    }
+    .tools-sidebar {
+      position: fixed;
+      top: 64px;
+      left: -300px;
+      width: 280px;
+      height: calc(100vh - 64px);
+      z-index: 999;
+      border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+      transition: left 0.3s ease;
+      max-height: none;
+    }
+    .tools-sidebar.open {
+      left: 0;
+      box-shadow: 20px 0 60px rgba(0,0,0,0.5);
+    }
+    .sidebar-toggle {
+      display: flex;
+    }
+    .tool-body {
+      grid-template-columns: 1fr;
+    }
+    .tool-form {
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+      padding: 20px;
+    }
+    .tool-results {
+      padding: 20px;
+    }
+    .tool-header {
+      padding: 20px;
+    }
+    .tool-title-row h1 {
+      font-size: 1.2rem;
+    }
+    .tool-desc {
+      margin-left: 0;
+    }
+  }
+</style>
+
+<!-- Mobile sidebar toggle button -->
+<button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle tools menu">
+  <i data-lucide="menu"></i>
+</button>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded',()=>{
+  const btn=document.getElementById('sidebarToggle');
+  const sb=document.getElementById('toolsSidebar');
+  if(btn&&sb){
+    btn.addEventListener('click',()=>sb.classList.toggle('open'));
+  }
+});
+</script>

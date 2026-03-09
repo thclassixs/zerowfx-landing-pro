@@ -1,0 +1,420 @@
+---
+---
+<div class="theme-selector" id="themeSelector">
+  <button class="theme-btn" id="themeToggle" aria-label="Change theme">
+    <svg class="theme-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/>
+      <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+    <span class="theme-label" id="themeLabel">Theme</span>
+    <svg class="chevron-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+
+  <div class="theme-dropdown" id="themeDropdown">
+    <div class="dropdown-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+      </svg>
+      <span>Choose a Style</span>
+    </div>
+
+    <div class="theme-list" id="themeList">
+      <!-- Emerald Night (Default) -->
+      <button class="theme-option active" data-theme="emerald-night" id="theme-emerald-night">
+        <div class="theme-preview">
+          <div class="preview-bar" style="background: linear-gradient(135deg, #0a0f0a, #111a11)"></div>
+          <div class="preview-accent" style="background: #22c55e"></div>
+          <div class="preview-accent-2" style="background: #4ade80"></div>
+        </div>
+        <div class="theme-info">
+          <span class="theme-name">Emerald Night</span>
+          <span class="theme-desc">Dark luxe · green accents</span>
+        </div>
+        <span class="theme-tag dark-tag">DARK</span>
+        <div class="theme-check">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </button>
+
+      <!-- Clean White (LIGHT) -->
+      <button class="theme-option" data-theme="clean-white" id="theme-clean-white">
+        <div class="theme-preview light-preview">
+          <div class="preview-bar" style="background: linear-gradient(135deg, #ffffff, #f7f8fa)"></div>
+          <div class="preview-accent" style="background: #10b981"></div>
+          <div class="preview-accent-2" style="background: #34d399"></div>
+        </div>
+        <div class="theme-info">
+          <span class="theme-name">Clean White</span>
+          <span class="theme-desc">Minimal · Apple-esque</span>
+        </div>
+        <span class="theme-tag light-tag">LIGHT</span>
+        <div class="theme-check">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // Theme Selector Logic
+  const themeToggle = document.getElementById('themeToggle');
+  const themeDropdown = document.getElementById('themeDropdown');
+  const themeLabel = document.getElementById('themeLabel');
+  const themeOptions = document.querySelectorAll('.theme-option');
+  const html = document.documentElement;
+
+  // Theme names for label
+  const themeNames: Record<string, string> = {
+    'emerald-night': 'Emerald Night',
+    'clean-white': 'Clean White'
+  };
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem('zerowfx-theme') || 'emerald-night';
+  applyTheme(savedTheme);
+
+  // Toggle dropdown
+  themeToggle?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    themeDropdown?.classList.toggle('open');
+    themeToggle.classList.toggle('active');
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (!target.closest('.theme-selector')) {
+      themeDropdown?.classList.remove('open');
+      themeToggle?.classList.remove('active');
+    }
+  });
+
+  // Theme option click
+  themeOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      const theme = (option as HTMLElement).dataset.theme;
+      if (theme) {
+        applyTheme(theme);
+        localStorage.setItem('zerowfx-theme', theme);
+      }
+    });
+  });
+
+  function applyTheme(theme: string) {
+    // Remove all theme classes
+    html.className = html.className.replace(/theme-\S+/g, '').trim();
+    // Add new theme class
+    if (theme !== 'emerald-night') {
+      html.classList.add(`theme-${theme}`);
+    }
+
+    // Update active state
+    themeOptions.forEach(opt => {
+      opt.classList.toggle('active', (opt as HTMLElement).dataset.theme === theme);
+    });
+
+    // Update label
+    if (themeLabel) {
+      themeLabel.textContent = themeNames[theme] || 'Theme';
+    }
+  }
+
+  // Close dropdown on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      themeDropdown?.classList.remove('open');
+      themeToggle?.classList.remove('active');
+    }
+  });
+</script>
+
+<style>
+  /* Theme Selector Button */
+  .theme-selector {
+    position: relative;
+  }
+
+  .theme-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(10px);
+  }
+
+  .theme-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-green);
+    color: var(--color-text);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
+  }
+
+  .theme-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--color-green);
+    color: var(--color-text);
+  }
+
+  .theme-icon {
+    opacity: 0.7;
+    transition: all 0.4s ease;
+  }
+
+  .theme-btn:hover .theme-icon {
+    opacity: 1;
+    transform: rotate(30deg);
+  }
+
+  .chevron-icon {
+    transition: transform 0.3s ease;
+    opacity: 0.5;
+  }
+
+  .theme-btn.active .chevron-icon {
+    transform: rotate(180deg);
+    opacity: 1;
+  }
+
+  .theme-label {
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Dropdown */
+  .theme-dropdown {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    width: 320px;
+    background: rgba(15, 18, 22, 0.97);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.97);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 9999;
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  }
+
+  .theme-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 4px;
+  }
+
+  .dropdown-header svg {
+    opacity: 0.6;
+  }
+
+  /* Theme Options */
+  .theme-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .theme-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    width: 100%;
+    color: var(--color-text);
+    font-family: inherit;
+  }
+
+  .theme-option:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .theme-option.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--color-green);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.1);
+  }
+
+  /* Theme Preview */
+  .theme-preview {
+    width: 44px;
+    height: 34px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .theme-preview.light-preview {
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+
+  .preview-bar {
+    position: absolute;
+    inset: 0;
+  }
+
+  .preview-accent {
+    position: absolute;
+    bottom: 4px;
+    left: 4px;
+    width: 16px;
+    height: 4px;
+    border-radius: 2px;
+  }
+
+  .preview-accent-2 {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 10px;
+    height: 4px;
+    border-radius: 2px;
+    opacity: 0.6;
+  }
+
+  /* Theme Info */
+  .theme-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .theme-name {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #e8e8e8;
+    margin-bottom: 2px;
+  }
+
+  .theme-desc {
+    display: block;
+    font-size: 0.72rem;
+    color: #7a7f8a;
+    letter-spacing: 0.2px;
+  }
+
+  /* Theme tags (DARK / LIGHT / 3D) */
+  .theme-tag {
+    font-size: 0.55rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .dark-tag {
+    background: rgba(255, 255, 255, 0.08);
+    color: #8a8f9a;
+  }
+
+  .light-tag {
+    background: rgba(255, 213, 79, 0.15);
+    color: #fbbf24;
+  }
+
+  /* Check mark */
+  .theme-check {
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.3s ease;
+    color: var(--color-green);
+    flex-shrink: 0;
+  }
+
+  .theme-option.active .theme-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Footer */
+  .dropdown-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 14px 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin-top: 4px;
+    font-size: 0.7rem;
+    color: #5a5f6a;
+    letter-spacing: 0.2px;
+  }
+
+  .dropdown-footer svg {
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .theme-label {
+      display: none;
+    }
+
+    .theme-btn {
+      padding: 7px 10px;
+    }
+
+    .chevron-icon {
+      display: none;
+    }
+
+    .theme-dropdown {
+      right: -60px;
+      width: 290px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .theme-dropdown {
+      right: -80px;
+      width: 270px;
+    }
+  }
+</style>

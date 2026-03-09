@@ -1,0 +1,365 @@
+---
+---
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="about-image">
+      <div class="about-video-wrapper" id="aboutVideoWrapper">
+        <video
+          class="about-video"
+          id="aboutVideo"
+          playsinline
+          preload="auto"
+          poster="/thumbnails/about-poster.jpg"
+        >
+          <source src="/assets/about-cta.mp4" type="video/mp4" />
+        </video>
+        <!-- Play button (visible when paused/not started) -->
+        <div class="about-play-btn" id="aboutPlayBtn">
+          <div class="about-play-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+          </div>
+        </div>
+        <!-- Pause indicator (briefly visible when pausing) -->
+        <div class="about-pause-indicator" id="aboutPauseIndicator" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+            <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+          </svg>
+        </div>
+      </div>
+      <div class="about-image-border"></div>
+    </div>
+
+    <div class="about-text">
+      <div class="about-features-list">
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Access to Zfx Telegram Trading Community</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Weekly Live Sessions on Forex, Stocks, and Crypto</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Mid-Week Market Updates on Forex, Stocks, and Crypto</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">High-Quality Trade Setups</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Daily Live Sessions and Q&A with WTW Seniors</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Monthly Live Sessions on Investments and Stocks</span>
+        </div>
+        <div class="about-feature-item">
+          <span class="about-feature-icon">✓</span>
+          <span class="about-feature-text">Best Tips to Strengthen Your Psychology</span>
+        </div>
+      </div>
+
+      <a href="#heroFormAnchor" class="about-cta">
+        <i data-lucide="send" style="width:18px;height:18px"></i>
+        JOIN ZFX COMMUNITY
+      </a>
+
+      <div class="about-trust-badges">
+        <div class="trust-badge">
+          <i data-lucide="star" style="width:16px;height:16px;fill:var(--color-green);color:var(--color-green);"></i>
+          <span>Verified Results</span>
+        </div>
+        <div class="trust-badge">
+          <i data-lucide="shield" style="width:16px;height:16px;fill:var(--color-green);color:var(--color-green);"></i>
+          <span>100% Transparent</span>
+        </div>
+        <div class="trust-badge">
+          <i data-lucide="history" style="width:16px;height:16px;color:var(--color-green);"></i>
+          <span>Real-Time Setups</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // About Video Player — matching testimonial video pattern (no native controls)
+  const aboutVideo = document.getElementById('aboutVideo') as HTMLVideoElement;
+  const aboutWrapper = document.getElementById('aboutVideoWrapper');
+  const aboutPauseIndicator = document.getElementById('aboutPauseIndicator');
+  let aboutClickCooldown = false;
+
+  function playAboutVideo() {
+    if (!aboutVideo) return;
+    aboutVideo.play();
+    aboutWrapper?.classList.add('is-playing');
+  }
+
+  function pauseAboutVideo() {
+    if (!aboutVideo) return;
+    aboutVideo.pause();
+    aboutWrapper?.classList.remove('is-playing');
+
+    // Flash pause indicator
+    if (aboutPauseIndicator) {
+      aboutPauseIndicator.style.opacity = '1';
+      aboutPauseIndicator.style.transform = 'translate(-50%, -50%) scale(1)';
+      setTimeout(() => {
+        aboutPauseIndicator.style.opacity = '0';
+        aboutPauseIndicator.style.transform = 'translate(-50%, -50%) scale(0.6)';
+      }, 400);
+    }
+  }
+
+  aboutWrapper?.addEventListener('click', () => {
+    if (!aboutVideo) return;
+
+    // Debounce to prevent double-fire
+    if (aboutClickCooldown) return;
+    aboutClickCooldown = true;
+    setTimeout(() => { aboutClickCooldown = false; }, 350);
+
+    if (aboutVideo.paused) {
+      playAboutVideo();
+    } else {
+      pauseAboutVideo();
+    }
+  });
+
+  aboutVideo?.addEventListener('ended', () => {
+    aboutWrapper?.classList.remove('is-playing');
+  });
+</script>
+
+<style>
+  .about {
+    padding: 100px 24px;
+    background: var(--color-bg-secondary);
+    position: relative;
+    overflow: hidden;
+  }
+  .about::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-green), transparent);
+    opacity: 0.3;
+  }
+  .about-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .about-image {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    max-width: 400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .about-video-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: #000;
+    cursor: pointer;
+  }
+  .about-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    display: block;
+    pointer-events: none;
+  }
+  .about-image-border {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+  }
+
+  /* Floating play button for about video */
+  .about-play-btn {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    border-radius: var(--radius-lg);
+  }
+  .about-video-wrapper.is-playing .about-play-btn {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+  }
+  .about-play-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    padding-left: 4px;
+  }
+  .about-video-wrapper:hover .about-play-circle {
+    background: rgba(34, 197, 94, 0.3);
+    border-color: rgba(34, 197, 94, 0.6);
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(34, 197, 94, 0.3);
+  }
+  .about-play-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Pause indicator — briefly flashes when pausing */
+  .about-pause-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.25s ease;
+  }
+
+  .about-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    font-weight: 800;
+    margin-bottom: 24px;
+    line-height: 1.2;
+  }
+  .about-accent {
+    background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .about-desc {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
+  }
+  .about-features-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .about-feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .about-feature-icon {
+    color: var(--color-green);
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+  .about-feature-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #9ca3af;
+  }
+  .about-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: var(--transition);
+    margin-top: 10px;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+  }
+  .about-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-strong);
+  }
+
+  .about-trust-badges {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+  .trust-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+
+  @media (max-width: 968px) {
+    .about-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .about-cta {
+      width: 100%;
+      justify-content: center;
+    }
+    .about-trust-badges {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .about {
+      padding: 60px 16px;
+    }
+  }
+</style>

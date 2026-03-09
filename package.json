@@ -1,0 +1,24 @@
+{
+  "name": "zerowfx-site",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "dev:server": "node server/index.js",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
+    "build": "astro build",
+    "preview": "astro preview",
+    "start": "node server/index.js",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.17.1",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^12.6.2",
+    "concurrently": "^9.2.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  }
+}

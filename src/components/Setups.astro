@@ -1,0 +1,581 @@
+---
+// Trading setups - before/after pairs
+const setups = [
+  { before: '/assets/setups/setup-a-before.webp', after: '/assets/setups/setup-a-after.webp' },
+  { before: '/assets/setups/setup-b-before.webp', after: '/assets/setups/setup-b-after.webp' },
+  { before: '/assets/setups/setup-c-before.webp', after: '/assets/setups/setup-c-after.webp' },
+];
+---
+
+<section class="setups" id="setups">
+  <div class="setups-inner">
+    <!-- Section header -->
+    <div class="setups-header">
+      <div class="section-badge">
+        <i data-lucide="trending-up" style="width:14px;height:14px"></i>
+        <span>VERIFIED RESULTS</span>
+      </div>
+      <h2 class="section-title">Our Trading Setups</h2>
+      <p class="section-subtitle">See the exact chart analysis and setups that led to successful trades — plan, execute, profit.</p>
+    </div>
+
+    <!-- Carousel Container -->
+    <div class="setup-carousel-wrapper">
+      <button class="setup-arrow left" id="setupLeft" aria-label="Previous setup">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <div class="setup-viewport" id="setupViewport">
+        <div class="setup-track" id="setupTrack">
+          {setups.map((s, i) => (
+            <div class="setup-slide" data-index={i}>
+              <div class="setup-comparison" data-comparison={i}>
+                <!-- Labels -->
+                <span class="comparison-label label-before">
+                  <i data-lucide="crosshair" style="width:12px;height:12px"></i>
+                  SETUP
+                </span>
+                <span class="comparison-label label-after">
+                  <i data-lucide="circle-check-big" style="width:12px;height:12px"></i>
+                  RESULT
+                </span>
+
+                <!-- After image (bottom layer) -->
+                <img src={s.before} alt={`Setup ${i + 1} - After`} class="comparison-img img-after" loading="lazy" draggable="false" />
+
+                <!-- Before image (top layer, clipped) -->
+                <div class="comparison-before-clip">
+                  <img src={s.after} alt={`Setup ${i + 1} - Before`} class="comparison-img img-before" loading="lazy" draggable="false" />
+                </div>
+
+                <!-- Slider handle -->
+                <div class="comparison-slider">
+                  <div class="slider-line"></div>
+                  <div class="slider-handle">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                  </div>
+                  <div class="slider-line"></div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <button class="setup-arrow right" id="setupRight" aria-label="Next setup">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Dot indicators -->
+    <div class="setup-dots">
+      {setups.map((_, i) => (
+        <button class={`setup-dot ${i === 0 ? 'active' : ''}`} data-dot={i} aria-label={`Go to setup ${i + 1}`}></button>
+      ))}
+    </div>
+
+    <!-- Instruction hint -->
+    <p class="comparison-hint">
+      <i data-lucide="move-horizontal" style="width:16px;height:16px"></i>
+      Drag the slider to compare setup vs result
+    </p>
+  </div>
+</section>
+
+<script>
+  // ===== Carousel Logic =====
+  const track = document.getElementById('setupTrack') as HTMLElement;
+  const viewport = document.getElementById('setupViewport') as HTMLElement;
+  const slides = document.querySelectorAll('.setup-slide');
+  const leftBtn = document.getElementById('setupLeft');
+  const rightBtn = document.getElementById('setupRight');
+  const dots = document.querySelectorAll('.setup-dot');
+  const totalSlides = slides.length;
+  let currentIdx = 0;
+  let isAnimating = false;
+
+  function goToSlide(idx: number) {
+    if (isAnimating || idx === currentIdx) return;
+    isAnimating = true;
+    currentIdx = idx;
+
+    const offset = currentIdx * 100;
+    track.style.transform = `translateX(-${offset}%)`;
+
+    // Update dots
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === currentIdx);
+    });
+
+    setTimeout(() => { isAnimating = false; }, 600);
+  }
+
+  leftBtn?.addEventListener('click', () => {
+    const next = currentIdx > 0 ? currentIdx - 1 : totalSlides - 1;
+    goToSlide(next);
+  });
+
+  rightBtn?.addEventListener('click', () => {
+    const next = currentIdx < totalSlides - 1 ? currentIdx + 1 : 0;
+    goToSlide(next);
+  });
+
+  dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const idx = parseInt((dot as HTMLElement).dataset.dot || '0');
+      goToSlide(idx);
+    });
+  });
+
+
+
+  // Touch / swipe support for carousel
+  let touchStartX = 0;
+  let touchEndX = 0;
+  viewport?.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+  viewport?.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    const diff = touchStartX - touchEndX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) {
+        const next = currentIdx < totalSlides - 1 ? currentIdx + 1 : 0;
+        goToSlide(next);
+      } else {
+        const next = currentIdx > 0 ? currentIdx - 1 : totalSlides - 1;
+        goToSlide(next);
+      }
+    }
+  }, { passive: true });
+
+  // ===== Comparison Slider Logic =====
+  document.querySelectorAll('.setup-comparison').forEach((container) => {
+    const el = container as HTMLElement;
+    const beforeClip = el.querySelector('.comparison-before-clip') as HTMLElement;
+    const slider = el.querySelector('.comparison-slider') as HTMLElement;
+    let isDragging = false;
+
+    function setPosition(x: number) {
+      const rect = el.getBoundingClientRect();
+      let percent = ((x - rect.left) / rect.width) * 100;
+      percent = Math.max(2, Math.min(98, percent));
+      beforeClip.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+      slider.style.left = `${percent}%`;
+    }
+
+    // Mouse events
+    slider.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      isDragging = true;
+      el.classList.add('dragging');
+    });
+
+    el.addEventListener('mousedown', (e) => {
+      // Allow clicking anywhere on the image to move the slider
+      isDragging = true;
+      el.classList.add('dragging');
+      setPosition(e.clientX);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      e.preventDefault();
+      setPosition(e.clientX);
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        el.classList.remove('dragging');
+      }
+    });
+
+    // Touch events
+    slider.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      el.classList.add('dragging');
+      // Prevent carousel swipe when interacting with slider
+      e.stopPropagation();
+    }, { passive: true });
+
+    el.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      // Check if touch is near the slider handle area
+      const sliderRect = slider.getBoundingClientRect();
+      if (Math.abs(touch.clientX - sliderRect.left) < 40) {
+        isDragging = true;
+        el.classList.add('dragging');
+        e.stopPropagation();
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!isDragging) return;
+      setPosition(e.touches[0].clientX);
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+      if (isDragging) {
+        isDragging = false;
+        el.classList.remove('dragging');
+      }
+    });
+
+    // Initialize at 50%
+    beforeClip.style.clipPath = 'inset(0 50% 0 0)';
+    slider.style.left = '50%';
+  });
+</script>
+
+<style>
+  .setups {
+    padding: 100px 24px;
+    background: var(--color-bg-secondary);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .setups::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-green), transparent);
+    opacity: 0.3;
+  }
+  .setups-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Section Header */
+  .setups-header {
+    margin-bottom: 48px;
+  }
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--color-green);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .section-subtitle {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    max-width: 550px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Carousel */
+  .setup-carousel-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* Navigation Arrows */
+  .setup-arrow {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--color-bg-card);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--color-border);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  .setup-arrow:hover {
+    background: var(--color-green);
+    color: #fff;
+    border-color: var(--color-green);
+    transform: scale(1.1);
+    box-shadow: 0 4px 24px var(--color-green-glow);
+  }
+  .setup-arrow:active {
+    transform: scale(0.95);
+  }
+
+  /* Viewport + Track */
+  .setup-viewport {
+    flex: 1;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+  }
+  .setup-track {
+    display: flex;
+    transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform;
+  }
+  .setup-slide {
+    flex: 0 0 100%;
+    min-width: 0;
+    padding: 0 4px;
+  }
+
+  /* ===== Comparison Slider ===== */
+  .setup-comparison {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-card);
+    cursor: col-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+  }
+  .setup-comparison:hover {
+    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.12);
+    border-color: var(--color-border-strong);
+  }
+
+  .comparison-img {
+    width: 100%;
+    display: block;
+  }
+
+  .img-after {
+    position: relative;
+    z-index: 1;
+  }
+
+  .comparison-before-clip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    clip-path: inset(0 50% 0 0);
+    will-change: clip-path;
+  }
+  .comparison-before-clip .img-before {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Labels */
+  .comparison-label {
+    position: absolute;
+    top: 16px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease;
+  }
+  .label-before {
+    left: 16px;
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+  }
+  .label-after {
+    right: 16px;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.25);
+  }
+
+  /* Slider */
+  .comparison-slider {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    width: 4px;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+    will-change: left;
+    pointer-events: none;
+  }
+
+  .slider-line {
+    flex: 1;
+    width: 3px;
+    background: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .slider-handle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.25), 0 0 0 3px rgba(255, 255, 255, 0.15);
+    cursor: col-resize;
+    pointer-events: all;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    flex-shrink: 0;
+  }
+  .slider-handle:hover {
+    transform: scale(1.15);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 0 4px rgba(255, 255, 255, 0.25);
+  }
+  .setup-comparison.dragging .slider-handle {
+    transform: scale(1.2);
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.4), 0 0 0 5px rgba(34, 197, 94, 0.25);
+  }
+  .slider-handle svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Dots */
+  .setup-dots {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 28px;
+  }
+  .setup-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-text-dim);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+  }
+  .setup-dot.active {
+    background: var(--color-green);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    transform: scale(1.2);
+  }
+  .setup-dot:hover:not(.active) {
+    background: var(--color-text-muted);
+  }
+
+  /* Hint text */
+  .comparison-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    color: var(--color-text-dim);
+    font-size: 0.8rem;
+    letter-spacing: 0.3px;
+    opacity: 0.7;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .setups {
+      padding: 70px 16px;
+    }
+    .setup-arrow {
+      width: 38px;
+      height: 38px;
+    }
+    .setup-arrow svg {
+      width: 16px;
+      height: 16px;
+    }
+    .setup-carousel-wrapper {
+      gap: 8px;
+    }
+    .comparison-label {
+      top: 10px;
+      padding: 4px 10px;
+      font-size: 0.58rem;
+      letter-spacing: 1px;
+    }
+    .label-before {
+      left: 10px;
+    }
+    .label-after {
+      right: 10px;
+    }
+    .slider-handle {
+      width: 36px;
+      height: 36px;
+    }
+    .slider-handle svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+  @media (max-width: 480px) {
+    .setups {
+      padding: 60px 12px;
+    }
+    .setup-arrow {
+      width: 34px;
+      height: 34px;
+    }
+    .section-badge {
+      font-size: 0.62rem;
+      padding: 5px 12px;
+    }
+    .comparison-label {
+      top: 8px;
+      padding: 3px 8px;
+      font-size: 0.5rem;
+    }
+    .label-before {
+      left: 8px;
+    }
+    .label-after {
+      right: 8px;
+    }
+    .slider-handle {
+      width: 32px;
+      height: 32px;
+    }
+  }
+</style>

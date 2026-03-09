@@ -1,0 +1,94 @@
+---
+// Member results gallery - screenshots from followers showing their results
+const images = Array.from({ length: 30 }, (_, i) => ({
+  src: `/assets/results/a${i + 1}.webp`,
+}));
+---
+
+<section class="results" id="results">
+  <div class="results-inner">
+    <h2 class="section-title">Member Results</h2>
+    <p class="section-subtitle">Real results from real members following our strategies</p>
+
+    <div class="results-grid-wrapper">
+      <div class="results-scroll" id="resultsScroll">
+        <div class="results-track" id="resultsTrack">
+          {images.map((img, i) => (
+            <div class="results-item">
+              <img src={img.src} alt={`Member result ${i + 1}`} loading="lazy" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .results {
+    padding: 80px 24px;
+    background: var(--color-bg);
+    text-align: center;
+    overflow: hidden;
+  }
+  .results-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .section-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 40px;
+  }
+  .results-grid-wrapper {
+    position: relative;
+  }
+  .results-scroll {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+  }
+  .results-track {
+    display: flex;
+    gap: 16px;
+    animation: resultsScroll 60s linear infinite;
+    width: max-content;
+  }
+  .results-item {
+    flex: 0 0 220px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .results-item:hover {
+    border-color: var(--color-green);
+    transform: scale(1.03);
+    box-shadow: var(--shadow-glow);
+  }
+  .results-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  @keyframes resultsScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 480px) {
+    .results {
+      padding: 60px 16px;
+    }
+    .results-item {
+      flex: 0 0 180px;
+    }
+  }
+</style>

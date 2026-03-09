@@ -1,0 +1,143 @@
+---
+// Ticker items with CoinGecko IDs for API mapping
+const tickerConfig = [
+  { name: 'GOLD', apiId: 'pax-gold' },
+  { name: 'BTC', apiId: 'bitcoin' },
+  { name: 'ETH', apiId: 'ethereum' },
+  { name: 'SOL', apiId: 'solana' },
+  { name: 'AVAX', apiId: 'avalanche-2' },
+];
+---
+
+<div class="ticker-bar">
+  <div class="ticker-track" id="ticker-track">
+    <!-- Rendered 3x for seamless scrolling -->
+    {[...tickerConfig, ...tickerConfig, ...tickerConfig].map((t) => (
+      <div class="ticker-item" data-api-id={t.apiId}>
+        <span class="ticker-name">{t.name}</span>
+        <span class="ticker-price">Loading...</span>
+        <span class="ticker-change">—</span>
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,avalanche-2,pax-gold&vs_currencies=usd&include_24hr_change=true';
+
+  function formatPrice(price) {
+    if (price >= 1000) {
+      return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+    return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function formatChange(change) {
+    const sign = change >= 0 ? '+' : '';
+    return sign + change.toFixed(2) + '%';
+  }
+
+  async function fetchPrices() {
+    try {
+      const response = await fetch(API_URL);
+      if (!response.ok) throw new Error('API request failed');
+      const data = await response.json();
+
+      const tickerItems = document.querySelectorAll('.ticker-item[data-api-id]');
+      tickerItems.forEach((item) => {
+        const apiId = item.getAttribute('data-api-id');
+        if (data[apiId]) {
+          const price = data[apiId].usd;
+          const change = data[apiId].usd_24h_change;
+          const isDown = change < 0;
+
+          const priceEl = item.querySelector('.ticker-price');
+          const changeEl = item.querySelector('.ticker-change');
+
+          if (priceEl) priceEl.textContent = formatPrice(price);
+          if (changeEl) {
+            changeEl.textContent = formatChange(change);
+            changeEl.className = 'ticker-change ' + (isDown ? 'down' : 'up');
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Failed to fetch ticker prices:', error);
+    }
+  }
+
+  // Fetch immediately on load, then refresh every 60 seconds
+  fetchPrices();
+  setInterval(fetchPrices, 60000);
+</script>
+
+<style>
+  .ticker-bar {
+    background: var(--color-bg-secondary);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    overflow: hidden;
+    padding: 10px 0;
+    position: relative;
+  }
+  .ticker-bar::before,
+  .ticker-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 60px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ticker-bar::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--color-bg-secondary), transparent);
+  }
+  .ticker-bar::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--color-bg-secondary), transparent);
+  }
+  .ticker-track {
+    display: flex;
+    gap: 40px;
+    animation: scroll 40s linear infinite;
+    width: max-content;
+  }
+  .ticker-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    font-size: 0.85rem;
+  }
+  .ticker-name {
+    color: var(--color-text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ticker-price {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+  .ticker-change {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .ticker-change.down {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+  }
+  .ticker-change.up {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--color-green);
+  }
+
+  @keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-33.33%); }
+  }
+</style>

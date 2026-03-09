@@ -1,0 +1,526 @@
+---
+---
+<section class="hero" id="hero">
+  <div class="hero-bg-gradient"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>FREE MASTERCLASS — LIMITED SPOTS</span>
+      </div>
+      <h1 class="hero-title">
+        ZEROWFX<br />
+        <span class="title-accent">COMMUNITY</span>
+      </h1>
+      <p class="hero-subtitle">
+        Join an exclusive professional trading community led by ZerowFX. Get real-time GOLD, US INDICES & CRYPTO signals, precise trading setups, live sessions, and clear daily analysis that help you truly understand the market not just follow it. With ZerowFX, you're accessing a methodology backed by 10+ years of experience and consistent performance across different market conditions.
+        <br /><br />
+        Get market insights + enter our $50 giveaway every 2 weeks&nbsp;🎁
+      </p>
+
+      <div id="heroFormAnchor"></div>
+      <form class="hero-form" id="heroForm">
+        <div class="form-group">
+          <input
+            type="email"
+            id="heroEmail"
+            placeholder="Enter your email"
+            required
+            class="form-input"
+          />
+          <button type="submit" class="form-btn" id="heroSubmitBtn">
+            Submit
+          </button>
+        </div>
+        <p class="form-message" id="heroMessage"></p>
+      </form>
+
+      <a href="#heroFormAnchor" class="cta-main" id="ctaJoin">
+        <i data-lucide="send" style="width:20px;height:20px"></i>
+        JOIN ZFX PRO NOW!
+      </a>
+
+      <div class="hero-badges">
+        <div class="badge-item">
+          <i data-lucide="badge-check" class="badge-icon-lucide"></i>
+          <span>Verified Results</span>
+        </div>
+        <div class="badge-item">
+          <i data-lucide="shield-check" class="badge-icon-lucide"></i>
+          <span>100% Transparent</span>
+        </div>
+        <div class="badge-item">
+          <i data-lucide="zap" class="badge-icon-lucide"></i>
+          <span>Real-Time Setups</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="hero-video-wrapper" id="heroVideoWrapper">
+        <video
+          class="hero-video"
+          id="heroVideo"
+          playsinline
+          preload="auto"
+          poster="/thumbnails/welcome-poster.jpg"
+        >
+          <source src="/assets/hero-intro.mp4" type="video/mp4" />
+        </video>
+        <!-- Play button (visible when paused/not started) -->
+        <div class="hero-video-play" id="heroPlayBtn">
+          <div class="hero-play-circle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+              <polygon points="6 3 20 12 6 21 6 3"></polygon>
+            </svg>
+          </div>
+        </div>
+        <div class="video-glow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const API = 'http://localhost:3001';
+
+  // Smart scroll to form (works on both mobile & desktop)
+  function scrollToForm() {
+    const anchor = document.getElementById('heroFormAnchor');
+    if (anchor) {
+      anchor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // CTA button scroll
+  document.getElementById('ctaJoin')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToForm();
+  });
+
+  document.getElementById('heroForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // On mobile, scroll to form area first to keep it in view
+    if (window.innerWidth <= 968) {
+      scrollToForm();
+    }
+
+    const emailInput = document.getElementById('heroEmail') as HTMLInputElement;
+    const message = document.getElementById('heroMessage');
+    const btn = document.getElementById('heroSubmitBtn');
+
+    if (!emailInput || !message || !btn) return;
+
+    btn.textContent = 'Joining...';
+    btn.setAttribute('disabled', 'true');
+
+    try {
+      const res = await fetch(`${API}/api/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        message.textContent = '✅ ' + data.message;
+        message.className = 'form-message success';
+        emailInput.value = '';
+      } else {
+        message.textContent = '⚠️ ' + (data.error || 'Something went wrong');
+        message.className = 'form-message error';
+      }
+    } catch {
+      message.textContent = '⚠️ Could not connect to server';
+      message.className = 'form-message error';
+    }
+
+    btn.textContent = 'Submit';
+    btn.removeAttribute('disabled');
+
+    // Keep form in view after submit on mobile
+    if (window.innerWidth <= 968) {
+      requestAnimationFrame(() => scrollToForm());
+    }
+
+    setTimeout(() => {
+      if (message) message.textContent = '';
+    }, 5000);
+  });
+
+  // Hero Video Player — matching testimonial video pattern (no native controls)
+  const heroVideo = document.getElementById('heroVideo') as HTMLVideoElement;
+  const heroWrapper = document.getElementById('heroVideoWrapper');
+  let heroClickCooldown = false;
+
+  function playHeroVideo() {
+    if (!heroVideo) return;
+    heroVideo.play();
+    heroWrapper?.classList.add('is-playing');
+  }
+
+  function pauseHeroVideo() {
+    if (!heroVideo) return;
+    heroVideo.pause();
+    heroWrapper?.classList.remove('is-playing');
+  }
+
+  heroWrapper?.addEventListener('click', () => {
+    if (!heroVideo) return;
+
+    // Debounce to prevent double-fire
+    if (heroClickCooldown) return;
+    heroClickCooldown = true;
+    setTimeout(() => { heroClickCooldown = false; }, 350);
+
+    if (heroVideo.paused) {
+      playHeroVideo();
+    } else {
+      pauseHeroVideo();
+    }
+  });
+
+  heroVideo?.addEventListener('ended', () => {
+    heroWrapper?.classList.remove('is-playing');
+  });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 100px 24px 60px;
+    overflow: hidden;
+  }
+  .hero-bg-gradient {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(34, 197, 94, 0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(34, 197, 94, 0.05) 0%, transparent 50%),
+      linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%);
+    pointer-events: none;
+  }
+  .hero-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    padding-left: 220px;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--color-green-light);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    animation: fadeInUp 0.6s ease-out;
+  }
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-green);
+    animation: pulse 2s infinite;
+  }
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    letter-spacing: 3px;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    animation: fadeInUp 0.6s ease-out 0.1s both;
+  }
+  .title-accent {
+    background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-subtitle {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 600px;
+    margin-bottom: 28px;
+    animation: fadeInUp 0.6s ease-out 0.2s both;
+  }
+  .hero-form {
+    margin-bottom: 20px;
+    animation: fadeInUp 0.6s ease-out 0.3s both;
+  }
+  .form-group {
+    display: flex;
+    gap: 0;
+    max-width: 480px;
+  }
+  .form-input {
+    flex: 1;
+    padding: 14px 20px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-strong);
+    border-right: none;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    transition: var(--transition);
+  }
+  .form-input:focus {
+    border-color: var(--color-green);
+    background: var(--color-bg-elevated);
+  }
+  .form-input::placeholder {
+    color: var(--color-text-dim);
+  }
+  .form-btn {
+    padding: 14px 28px;
+    background: var(--color-green);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    transition: var(--transition);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-btn:hover {
+    background: var(--color-green-light);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  .form-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .form-message {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    min-height: 20px;
+  }
+  .form-message.success {
+    color: var(--color-green);
+  }
+  .form-message.error {
+    color: var(--color-red);
+  }
+  .cta-main {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 36px;
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.05rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: var(--transition);
+    margin-bottom: 28px;
+    animation: fadeInUp 0.6s ease-out 0.4s both;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+  }
+  .cta-main:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-strong);
+  }
+  .hero-badges {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    animation: fadeInUp 0.6s ease-out 0.5s both;
+  }
+  .badge-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .badge-icon-lucide {
+    width: 18px;
+    height: 18px;
+    color: var(--color-green);
+    flex-shrink: 0;
+  }
+
+  /* Hero Right - Video */
+  .hero-right {
+    display: flex;
+    justify-content: center;
+    animation: fadeInUp 0.8s ease-out 0.3s both;
+  }
+  .hero-video-wrapper {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-border-strong);
+    max-width: 400px;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: #000;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  }
+  .hero-video-wrapper:hover {
+    transform: scale(1.02);
+    box-shadow: 0 25px 70px rgba(34, 197, 94, 0.15);
+  }
+  .hero-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+  }
+  .hero-video::-webkit-media-controls {
+    display: none !important;
+  }
+  .hero-video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+
+  /* Floating play button */
+  .hero-video-play {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    z-index: 2;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+  .hero-video-wrapper.is-playing .hero-video-play {
+    opacity: 0;
+    transform: scale(0.8);
+    pointer-events: none;
+  }
+  .hero-play-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    padding-left: 4px;
+  }
+  .hero-video-wrapper:hover .hero-play-circle {
+    background: rgba(34, 197, 94, 0.3);
+    border-color: rgba(34, 197, 94, 0.6);
+    transform: scale(1.1);
+    box-shadow: 0 6px 30px rgba(34, 197, 94, 0.3);
+  }
+  .hero-play-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Floating play button */
+
+  .video-glow {
+    position: absolute;
+    inset: -2px;
+    border-radius: var(--radius-lg);
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), transparent, rgba(34, 197, 94, 0.1));
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  @media (max-width: 968px) {
+    .hero-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+      gap: 40px;
+      padding-left: 0;
+    }
+    .hero-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-form .form-group {
+      max-width: 100%;
+    }
+    .cta-main {
+      width: 100%;
+      justify-content: center;
+    }
+    .hero-badges {
+      justify-content: center;
+    }
+    .hero-right {
+      order: -1;
+    }
+    .hero-video-wrapper {
+      max-width: 320px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero {
+      padding: 130px 16px 40px;
+    }
+    .form-group {
+      flex-direction: column;
+    }
+    .form-input {
+      border-radius: var(--radius-md);
+      border-right: 1px solid var(--color-border-strong);
+    }
+    .form-btn {
+      border-radius: var(--radius-md);
+    }
+    .hero-badges {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>

@@ -1,0 +1,254 @@
+/* ============================================
+   ZEROWFX THEME SYSTEM — 2 STYLES
+   Emerald Night (dark) and Clean White (light)
+   ============================================ */
+
+
+/* ============================================================
+   THEME 1: Emerald Night (DEFAULT — no class needed)
+   Dark luxe with green accents — already defined in Layout.astro
+   ============================================================ */
+
+
+/* ============================================================
+   THEME 2: CLEAN WHITE — Light, minimal, Apple-esque
+   Completely light theme with soft grays and crisp green
+   ============================================================ */
+html.theme-clean-white {
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f7f8fa;
+  --color-bg-card: #ffffff;
+  --color-bg-elevated: #f0f2f5;
+  --color-green: #10b981;
+  --color-green-light: #34d399;
+  --color-green-dark: #059669;
+  --color-green-glow: rgba(16, 185, 129, 0.15);
+  --color-gold: #f59e0b;
+  --color-gold-light: #fbbf24;
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-text-dim: #9ca3af;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+  --color-red: #ef4444;
+  --color-red-dim: rgba(239, 68, 68, 0.1);
+  --shadow-glow: 0 2px 16px rgba(16, 185, 129, 0.12);
+  --shadow-glow-strong: 0 4px 30px rgba(16, 185, 129, 0.2);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+html.theme-clean-white body {
+  background: #ffffff;
+  color: #111827;
+}
+
+html.theme-clean-white ::-webkit-scrollbar-track {
+  background: #f7f8fa;
+}
+
+html.theme-clean-white ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+
+html.theme-clean-white ::-webkit-scrollbar-thumb:hover {
+  background: #10b981;
+}
+
+/* Fix navbar for light theme */
+html.theme-clean-white .navbar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.theme-clean-white .navbar.scrolled {
+  background: rgba(255, 255, 255, 0.97) !important;
+  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.06) !important;
+}
+
+html.theme-clean-white .nav-link {
+  color: #6b7280 !important;
+}
+
+html.theme-clean-white .nav-link:hover {
+  color: #059669 !important;
+}
+
+html.theme-clean-white .logo-text {
+  color: #111827 !important;
+}
+
+html.theme-clean-white .hamburger span {
+  background: #111827 !important;
+}
+
+/* Fix CTA buttons for light theme */
+html.theme-clean-white .cta-main,
+html.theme-clean-white .about-cta {
+  color: #fff !important;
+}
+
+/* Fix form inputs */
+html.theme-clean-white .form-input,
+html.theme-clean-white .modal-input {
+  background: #f7f8fa !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111827 !important;
+}
+
+html.theme-clean-white .form-input::placeholder,
+html.theme-clean-white .modal-input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Fix modal overlay */
+html.theme-clean-white .modal-overlay {
+  background: rgba(255, 255, 255, 0.6) !important;
+}
+
+html.theme-clean-white .modal-card {
+  background: #fff !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Fix bottom bar */
+html.theme-clean-white .bottom-bar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-top-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Fix countdown */
+html.theme-clean-white .countdown-widget {
+  background: #fff !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Theme selector dropdown fix for light */
+html.theme-clean-white .theme-dropdown {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04) inset !important;
+}
+
+html.theme-clean-white .theme-option:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+html.theme-clean-white .theme-option.active {
+  background: rgba(16, 185, 129, 0.08) !important;
+  border-color: #10b981 !important;
+}
+
+html.theme-clean-white .theme-name {
+  color: #111827 !important;
+}
+
+html.theme-clean-white .theme-desc {
+  color: #9ca3af !important;
+}
+
+html.theme-clean-white .dropdown-header,
+html.theme-clean-white .dropdown-footer {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  color: #9ca3af !important;
+}
+
+/* Subtle gradient for hero instead of dark bg */
+html.theme-clean-white .hero-bg-gradient {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
+    linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ============================================
+   NAVBAR DROPDOWN + TOOLS PAGE THEME OVERRIDES
+   ============================================ */
+
+/* Clean White */
+html.theme-clean-white .dropdown-panel {
+  background: rgba(255, 255, 255, 0.97) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12) !important;
+}
+
+html.theme-clean-white .dropdown-item {
+  color: #6b7280 !important;
+}
+
+html.theme-clean-white .dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: #059669 !important;
+}
+
+html.theme-clean-white .tools-sidebar,
+html.theme-clean-white .tool-panel {
+  background: #fff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.theme-clean-white .sidebar-btn {
+  color: #6b7280 !important;
+}
+
+html.theme-clean-white .sidebar-btn:hover {
+  background: #f0f2f5 !important;
+  color: #111827 !important;
+}
+
+html.theme-clean-white .sidebar-btn.active {
+  background: rgba(16, 185, 129, 0.08) !important;
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.2) !important;
+}
+
+html.theme-clean-white .form-control {
+  background: #f7f8fa !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  color: #111827 !important;
+}
+
+html.theme-clean-white .result-item {
+  background: #f7f8fa !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+html.theme-clean-white select.form-control option {
+  background: #fff !important;
+  color: #111827 !important;
+}
+
+
+
+
+/* ============================================
+   SMOOTH THEME TRANSITIONS
+   ============================================ */
+
+html,
+body {
+  transition:
+    background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

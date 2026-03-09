@@ -1,0 +1,147 @@
+---
+import '../styles/themes.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Zerowfx - Master Forex Trading',
+  description = 'Master the Forex markets with proven strategies and expert mentorship. Join hundreds of successful traders who have transformed their trading journey with Zerowfx.'
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <title>{title}</title>
+    <!-- Apply saved theme immediately to prevent FOUC -->
+    <script is:inline>
+      (function() {
+        var valid = ['emerald-night','clean-white'];
+        var saved = localStorage.getItem('zerowfx-theme');
+        if (!saved || valid.indexOf(saved) === -1) {
+          saved = 'emerald-night';
+          localStorage.setItem('zerowfx-theme', 'emerald-night');
+        }
+        if (saved !== 'emerald-night') {
+          document.documentElement.classList.add('theme-' + saved);
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <script is:inline>
+      // Initialize Lucide icons after DOM is ready
+      document.addEventListener('DOMContentLoaded', () => {
+        if (window.lucide) window.lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  *,
+  *::before,
+  *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --color-bg: #0a0f0a;
+    --color-bg-secondary: #111a11;
+    --color-bg-card: #141e14;
+    --color-bg-elevated: #1a2a1a;
+    --color-green: #22c55e;
+    --color-green-light: #4ade80;
+    --color-green-dark: #16a34a;
+    --color-green-glow: rgba(34, 197, 94, 0.3);
+    --color-gold: #d4a853;
+    --color-gold-light: #e8c97a;
+    --color-text: #f0f0f0;
+    --color-text-muted: #9ca3af;
+    --color-text-dim: #6b7280;
+    --color-border: rgba(34, 197, 94, 0.15);
+    --color-border-strong: rgba(34, 197, 94, 0.3);
+    --color-red: #ef4444;
+    --color-red-dim: rgba(239, 68, 68, 0.15);
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --shadow-glow: 0 0 20px rgba(34, 197, 94, 0.15);
+    --shadow-glow-strong: 0 0 40px rgba(34, 197, 94, 0.25);
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-family);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img, video {
+    max-width: 100%;
+    display: block;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    outline: none;
+  }
+
+  input {
+    font-family: inherit;
+    outline: none;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-green-dark);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-green);
+  }
+</style>

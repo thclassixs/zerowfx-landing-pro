@@ -1,0 +1,555 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Admin Panel - Zerowfx" description="Admin dashboard">
+  <div class="admin-wrapper">
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+      <div class="login-card">
+        <div class="login-logo">
+          <span class="login-logo-text">ZERO<span class="accent">WFX</span></span>
+          <span class="login-subtitle">Admin Panel</span>
+        </div>
+        <form class="login-form" id="loginForm">
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required />
+          </div>
+          <p class="login-error" id="loginError"></p>
+          <button type="submit" class="login-btn" id="loginBtn">Login</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard" style="display:none">
+      <header class="dash-header">
+        <div class="dash-header-left">
+          <span class="dash-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="dash-title">Admin Dashboard</span>
+        </div>
+        <div class="dash-header-right">
+          <span class="dash-user" id="dashUser">admin</span>
+          <button class="logout-btn" id="logoutBtn">Logout</button>
+        </div>
+      </header>
+
+      <main class="dash-main">
+        <div class="dash-stats" id="dashStats">
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalSubs">0</span>
+              <span class="stat-label">Total Subscribers</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+              <span class="stat-value" id="todaySubs">0</span>
+              <span class="stat-label">Today</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🌍</div>
+            <div class="stat-info">
+              <span class="stat-value" id="totalCountries">0</span>
+              <span class="stat-label">Countries</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-controls">
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by email, IP, or country..." />
+          </div>
+          <a href="http://localhost:3001/api/admin/subscribers/export/csv" target="_blank" class="export-btn" id="exportBtn">
+            📥 Export CSV
+          </a>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="subs-table" id="subsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>IP Address</th>
+                <th>Country</th>
+                <th>Joined</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="subsBody">
+              <tr>
+                <td colspan="6" class="empty-state">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+      </main>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  const API = 'http://localhost:3001';
+  let currentPage = 1;
+  let searchQuery = '';
+
+  // Check if already logged in
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        showDashboard(data.username);
+      }
+    } catch {}
+  }
+
+  function showDashboard(username: string) {
+    (document.getElementById('loginScreen') as HTMLElement).style.display = 'none';
+    (document.getElementById('dashboard') as HTMLElement).style.display = 'block';
+    (document.getElementById('dashUser') as HTMLElement).textContent = username;
+    loadSubscribers();
+  }
+
+  // Login
+  document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const username = (document.getElementById('username') as HTMLInputElement).value;
+    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn') as HTMLButtonElement;
+
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    try {
+      const res = await fetch(`${API}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        showDashboard(data.username);
+      } else {
+        if (errorEl) {
+          errorEl.textContent = data.error || 'Login failed';
+        }
+      }
+    } catch {
+      if (errorEl) errorEl.textContent = 'Cannot connect to server';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Login';
+  });
+
+  // Logout
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    (document.getElementById('dashboard') as HTMLElement).style.display = 'none';
+    (document.getElementById('loginScreen') as HTMLElement).style.display = 'flex';
+  });
+
+  // Load subscribers
+  async function loadSubscribers() {
+    try {
+      const res = await fetch(
+        `${API}/api/admin/subscribers?page=${currentPage}&limit=20&search=${encodeURIComponent(searchQuery)}`,
+        { credentials: 'include' }
+      );
+
+      if (!res.ok) return;
+
+      const data = await res.json();
+      const tbody = document.getElementById('subsBody');
+      const totalEl = document.getElementById('totalSubs');
+      const paginationEl = document.getElementById('pagination');
+
+      if (totalEl) totalEl.textContent = String(data.pagination.total);
+
+      // Compute unique countries
+      if (data.subscribers.length > 0) {
+        const countries = new Set(data.subscribers.map((s: any) => s.country));
+        const countriesEl = document.getElementById('totalCountries');
+        if (countriesEl) countriesEl.textContent = String(countries.size);
+      }
+
+      // Today count
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = data.subscribers.filter((s: any) =>
+        s.created_at && s.created_at.startsWith(today)
+      ).length;
+      const todayEl = document.getElementById('todaySubs');
+      if (todayEl) todayEl.textContent = String(todayCount);
+
+      if (!tbody) return;
+
+      if (data.subscribers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No subscribers found</td></tr>';
+      } else {
+        tbody.innerHTML = data.subscribers.map((s: any) => `
+          <tr>
+            <td>${s.id}</td>
+            <td><strong>${s.email}</strong></td>
+            <td>${s.ip_address || 'N/A'}</td>
+            <td>${s.country || 'Unknown'}</td>
+            <td>${new Date(s.created_at).toLocaleDateString()}</td>
+            <td>
+              <button class="del-btn" onclick="deleteSub(${s.id})">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      // Pagination
+      if (paginationEl && data.pagination.totalPages > 1) {
+        let html = '';
+        for (let i = 1; i <= data.pagination.totalPages; i++) {
+          html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        paginationEl.innerHTML = html;
+      }
+    } catch (err) {
+      console.error('Error loading subscribers:', err);
+    }
+  }
+
+  // Global functions for inline onclick handlers
+  (window as any).deleteSub = async (id: number) => {
+    if (!confirm('Delete this subscriber?')) return;
+    await fetch(`${API}/api/admin/subscribers/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    loadSubscribers();
+  };
+
+  (window as any).goToPage = (page: number) => {
+    currentPage = page;
+    loadSubscribers();
+  };
+
+  // Search
+  let searchTimeout: any;
+  document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchQuery = (e.target as HTMLInputElement).value;
+      currentPage = 1;
+      loadSubscribers();
+    }, 300);
+  });
+
+  checkAuth();
+</script>
+
+<style>
+  .admin-wrapper {
+    min-height: 100vh;
+    background: var(--color-bg);
+  }
+
+  /* Login */
+  .login-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .login-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-xl);
+    padding: 48px 40px;
+    max-width: 420px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+  .login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .login-logo-text {
+    display: block;
+    font-size: 2rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+  }
+  .accent {
+    color: var(--color-green);
+  }
+  .login-subtitle {
+    display: block;
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .field {
+    margin-bottom: 16px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    transition: var(--transition);
+  }
+  .field input:focus {
+    border-color: var(--color-green);
+  }
+  .login-error {
+    color: var(--color-red);
+    font-size: 0.85rem;
+    min-height: 20px;
+    margin-bottom: 8px;
+  }
+  .login-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    letter-spacing: 1px;
+  }
+  .login-btn:hover {
+    box-shadow: var(--shadow-glow-strong);
+  }
+  .login-btn:disabled {
+    opacity: 0.6;
+  }
+
+  /* Dashboard */
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .dash-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .dash-logo {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+  .dash-title {
+    color: var(--color-text-dim);
+    font-size: 0.85rem;
+  }
+  .dash-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .dash-user {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+  }
+  .logout-btn {
+    padding: 8px 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--color-red);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+  .logout-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+  .dash-main {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  /* Stats */
+  .dash-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .stat-icon {
+    font-size: 2rem;
+  }
+  .stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--color-green);
+  }
+  .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Table controls */
+  .table-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .search-box {
+    flex: 1;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 16px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 0.9rem;
+  }
+  .search-box input:focus {
+    border-color: var(--color-green);
+  }
+  .export-btn {
+    padding: 10px 20px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    white-space: nowrap;
+  }
+  .export-btn:hover {
+    border-color: var(--color-green);
+    color: var(--color-green);
+  }
+
+  /* Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+  .subs-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .subs-table th {
+    background: var(--color-bg-card);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .subs-table td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .subs-table tr:hover td {
+    background: rgba(34, 197, 94, 0.03);
+  }
+  .empty-state {
+    text-align: center !important;
+    color: var(--color-text-dim) !important;
+    padding: 40px 16px !important;
+  }
+  .del-btn {
+    background: none;
+    font-size: 1rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: var(--transition);
+  }
+  .del-btn:hover {
+    background: var(--color-red-dim);
+  }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+  .pagination :global(.page-btn) {
+    padding: 8px 14px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .pagination :global(.page-btn.active) {
+    background: var(--color-green);
+    color: #000;
+    border-color: var(--color-green);
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .dash-stats {
+      grid-template-columns: 1fr;
+    }
+    .table-controls {
+      flex-direction: column;
+    }
+    .dash-header {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+</style>

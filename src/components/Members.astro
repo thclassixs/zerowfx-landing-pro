@@ -1,0 +1,723 @@
+---
+// Generate array for testimonial videos
+const videos = [
+  { src: '/assets/testimonials/testimonial-01.mp4' },
+  { src: '/assets/testimonials/testimonial-02.mp4' },
+  { src: '/assets/testimonials/testimonial-03.mp4' },
+  { src: '/assets/testimonials/testimonial-04.mp4' },
+  { src: '/assets/testimonials/testimonial-05.mp4' },
+  { src: '/assets/testimonials/testimonial-06.mp4' },
+  { src: '/assets/testimonials/testimonial-07.mp4' },
+  { src: '/assets/testimonials/testimonial-08.mp4' },
+  { src: '/assets/testimonials/testimonial-09.mp4' },
+];
+
+// For infinite scroll, we duplicate the entire set
+const allVideos = [...videos, ...videos];
+---
+
+<section class="members" id="members">
+  <div class="members-inner">
+    <div class="members-header">
+      <div class="members-badge">
+        <i data-lucide="message-circle" style="width:14px;height:14px"></i>
+        <span>REAL TESTIMONIALS</span>
+      </div>
+      <h2 class="section-title">What Our Members Say</h2>
+      <p class="section-subtitle">Hear directly from our community — real people, real results, real transformations.</p>
+    </div>
+
+    <div class="video-carousel-wrapper">
+      <!-- Fade edges for infinite scroll effect -->
+      <div class="carousel-fade fade-left"></div>
+      <div class="carousel-fade fade-right"></div>
+
+      <div class="video-carousel" id="videoCarousel">
+        <div class="video-track" id="videoTrack">
+          {allVideos.map((v, i) => (
+            <div class="video-card" data-index={i}>
+              <div class="video-poster-fallback"></div>
+              <video
+                class="testimonial-video"
+                preload="metadata"
+                playsinline
+                webkit-playsinline
+                muted
+                data-src={v.src}
+              >
+                <source src={v.src} type="video/mp4" />
+              </video>
+              <!-- Play button (visible when paused/not started) -->
+              <div class="video-play-btn" aria-label="Play video">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <polygon points="6 3 20 12 6 21 6 3"></polygon>
+                </svg>
+              </div>
+              <!-- Pause indicator (briefly visible when pausing) -->
+              <div class="video-pause-indicator" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                  <rect x="14" y="4" width="4" height="16" rx="1"></rect>
+                </svg>
+              </div>
+              <div class="video-card-badge">
+                <i data-lucide="star" style="width:10px;height:10px;fill:currentColor"></i>
+                <span>Member</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Control buttons -->
+    <div class="carousel-controls">
+      <button class="control-btn" id="videoLeft" aria-label="Previous">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <div class="scroll-indicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+      </div>
+      <button class="control-btn" id="videoRight" aria-label="Next">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <a href="https://t.me/zerowfx" target="_blank" rel="noopener" class="telegram-btn">
+      <i data-lucide="send" style="width:20px;height:20px"></i>
+      JOIN TELEGRAM COMMUNITY
+    </a>
+  </div>
+</section>
+
+<script>
+  const carousel = document.getElementById('videoCarousel') as HTMLElement;
+  const trackEl = document.getElementById('videoTrack') as HTMLElement;
+  const leftBtn = document.getElementById('videoLeft');
+  const rightBtn = document.getElementById('videoRight');
+  const progressBar = document.getElementById('scrollProgress') as HTMLElement;
+
+  const totalOriginal = 9; // original video count
+  const cards = trackEl.querySelectorAll('.video-card');
+  const gap = 16;
+  let autoScrollInterval: ReturnType<typeof setInterval> | null = null;
+  let autoScrollSpeed = 0.5; // pixels per frame
+  let isAutoScrolling = true;
+  let animFrameId: number | null = null;
+  let isUserInteracting = false;
+
+  // Detect iOS for specific workarounds
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+  // ─── iOS Thumbnail Generation ───
+  // iOS Safari doesn't reliably show video first frames with preload="metadata".
+  // We generate poster thumbnails by briefly loading the video metadata
+  // and drawing the first frame to a canvas.
+  function generateThumbnail(video: HTMLVideoElement, card: Element) {
+    const fallback = card.querySelector('.video-poster-fallback') as HTMLElement;
+    
+    // Try to capture first frame as poster
+    function captureFrame() {
+      try {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth || 200;
+        canvas.height = video.videoHeight || 356;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+          // Only use if we got actual pixel data (not blank)
+          if (dataUrl.length > 1000) {
+            video.setAttribute('poster', dataUrl);
+            if (fallback) fallback.style.opacity = '0';
+            return true;
+          }
+        }
+      } catch (e) {
+        // Cross-origin or security error — keep fallback visible
+      }
+      return false;
+    }
+
+    // When metadata/data is available, try to capture
+    if (video.readyState >= 2) {
+      captureFrame();
+    } else {
+      video.addEventListener('loadeddata', () => {
+        // Small delay to ensure frame is rendered
+        setTimeout(() => captureFrame(), 100);
+      }, { once: true });
+      
+      // Fallback: also try on seeked event for iOS
+      if (isIOS) {
+        video.addEventListener('loadedmetadata', () => {
+          // iOS needs to seek to get a frame
+          video.currentTime = 0.1;
+        }, { once: true });
+        video.addEventListener('seeked', () => {
+          setTimeout(() => {
+            captureFrame();
+            video.currentTime = 0;
+          }, 50);
+        }, { once: true });
+      }
+    }
+  }
+
+  // Generate thumbnails for all video cards
+  cards.forEach((card) => {
+    const video = card.querySelector('video') as HTMLVideoElement;
+    if (video) {
+      generateThumbnail(video, card);
+    }
+  });
+
+  function getCardWidth() {
+    const card = cards[0] as HTMLElement;
+    if (!card) return 200;
+    return card.offsetWidth + gap;
+  }
+
+  function getOriginalSetWidth() {
+    return getCardWidth() * totalOriginal;
+  }
+
+  // Update scroll progress
+  function updateProgress() {
+    if (!progressBar || !carousel) return;
+    const scrollLeft = carousel.scrollLeft;
+    const setWidth = getOriginalSetWidth();
+    const posInSet = scrollLeft % setWidth;
+    const percent = (posInSet / setWidth) * 100;
+    progressBar.style.width = `${Math.min(100, Math.max(0, percent))}%`;
+  }
+
+  // Infinite scroll logic: when we scroll past the duplicate set, reset position
+  function handleInfiniteScroll() {
+    const setWidth = getOriginalSetWidth();
+    const scrollLeft = carousel.scrollLeft;
+
+    // If scrolled past the first full set, jump back
+    if (scrollLeft >= setWidth) {
+      carousel.scrollLeft = scrollLeft - setWidth;
+    }
+    // If scrolled before 0 (shouldn't happen with auto-scroll right, but safety)
+    if (scrollLeft <= 0) {
+      carousel.scrollLeft = scrollLeft + setWidth;
+    }
+    updateProgress();
+  }
+
+  // Smooth auto-scroll using requestAnimationFrame
+  function autoScroll() {
+    if (!isAutoScrolling || isUserInteracting) {
+      animFrameId = requestAnimationFrame(autoScroll);
+      return;
+    }
+    carousel.scrollLeft += autoScrollSpeed;
+    handleInfiniteScroll();
+    animFrameId = requestAnimationFrame(autoScroll);
+  }
+
+  // Start auto-scrolling
+  animFrameId = requestAnimationFrame(autoScroll);
+
+  // Manual navigation
+  leftBtn?.addEventListener('click', () => {
+    const cardWidth = getCardWidth();
+    carousel.scrollBy({ left: -cardWidth * 2, behavior: 'smooth' });
+  });
+
+  rightBtn?.addEventListener('click', () => {
+    const cardWidth = getCardWidth();
+    carousel.scrollBy({ left: cardWidth * 2, behavior: 'smooth' });
+  });
+
+  // Pause auto-scroll on hover
+  carousel.addEventListener('mouseenter', () => {
+    isUserInteracting = true;
+  });
+  carousel.addEventListener('mouseleave', () => {
+    // Don't resume if a video is playing
+    if (!activeVideoCard) {
+      isUserInteracting = false;
+    }
+  });
+
+  // Touch events for pause
+  carousel.addEventListener('touchstart', () => {
+    isUserInteracting = true;
+  }, { passive: true });
+  carousel.addEventListener('touchend', () => {
+    // Don't resume if a video is playing
+    setTimeout(() => {
+      if (!activeVideoCard) {
+        isUserInteracting = false;
+      }
+    }, 2000);
+  }, { passive: true });
+
+  // Listen to scroll events for infinite loop
+  carousel.addEventListener('scroll', () => {
+    handleInfiniteScroll();
+  }, { passive: true });
+
+  // Play/pause on click — with debounce to prevent double-fire
+  let clickCooldown = false;
+  let activeVideoCard: Element | null = null;
+
+  function pauseAllVideos() {
+    document.querySelectorAll('.video-card').forEach(c => {
+      const v = c.querySelector('video') as HTMLVideoElement;
+      if (v && !v.paused) {
+        v.pause();
+      }
+      c.classList.remove('is-playing');
+    });
+  }
+
+  function playVideo(card: Element) {
+    const video = card.querySelector('video') as HTMLVideoElement;
+    if (!video) return;
+
+    // Pause everything else first
+    pauseAllVideos();
+
+    // Pause auto-scroll
+    isUserInteracting = true;
+    activeVideoCard = card;
+
+    // iOS requires unmuting for programmatic play (if it was muted for thumb gen)
+    video.muted = false;
+
+    // Use play() promise to handle iOS autoplay restrictions
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        card.classList.add('is-playing');
+      }).catch(() => {
+        // Autoplay blocked — keep play button visible
+        card.classList.remove('is-playing');
+        activeVideoCard = null;
+        isUserInteracting = false;
+      });
+    } else {
+      card.classList.add('is-playing');
+    }
+  }
+
+  function pauseVideo(card: Element) {
+    const video = card.querySelector('video') as HTMLVideoElement;
+    if (!video) return;
+
+    video.pause();
+    card.classList.remove('is-playing');
+    activeVideoCard = null;
+
+    // Resume auto-scroll after a short delay
+    setTimeout(() => {
+      // Only resume if no other video started playing
+      if (!activeVideoCard) {
+        isUserInteracting = false;
+      }
+    }, 500);
+  }
+
+  document.querySelectorAll('.video-card').forEach((card) => {
+    const video = card.querySelector('video') as HTMLVideoElement;
+    if (!video) return;
+
+    // Single click handler on the card itself
+    card.addEventListener('click', (e) => {
+      // Don't toggle if clicking on the badge
+      if ((e.target as HTMLElement).closest('.video-card-badge')) return;
+
+      // Debounce to prevent double-fire
+      if (clickCooldown) return;
+      clickCooldown = true;
+      setTimeout(() => { clickCooldown = false; }, 300);
+
+      if (video.paused) {
+        playVideo(card);
+      } else {
+        pauseVideo(card);
+      }
+    });
+
+    // When video ends, show play button and resume scroll
+    video.addEventListener('ended', () => {
+      card.classList.remove('is-playing');
+      activeVideoCard = null;
+      isUserInteracting = false;
+    });
+  });
+
+  // Update progress on scroll
+  updateProgress();
+</script>
+
+<style>
+  .members {
+    padding: 80px 24px;
+    background: var(--color-bg);
+    text-align: center;
+    overflow: hidden;
+  }
+  .members-inner {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .members-header {
+    max-width: 600px;
+    margin: 0 auto 40px;
+  }
+  .members-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid var(--color-border-strong);
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--color-green);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    margin-bottom: 10px;
+  }
+  .section-subtitle {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 0;
+    line-height: 1.6;
+  }
+
+  /* Carousel wrapper */
+  .video-carousel-wrapper {
+    position: relative;
+    margin: 0 -24px;
+  }
+
+  /* Fade edges */
+  .carousel-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    z-index: 3;
+    pointer-events: none;
+  }
+  .fade-left {
+    left: 0;
+    background: linear-gradient(to right, var(--color-bg), transparent);
+  }
+  .fade-right {
+    right: 0;
+    background: linear-gradient(to left, var(--color-bg), transparent);
+  }
+
+  .video-carousel {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: auto;
+  }
+  .video-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .video-track {
+    display: flex;
+    gap: 16px;
+    padding: 20px 40px;
+    width: max-content;
+  }
+
+  /* Poster fallback — gradient shown until real thumbnail loads */
+  .video-poster-fallback {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+    z-index: 1;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .video-card {
+    flex: 0 0 200px;
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 2px solid var(--color-border-strong);
+    background: #000;
+    aspect-ratio: 9/16;
+    cursor: pointer;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    /* iOS: Force stable GPU compositing layer */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+  .video-card:hover {
+    border-color: var(--color-green);
+    box-shadow: var(--shadow-glow), 0 12px 32px rgba(0, 0, 0, 0.2);
+  }
+  /* Only apply transform hover on non-touch (desktop) to avoid iOS flicker */
+  @media (hover: hover) and (pointer: fine) {
+    .video-card:hover {
+      transform: translateY(-6px) scale(1.03) translateZ(0);
+    }
+  }
+
+  .video-card-badge {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    /* iOS: Use solid background instead of backdrop-filter to prevent flicker */
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 50px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-gold);
+    z-index: 4;
+    text-transform: uppercase;
+    /* iOS: Stable compositing */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+  /* Only enable backdrop-filter on non-touch devices */
+  @supports (backdrop-filter: blur(8px)) {
+    @media (hover: hover) and (pointer: fine) {
+      .video-card-badge {
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+    }
+  }
+
+  .testimonial-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    /* iOS: Prevent video flicker during scroll/recomposite */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    position: relative;
+    z-index: 0;
+  }
+  /* Play button — floating circle, no full overlay */
+  .video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) translateZ(0);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    /* iOS: Solid background instead of backdrop-filter to prevent flicker */
+    background: rgba(20, 20, 30, 0.55);
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 3px;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.35s ease, background 0.35s ease;
+    opacity: 1;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  /* Only apply backdrop-filter blur on desktop (non-touch) */
+  @supports (backdrop-filter: blur(8px)) {
+    @media (hover: hover) and (pointer: fine) {
+      .video-play-btn {
+        background: rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+    }
+  }
+  /* Hover effects only on desktop to avoid iOS flicker */
+  @media (hover: hover) and (pointer: fine) {
+    .video-card:hover .video-play-btn {
+      background: rgba(34, 197, 94, 0.35);
+      border-color: rgba(34, 197, 94, 0.6);
+      transform: translate(-50%, -50%) scale(1.12) translateZ(0);
+      box-shadow: 0 0 24px rgba(34, 197, 94, 0.35);
+    }
+  }
+  /* Hide play button while video is playing */
+  .video-card.is-playing .video-play-btn {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6) translateZ(0);
+    pointer-events: none;
+  }
+
+  /* Pause indicator — briefly flashes when pausing */
+  .video-pause-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6) translateZ(0);
+    -webkit-transform: translate(-50%, -50%) scale(0.6) translateZ(0);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.55);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Controls row */
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .control-btn {
+    flex-shrink: 0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--color-bg-card);
+    color: var(--color-text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--color-border);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .control-btn:hover {
+    background: var(--color-green);
+    color: #fff;
+    border-color: var(--color-green);
+    box-shadow: 0 4px 18px var(--color-green-glow);
+    transform: scale(1.1);
+  }
+  .control-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Scroll progress indicator */
+  .scroll-indicator {
+    flex: 1;
+    height: 3px;
+    background: var(--color-border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .scroll-progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--color-green-dark), var(--color-green), var(--color-green-light));
+    border-radius: 3px;
+    transition: width 0.15s linear;
+    box-shadow: 0 0 10px var(--color-green-glow);
+  }
+
+  .telegram-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: var(--transition);
+    margin-top: 32px;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+  }
+  .telegram-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-strong);
+  }
+
+  @media (max-width: 1024px) {
+    .video-card {
+      flex: 0 0 180px;
+    }
+  }
+  @media (max-width: 768px) {
+    .video-card {
+      flex: 0 0 160px;
+    }
+    .control-btn {
+      width: 36px;
+      height: 36px;
+    }
+    .carousel-fade {
+      width: 40px;
+    }
+  }
+  @media (max-width: 480px) {
+    .video-card {
+      flex: 0 0 140px;
+    }
+    .members {
+      padding: 60px 16px;
+    }
+    .video-carousel-wrapper {
+      margin: 0 -16px;
+    }
+    .carousel-fade {
+      width: 24px;
+    }
+    .video-play-btn {
+      width: 40px;
+      height: 40px;
+    }
+    .video-play-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+    .video-pause-indicator {
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>

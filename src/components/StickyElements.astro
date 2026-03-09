@@ -1,0 +1,736 @@
+---
+---
+<!-- Sticky Countdown Timer (Left side) -->
+<div class="countdown-widget" id="countdownWidget">
+  <button class="countdown-toggle" id="countdownToggle" aria-label="Toggle Countdown">
+    <i data-lucide="chevron-right" class="toggle-icon"></i>
+  </button>
+  <div class="countdown-header">
+    <i data-lucide="timer" class="countdown-icon-lucide"></i>
+    <span class="countdown-label">OFFER ENDS IN</span>
+    <button class="countdown-close" id="countdownClose" aria-label="Close"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+  </div>
+  <div class="countdown-timer" id="countdownTimer">
+    <div class="time-unit">
+      <span class="time-value" id="cdDays">01</span>
+      <span class="time-label">D</span>
+    </div>
+    <span class="time-sep">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="cdHours">01</span>
+      <span class="time-label">H</span>
+    </div>
+    <span class="time-sep">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="cdMins">59</span>
+      <span class="time-label">M</span>
+    </div>
+    <span class="time-sep">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="cdSecs">59</span>
+      <span class="time-label">S</span>
+    </div>
+  </div>
+  <div class="countdown-perks">
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> Free Masterclass</div>
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> VIP Inner Circle</div>
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> 100% XM Bonus</div>
+  </div>
+</div>
+
+<!-- Sticky Bottom CTA Bar -->
+<div class="bottom-bar" id="bottomBar">
+  <div class="bottom-bar-inner">
+    <p class="bottom-text">
+      <strong>⚡ LIMITED SPOTS</strong> — Double Your Deposit + Get a $247 Masterclass FREE
+    </p>
+    <a href="#heroFormAnchor" class="bottom-cta">CLAIM MY BONUS</a>
+  </div>
+</div>
+
+<!-- Broker Popup Modal -->
+<div class="modal-overlay" id="brokerModal">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="Close modal"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    <div class="modal-badge"><i data-lucide="shield-check" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:4px"></i> TRUSTED BY 50,000+ TRADERS</div>
+    <h3 class="modal-title">
+      Your <em class="modal-accent">100% Bonus</em> Is Reserved
+    </h3>
+    <p class="modal-desc">
+      Double your first deposit instantly with XM — the broker trusted by traders worldwide. Enter your email below to lock in your bonus before spots fill up.
+    </p>
+    <div class="modal-features">
+      <span><i data-lucide="check" class="mf-check-icon"></i> Double Your Deposit</span>
+      <span><i data-lucide="check" class="mf-check-icon"></i> Gold Spreads from 0.1</span>
+      <span><i data-lucide="check" class="mf-check-icon"></i> Withdraw Anytime</span>
+    </div>
+    
+    <div class="modal-promo">
+      <span class="promo-badge">Your Exclusive Code: <strong>CQMHK</strong></span>
+      <span class="promo-slots" id="promoSlots">🔥 Only <strong id="slotsCount">47</strong> codes left today</span>
+    </div>
+    <form class="modal-form" id="modalForm">
+      <div class="modal-input-row">
+        <input type="email" id="modalEmail" placeholder="Enter your best email to lock in bonus" class="modal-input" required />
+        <button type="submit" class="modal-submit">SUBMIT</button>
+      </div>
+      <a href="https://affs.click/X3LJB" target="_blank" rel="noopener noreferrer" class="affiliate-button">
+        CLAIM MY 100% BONUS <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-left:6px"></i>
+      </a>
+      <p class="modal-micro">⚡ 2,340 traders claimed this today · Bonus expires soon</p>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Countdown Timer
+  const endTime = new Date().getTime() + (1 * 24 + 2) * 60 * 60 * 1000; // ~1 day 2 hours from now
+
+  function updateCountdown() {
+    const now = new Date().getTime();
+    const diff = endTime - now;
+
+    if (diff <= 0) return;
+
+    const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+    const dEl = document.getElementById('cdDays');
+    const hEl = document.getElementById('cdHours');
+    const mEl = document.getElementById('cdMins');
+    const sEl = document.getElementById('cdSecs');
+
+    if (dEl) dEl.textContent = String(d).padStart(2, '0');
+    if (hEl) hEl.textContent = String(h).padStart(2, '0');
+    if (mEl) mEl.textContent = String(m).padStart(2, '0');
+    if (sEl) sEl.textContent = String(s).padStart(2, '0');
+  }
+
+  setInterval(updateCountdown, 1000);
+  updateCountdown();
+
+  // Read from localStorage to see if user has collapsed it previously
+  const savedState = localStorage.getItem('countdownCollapsed');
+  if (savedState === 'true') {
+    document.getElementById('countdownWidget')?.classList.add('collapsed');
+  }
+
+  // Close countdown completely (if needed, but toggle is preferred)
+  document.getElementById('countdownClose')?.addEventListener('click', () => {
+    document.getElementById('countdownWidget')?.classList.add('collapsed');
+    localStorage.setItem('countdownCollapsed', 'true');
+  });
+
+  // Toggle countdown
+  document.getElementById('countdownToggle')?.addEventListener('click', () => {
+    const widget = document.getElementById('countdownWidget');
+    if (widget) {
+      widget.classList.toggle('collapsed');
+      const isCollapsed = widget.classList.contains('collapsed');
+      localStorage.setItem('countdownCollapsed', isCollapsed ? 'true' : 'false');
+    }
+  });
+
+  // Broker popup - show after 3 seconds
+  const isBrokerModalClosed = localStorage.getItem('brokerModalClosed');
+  if (isBrokerModalClosed !== 'true') {
+    setTimeout(() => {
+      document.getElementById('brokerModal')?.classList.add('visible');
+    }, 3000);
+  }
+
+  document.getElementById('modalClose')?.addEventListener('click', () => {
+    document.getElementById('brokerModal')?.classList.remove('visible');
+    localStorage.setItem('brokerModalClosed', 'true');
+  });
+
+  document.getElementById('brokerModal')?.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).id === 'brokerModal') {
+      document.getElementById('brokerModal')?.classList.remove('visible');
+      localStorage.setItem('brokerModalClosed', 'true');
+    }
+  });
+
+  // Modal form submission
+  const API = 'http://localhost:3001';
+
+  // Scarcity counter — slowly decrements slots
+  let slotsLeft = 47;
+  function decrementSlots() {
+    const el = document.getElementById('slotsCount');
+    if (el && slotsLeft > 12) {
+      slotsLeft -= 1;
+      el.textContent = String(slotsLeft);
+    }
+    const next = Math.floor(Math.random() * 25000) + 15000; // 15-40s random
+    setTimeout(decrementSlots, next);
+  }
+  setTimeout(decrementSlots, 20000);
+
+  document.getElementById('modalForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const emailInput = document.getElementById('modalEmail') as HTMLInputElement;
+    if (!emailInput) return;
+
+    try {
+      const res = await fetch(`${API}/api/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: emailInput.value })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        emailInput.value = '';
+        document.getElementById('brokerModal')?.classList.remove('visible');
+        localStorage.setItem('brokerModalClosed', 'true');
+        alert('✅ Successfully joined!');
+      } else {
+        alert(data.error || 'Something went wrong');
+      }
+    } catch {
+      alert('Could not connect to server');
+    }
+  });
+</script>
+
+<style>
+  /* Countdown Widget */
+  .countdown-widget {
+    position: fixed;
+    left: 0;
+    right: auto;
+    top: 50%;
+    transform: translateY(-50%) translateX(0);
+    z-index: 900;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-strong);
+    border-left: none;
+    border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+    padding: 20px 26px 20px 20px;
+    width: max-content;
+    box-shadow: 4px 8px 32px rgba(0, 0, 0, 0.4);
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .countdown-widget.collapsed {
+    transform: translateY(-50%) translateX(-100%);
+  }
+  .countdown-widget.hidden {
+    display: none !important;
+  }
+  
+  .countdown-toggle {
+    display: flex;
+    position: absolute;
+    right: -32px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 60px;
+    background: var(--color-green);
+    border: none;
+    border-radius: 0 8px 8px 0;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+    transition: var(--transition);
+    z-index: 901;
+  }
+  .countdown-toggle:hover {
+    background: var(--color-green-light);
+  }
+  .toggle-icon {
+    color: #000;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.4s ease;
+  }
+  /* When expanded, arrow points left to close. When collapsed, it points right to open. */
+  .countdown-widget:not(.collapsed) .toggle-icon {
+    transform: rotate(180deg);
+  }
+  .countdown-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 14px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--color-text);
+  }
+  .countdown-icon-lucide {
+    width: 16px;
+    height: 16px;
+    color: var(--color-gold);
+    flex-shrink: 0;
+  }
+  .countdown-close {
+    margin-left: auto;
+    background: none;
+    color: var(--color-text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 4px;
+    transition: var(--transition);
+  }
+  .countdown-close:hover {
+    color: var(--color-text);
+  }
+  .countdown-timer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+  .time-unit {
+    text-align: center;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-sm);
+    padding: 8px 0;
+    width: 46px;
+    flex-shrink: 0;
+  }
+  .time-value {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--color-text);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+  .time-label {
+    display: block;
+    font-size: 0.55rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .time-sep {
+    color: var(--color-text-dim);
+    font-weight: 700;
+    margin-top: -10px;
+  }
+  .countdown-perks {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .perk {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+  }
+  .perk-check-icon {
+    color: var(--color-green);
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Bottom Bar */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 950;
+    background: linear-gradient(135deg, var(--color-bg-card), var(--color-bg-elevated));
+    border-top: 1px solid var(--color-border-strong);
+    padding: 12px 24px;
+    backdrop-filter: blur(10px);
+  }
+  .bottom-bar-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .bottom-text {
+    font-size: 0.9rem;
+    color: var(--color-text);
+  }
+  .bottom-text strong {
+    color: var(--color-gold);
+  }
+  .bottom-cta {
+    flex-shrink: 0;
+    padding: 10px 28px;
+    border: 2px solid var(--color-green);
+    color: var(--color-green);
+    font-weight: 700;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    letter-spacing: 1px;
+    transition: var(--transition);
+  }
+  .bottom-cta:hover {
+    background: var(--color-green);
+    color: #000;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: var(--transition);
+    padding: 24px;
+  }
+  .modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+  .modal-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-xl);
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+  .modal-overlay.visible .modal-card {
+    transform: scale(1);
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    color: var(--color-text-dim);
+    font-size: 1.5rem;
+    line-height: 1;
+    transition: var(--transition);
+  }
+  .modal-close:hover {
+    color: var(--color-text);
+  }
+  .modal-badge {
+    display: inline-block;
+    padding: 6px 20px;
+    border: 1px solid var(--color-green);
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--color-green);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .modal-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+  .modal-accent {
+    background: linear-gradient(135deg, var(--color-green), var(--color-green-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-style: italic;
+  }
+  .modal-desc {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .modal-features {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+  }
+  .modal-promo {
+    margin-bottom: 20px;
+  }
+  .affiliate-button {
+    padding: 14px;
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+    border: none;
+    font-weight: 800;
+    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    text-decoration: none;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.3);
+  }
+  .affiliate-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow-strong);
+    color: #fff;
+  }
+  .affiliate-button:active {
+    transform: translateY(0);
+  }
+  .promo-badge {
+    background: var(--color-bg-elevated);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+  .promo-badge strong {
+    color: var(--color-gold);
+    letter-spacing: 1px;
+    margin-left: 4px;
+  }
+  .promo-slots {
+    display: block;
+    margin-top: 8px;
+    font-size: 0.78rem;
+    color: var(--color-green);
+    letter-spacing: 0.3px;
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  .promo-slots strong {
+    color: #fff;
+    font-weight: 800;
+  }
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.65; }
+  }
+  .modal-micro {
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--color-text-dim);
+    margin: 0;
+    padding: 0;
+    letter-spacing: 0.2px;
+  }
+  .mf-check-icon {
+    color: var(--color-green);
+    width: 16px;
+    height: 16px;
+    display: inline;
+    vertical-align: middle;
+  }
+  .modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .modal-input-row {
+    display: flex;
+    gap: 10px;
+  }
+  .modal-input {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 20px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 0.95rem;
+    text-align: center;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .modal-input:focus {
+    border-color: var(--color-green);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.15);
+  }
+  .modal-input::placeholder {
+    color: var(--color-text-dim);
+  }
+  .modal-submit {
+    padding: 14px 24px;
+    white-space: nowrap;
+    background: var(--color-green);
+    color: #ffffffff;
+    font-weight: 800;
+    font-size: 0.85rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .modal-submit:hover {
+    background: var(--color-green-light);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.35);
+    transform: translateY(-2px);
+  }
+  .modal-submit:active {
+    transform: translateY(0);
+  }
+
+  /* Tablet */
+  @media (max-width: 768px) {
+    .countdown-widget {
+      width: max-content;
+      padding: 16px 20px 16px 14px;
+    }
+    .time-unit {
+      padding: 6px 0;
+      width: 40px;
+    }
+    .time-value {
+      font-size: 1rem;
+    }
+    .bottom-bar-inner {
+      flex-direction: column;
+      text-align: center;
+      gap: 10px;
+    }
+    .bottom-text {
+      font-size: 0.8rem;
+    }
+    .bottom-cta {
+      width: 100%;
+      text-align: center;
+    }
+    .modal-card {
+      padding: 28px 20px;
+    }
+    .modal-input-row {
+      flex-direction: column;
+    }
+  }
+
+  /* Mobile: professional horizontal countdown bar */
+  @media (max-width: 480px) {
+    .modal-features {
+      flex-wrap: wrap;
+      white-space: normal;
+      font-size: 0.75rem;
+      gap: 10px;
+    }
+    .countdown-toggle {
+      display: none;
+    }
+    .countdown-widget.collapsed {
+      display: none !important;
+    }
+    .countdown-widget {
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 64px;
+      bottom: auto;
+      transform: none;
+      width: 100%;
+      border-radius: 0;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      background: var(--color-bg-card);
+      border: none;
+      border-bottom: 1px solid var(--color-border-strong);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+    /* Accent stripe on left */
+    .countdown-widget::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: linear-gradient(to bottom, var(--color-green), var(--color-gold));
+    }
+    .countdown-header {
+      margin-bottom: 0;
+      flex-shrink: 0;
+      gap: 5px;
+      font-size: 0.6rem;
+      padding: 8px 10px 8px 14px;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      background: rgba(255,255,255,0.02);
+      border-right: 1px solid var(--color-border);
+    }
+    .countdown-header .countdown-icon-lucide {
+      width: 14px;
+      height: 14px;
+    }
+    .countdown-header .countdown-close {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 0;
+      z-index: 2;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .countdown-timer {
+      margin-bottom: 0;
+      gap: 3px;
+      flex-shrink: 0;
+      padding: 8px 12px;
+    }
+    .time-unit {
+      padding: 3px 6px;
+      min-width: 30px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+    }
+    .time-value {
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: var(--color-green);
+    }
+    .time-label {
+      font-size: 0.4rem;
+      color: var(--color-text-dim);
+      margin-top: 1px;
+    }
+    .time-sep {
+      margin-top: -4px;
+      font-size: 0.7rem;
+      color: var(--color-text-dim);
+    }
+    .countdown-perks {
+      display: none;
+    }
+    .countdown-close {
+      font-size: 0.85rem;
+      padding: 0 2px;
+    }
+  }
+</style>

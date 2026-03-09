@@ -1,0 +1,271 @@
+---
+// Luxury lifestyle images
+const images = [
+  ...Array.from({ length: 6 }, (_, i) => ({
+    src: `/assets/lifestyle/0${i + 1}.webp`,
+  })),
+  ...Array.from({ length: 13 }, (_, i) => ({
+    src: `/assets/lifestyle/image${i + 1}.webp`,
+  })),
+];
+---
+
+<section class="lifestyle" id="lifestyle">
+  <div class="lifestyle-inner">
+    <div class="lifestyle-slider-container" id="lifestyleSlider">
+      {images.map((img, index) => (
+        <img 
+          src={img.src} 
+          alt={`Zerowfx Lifestyle ${index + 1}`} 
+          loading={index === 0 ? "eager" : "lazy"} 
+          class={`slider-image-about ${index === 0 ? 'active' : ''}`}
+        />
+      ))}
+      <div class="lifestyle-image-border"></div>
+    </div>
+
+    <div class="lifestyle-text">
+      <h2 class="lifestyle-title">
+        Zerowfx Beyond trading,<br />
+        <span class="lifestyle-accent">your success partner</span>
+      </h2>
+      
+      <p class="lifestyle-desc">
+        Our community thrives on collaboration and mutual growth. We organize regular giveaways to give back to our members, host group chats where traders share insights and strategies, and create spaces where everyone helps each other succeed. Knowledge flows freely here from beginner questions to advanced market analysis.
+      </p>
+
+      <p class="lifestyle-desc">
+        We believe in real connections beyond the screen. That's why we organize city meetups where members can network, share experiences, and build lasting friendships. This isn't just about signals and profits it's about building a supportive family of like-minded traders who celebrate wins together and provide support during challenges.
+      </p>
+
+      <div class="lifestyle-buttons">
+        <a href="#heroFormAnchor" class="lifestyle-cta-green">
+          <i data-lucide="send" style="width:18px;height:18px"></i>
+          JOIN ZFX COMMUNITY
+        </a>
+        <div class="lifestyle-cta-blue-wrapper">
+          <span class="bonus-badge">100% BONUS</span>
+          <a href="#" class="lifestyle-cta-blue">
+            REGISTER NOW
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initLifestyleSlider() {
+    const slider = document.getElementById('lifestyleSlider');
+    if (!slider) return;
+
+    const slides = Array.from(slider.querySelectorAll('.slider-image-about'));
+    if (slides.length <= 1) return;
+
+    let currentSlide = 0;
+
+    // Use window to hold interval to prevent duplicates during HMR / View Transitions
+    if (window.lifestyleInterval) {
+      clearInterval(window.lifestyleInterval);
+    }
+
+    // Initialize state
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === currentSlide);
+    });
+
+    window.lifestyleInterval = setInterval(() => {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }, 3000);
+  }
+
+  // Setup initial call
+  initLifestyleSlider();
+  
+  // Clean up and restart for Astro View Transitions if enabled
+  document.addEventListener('astro:page-load', initLifestyleSlider);
+</script>
+
+<style>
+  .lifestyle {
+    padding: 100px 24px;
+    background: var(--color-bg-secondary);
+    position: relative;
+    overflow: hidden;
+  }
+  .lifestyle::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-green), transparent);
+    opacity: 0.3;
+  }
+  .lifestyle-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .lifestyle-slider-container {
+    position: relative;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+  .slider-image-about {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+    z-index: 0;
+  }
+  .slider-image-about.active {
+    opacity: 1;
+    z-index: 1;
+  }
+  .lifestyle-image-border {
+    position: absolute;
+    inset: 0;
+    border: 2px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    pointer-events: none;
+  }
+
+  .lifestyle-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .lifestyle-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    margin-bottom: 24px;
+    line-height: 1.1;
+    color: var(--color-text);
+  }
+  .lifestyle-accent {
+    color: var(--color-green);
+  }
+
+  .lifestyle-desc {
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+    margin-bottom: 24px;
+  }
+
+  .lifestyle-buttons {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .lifestyle-cta-green {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background: var(--color-green);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.25);
+  }
+  .lifestyle-cta-green:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(34, 197, 94, 0.4);
+  }
+
+  .lifestyle-cta-blue-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+  .bonus-badge {
+    position: absolute;
+    top: -12px;
+    right: -10px;
+    background: var(--color-green);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 20px;
+    z-index: 2;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
+  }
+  .lifestyle-cta-blue {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 14px 28px;
+    background: #2563eb;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-radius: var(--radius-md);
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: var(--transition);
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
+  }
+  .lifestyle-cta-blue:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4);
+  }
+
+  @media (max-width: 968px) {
+    .lifestyle-inner {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    .lifestyle-slider-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .lifestyle-buttons {
+      justify-content: center;
+    }
+    .lifestyle-cta-blue-wrapper {
+      margin-top: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .lifestyle {
+      padding: 60px 16px;
+    }
+    .lifestyle-buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+    .lifestyle-cta-green, .lifestyle-cta-blue, .lifestyle-cta-blue-wrapper {
+      width: 100%;
+    }
+    .lifestyle-cta-blue-wrapper {
+        margin-top: 20px;
+    }
+  }
+</style>
