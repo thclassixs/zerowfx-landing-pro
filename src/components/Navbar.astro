@@ -9,7 +9,7 @@ import ThemeSelector from './ThemeSelector.astro';
     </a>
 
     <div class="nav-links" id="navLinks">
-      <a href="/#about" class="nav-link" data-i18n="nav.about">About</a>
+      <a href="/" class="nav-link" data-i18n="nav.about" onclick="if(window.location.pathname==='/'||window.location.pathname==='/index.html'){window.scrollTo({top:0,behavior:'smooth'});return false;}">Home</a>
       <a href="/#setups" class="nav-link" data-i18n="nav.setups">Setups</a>
       <a href="/#results" class="nav-link" data-i18n="nav.results">Results</a>
       <a href="/#partners" class="nav-link" data-i18n="nav.partners">Partners</a>
@@ -76,7 +76,7 @@ import ThemeSelector from './ThemeSelector.astro';
 
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/#about" class="mobile-link" data-i18n="nav.about">About</a>
+    <a href="/" class="mobile-link" data-i18n="nav.about" onclick="if(window.location.pathname==='/'||window.location.pathname==='/index.html'){window.scrollTo({top:0,behavior:'smooth'});return false;}">Home</a>
     <a href="/#setups" class="mobile-link" data-i18n="nav.setups">Setups</a>
     <a href="/#results" class="mobile-link" data-i18n="nav.results">Results</a>
     <a href="/#partners" class="mobile-link" data-i18n="nav.partners">Partners</a>
@@ -156,23 +156,7 @@ import ThemeSelector from './ThemeSelector.astro';
       const selectedLang = (e.currentTarget as HTMLElement).getAttribute('data-lang');
       if (selectedLang && validLangs.includes(selectedLang)) {
         localStorage.setItem('language', selectedLang);
-        window.currentLang = selectedLang;
-        document.documentElement.lang = selectedLang;
-        document.documentElement.dir = selectedLang === 'ar' ? 'rtl' : 'ltr';
-        
-        if (activeLangText) {
-          activeLangText.textContent = selectedLang.toUpperCase();
-        }
-
-        // Apply translations via global function
-        if (typeof window.applyTranslations === 'function') {
-          window.applyTranslations();
-        }
-
-        // Force reload TradingView widgets if we are on charts page
-        // A simple way is to dispatch an event or just reload, but requirements say "no page reload"
-        // Let's fire a custom event just in case charts need to re-render
-        window.dispatchEvent(new Event('languageChanged'));
+        window.location.reload();
       }
     });
   });
