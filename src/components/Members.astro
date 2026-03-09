@@ -36,7 +36,6 @@ const allVideos = [...videos, ...videos];
         <div class="video-track" id="videoTrack">
           {allVideos.map((v, i) => (
             <div class="video-card" data-index={i}>
-              <div class="video-poster-fallback"></div>
               <video
                 class="testimonial-video"
                 preload="metadata"
@@ -46,7 +45,7 @@ const allVideos = [...videos, ...videos];
                 data-src={v.src}
                 x-webkit-airplay="deny"
               >
-                <source src={v.src} type="video/mp4" />
+                <source src={`${v.src}#t=0.1`} type="video/mp4" />
               </video>
               <!-- Play button (visible when paused/not started) -->
               <div class="video-play-btn" aria-label="Play video">
@@ -88,7 +87,7 @@ const allVideos = [...videos, ...videos];
       </button>
     </div>
 
-    <a href="https://t.me/zerowfx" target="_blank" rel="noopener" class="telegram-btn">
+    <a href="https://t.me/+gszChmY_o4AwMzg0" target="_blank" rel="noopener" class="telegram-btn">
       <i data-lucide="send" style="width:20px;height:20px"></i>
       <span data-i18n="members.btn">JOIN TELEGRAM COMMUNITY</span>
     </a>
@@ -116,68 +115,8 @@ const allVideos = [...videos, ...videos];
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-  // ─── iOS Thumbnail Generation ───
-  // iOS Safari doesn't reliably show video first frames with preload="metadata".
-  // We generate poster thumbnails by briefly loading the video metadata
-  // and drawing the first frame to a canvas.
-  function generateThumbnail(video: HTMLVideoElement, card: Element) {
-    const fallback = card.querySelector('.video-poster-fallback') as HTMLElement;
-    
-    // Try to capture first frame as poster
-    function captureFrame() {
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth || 200;
-        canvas.height = video.videoHeight || 356;
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          // Only use if we got actual pixel data (not blank)
-          if (dataUrl.length > 1000) {
-            video.setAttribute('poster', dataUrl);
-            if (fallback) fallback.style.opacity = '0';
-            return true;
-          }
-        }
-      } catch (e) {
-        // Cross-origin or security error — keep fallback visible
-      }
-      return false;
-    }
-
-    // When metadata/data is available, try to capture
-    if (video.readyState >= 2) {
-      captureFrame();
-    } else {
-      video.addEventListener('loadeddata', () => {
-        // Small delay to ensure frame is rendered
-        setTimeout(() => captureFrame(), 100);
-      }, { once: true });
-      
-      // Fallback: also try on seeked event for iOS
-      if (isIOS) {
-        video.addEventListener('loadedmetadata', () => {
-          // iOS needs to seek to get a frame
-          video.currentTime = 0.1;
-        }, { once: true });
-        video.addEventListener('seeked', () => {
-          setTimeout(() => {
-            captureFrame();
-            video.currentTime = 0;
-          }, 50);
-        }, { once: true });
-      }
-    }
-  }
-
-  // Generate thumbnails for all video cards
-  cards.forEach((card) => {
-    const video = card.querySelector('video') as HTMLVideoElement;
-    if (video) {
-      generateThumbnail(video, card);
-    }
-  });
+  // ─── Removed JS Canvas Thumbnail Generation ───
+  // Native HTML5 #t=0.1 anchor in the video URL automatically fetches a poster frame.
 
   function getCardWidth() {
     const card = cards[0] as HTMLElement;
@@ -495,15 +434,7 @@ const allVideos = [...videos, ...videos];
     width: max-content;
   }
 
-  /* Poster fallback — gradient shown until real thumbnail loads */
-  .video-poster-fallback {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-    z-index: 1;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-  }
+
 
   .video-card {
     flex: 0 0 200px;

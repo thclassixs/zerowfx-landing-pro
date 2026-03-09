@@ -109,7 +109,8 @@ const setups = [
     currentIdx = idx;
 
     const offset = currentIdx * 100;
-    track.style.transform = `translateX(-${offset}%)`;
+    const isRtl = document.documentElement.dir === 'rtl';
+    track.style.transform = isRtl ? `translateX(${offset}%)` : `translateX(-${offset}%)`;
 
     // Update dots
     dots.forEach((dot, i) => {
@@ -136,7 +137,12 @@ const setups = [
     });
   });
 
-
+  // Re-apply correct translation when language changes
+  window.addEventListener('languageChanged', () => {
+    const offset = currentIdx * 100;
+    const isRtl = document.documentElement.dir === 'rtl';
+    track.style.transform = isRtl ? `translateX(${offset}%)` : `translateX(-${offset}%)`;
+  });
 
   // Touch / swipe support for carousel
   let touchStartX = 0;

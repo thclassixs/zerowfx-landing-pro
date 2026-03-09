@@ -36,7 +36,7 @@
         <p class="form-message" id="heroMessage"></p>
       </form>
 
-      <a href="#heroFormAnchor" class="cta-main" id="ctaJoin">
+      <a href="https://t.me/Zerowfxgold" class="cta-main" id="ctaJoin">
         <i data-lucide="send" style="width:20px;height:20px"></i>
         <span data-i18n="hero.cta">JOIN ZFX PRO NOW!</span>
       </a>
@@ -83,7 +83,7 @@
 </section>
 
 <script>
-  const API = `http://${window.location.hostname}:3001`;
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
 
   // Smart scroll to form (works on both mobile & desktop)
   function scrollToForm() {

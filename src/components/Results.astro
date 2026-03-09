@@ -94,9 +94,18 @@ const images = Array.from({ length: 30 }, (_, i) => ({
     display: block;
   }
 
+  html[dir="rtl"] .results-track {
+    animation: resultsScrollRtl 60s linear infinite;
+  }
+
   @keyframes resultsScroll {
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
+  }
+
+  @keyframes resultsScrollRtl {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(50%); }
   }
 
   /* ZERO Strategy CTA */

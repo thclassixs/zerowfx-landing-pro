@@ -100,7 +100,7 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script>
-  const API = `http://${window.location.hostname}:3001`;
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
   let currentPage = 1;
   let searchQuery = '';
 

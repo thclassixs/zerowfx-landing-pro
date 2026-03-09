@@ -7,7 +7,7 @@ window.i18nData = {
         // Navbar
         "nav.tools": "Tools",
         "nav.charts": "Charts",
-        "nav.videos": "Videos",
+        "nav.blogs": "Blogs",
         "nav.about": "About",
         "nav.setups": "Setups",
         "nav.results": "Results",
@@ -161,7 +161,32 @@ window.i18nData = {
         "blog.loadmore": "Load More Videos",
         "blog.watchnow": "Watch Now",
         "blog.duration": "Duration",
-        "blog.loading": "Loading videos..."
+        "blog.loading": "Loading videos...",
+
+        // New Blog Articles
+        "blog.vid1.title": "1st Place Winner Among 8,000 Traders in XM Morocco Championship",
+        "blog.vid1.article": "An inspiring journey of winning 1st place among 8,000 traders in the XM Morocco Trading Championship. We share the strategies, patience, and mindset that led to this remarkable achievement. This showcases the power of disciplined trading.",
+        "blog.vid1.tags": "#Trading #XM #Forex #Morocco #Championship",
+
+        "blog.vid2.title": "Most Important Markets in 2026 & Quick Fundamentals Guide",
+        "blog.vid2.article": "Discover the most important markets to trade in 2026. This video provides a quick and effective explanation of fundamental analysis in trading, covering key economic indicators and market trends to watch out for.",
+        "blog.vid2.tags": "#Trading2026 #Fundamentals #Forex #Investing",
+
+        "blog.vid3.title": "Most Powerful Classic Strategies for Beginners 2026 - Part 4",
+        "blog.vid3.article": "Part 4 of our comprehensive guide to the most powerful classic trading strategies for beginners in 2026. Learn how to effectively apply support, resistance, and price action to maximize your setups.",
+        "blog.vid3.tags": "#TradingStrategies #Beginners #PriceAction #ClassicTrading",
+
+        "blog.vid4.title": "How to Identify the Trend and Choose Your Profitable Style - Part 3",
+        "blog.vid4.article": "In Part 3 of our series, we focus on identifying the true market trend and selecting the trading style that fits your psychology and maximizes your profitability in today's dynamic markets.",
+        "blog.vid4.tags": "#MarketTrend #TradingStyle #Profit #ForexTrends",
+
+        "blog.vid5.title": "How Professional Traders Manage Capital - Part 2",
+        "blog.vid5.article": "How do professional traders manage their capital? Part 2 dives deep into risk management, preserving equity, and calculating position sizes effectively to survive and thrive in trading.",
+        "blog.vid5.tags": "#RiskManagement #Capital #ProTrading #Finance",
+
+        "blog.vid6.title": "Want to Start Trading in 2026? This is the Right Start - Part 1",
+        "blog.vid6.article": "Do you want to start trading in 2026? This is the right beginning! Part 1 of our ultimate start guide covers everything a novice trader needs to set a solid foundation.",
+        "blog.vid6.tags": "#StartTrading #Trading2026 #ForexBeginners #Success"
     },
 
     ar: {
@@ -172,7 +197,7 @@ window.i18nData = {
         // Navbar
         "nav.tools": "الأدوات",
         "nav.charts": "الرسوم",
-        "nav.videos": "الفيديوهات",
+        "nav.blogs": "المدونات",
         "nav.about": "عن الموقع",
         "nav.setups": "الإعدادات",
         "nav.results": "النتائج",
@@ -460,7 +485,32 @@ window.i18nData = {
         "blog.loadmore": "تحميل المزيد من الفيديوهات",
         "blog.watchnow": "شاهد الآن",
         "blog.duration": "المدة",
-        "blog.loading": "جاري تحميل الفيديوهات..."
+        "blog.loading": "جاري تحميل الفيديوهات...",
+
+        // New Blog Articles
+        "blog.vid1.title": "المركز الأول من بين 8000 متداول في بطولة XM المغرب",
+        "blog.vid1.article": "رحلة ملهمة للحصول على المركز الأول من بين 8000 متداول في بطولة تداول إكس إم المغرب. نشارككم الاستراتيجيات، الصبر والعقلية التي أدت إلى هذا الإنجاز الرائع، مما يبرز قوة التداول المنضبط.",
+        "blog.vid1.tags": "#تداول #إكس_إم #فوركس #المغرب #بطولة",
+
+        "blog.vid2.title": "أهم الأسواق للتداول في 2026 وشرح سريع للتحليل الأساسي (الفندامنتال)",
+        "blog.vid2.article": "اكتشف أهم الأسواق التي يجب تداولها في عام 2026. يقدم هذا الفيديو شرحًا سريعًا وفعالًا للتحليل الأساسي في التداول، ويغطي المؤشرات الاقتصادية الرئيسية واتجاهات السوق التي يجب الانتباه إليها.",
+        "blog.vid2.tags": "#تداول_2026 #التحليل_الأساسي #فوركس #استثمار",
+
+        "blog.vid3.title": "أقوى الاستراتيجيات الكلاسيكية للمبتدئين 2026 - الجزء الرابع",
+        "blog.vid3.article": "الجزء الرابع من دليلنا الشامل لأقوى استراتيجيات التداول الكلاسيكية للمبتدئين في عام 2026. تعلم كيفية تطبيق الدعم والمقاومة وحركة السعر بفعالية لتعظيم نجاح صفقاتك.",
+        "blog.vid3.tags": "#استراتيجيات_التداول #للمبتدئين #حركة_السعر #التداول_الكلاسيكي",
+
+        "blog.vid4.title": "كيف تحدد الترند وتختار نوع التداول المربح لك - الجزء الثالث",
+        "blog.vid4.article": "في الجزء الثالث من سلسلتنا، نركز على تحديد الاتجاه الحقيقي للسوق واختيار أسلوب التداول الذي يناسب نفسيتك ويزيد من ربحيتك في الأسواق الديناميكية اليوم.",
+        "blog.vid4.tags": "#اتجاه_السوق #أسلوب_التداول #ربح #اتجاهات_الفوركس",
+
+        "blog.vid5.title": "كيف يتعامل المتداولون المحترفون مع رأس المال؟ - الجزء الثاني",
+        "blog.vid5.article": "كيف يدير المتداولون المحترفون رأس مالهم؟ يتعمق الجزء الثاني في إدارة المخاطر، والحفاظ على رأس المال، وحساب أحجام الصفقات بفعالية للبقاء والنجاح في التداول.",
+        "blog.vid5.tags": "#إدارة_المخاطر #رأس_المال #تداول_احترافي #مالية",
+
+        "blog.vid6.title": "تريد أن تبدأ التداول في 2026؟ هذه هي البداية الصحيحة - الجزء الأول",
+        "blog.vid6.article": "هل تريد البدء في التداول في عام 2026؟ هذه هي البداية الصحيحة! يغطي الجزء الأول من دليل البداية الشامل الخاص بنا كل ما يحتاجه المتداول المبتدئ لوضع أساس متين.",
+        "blog.vid6.tags": "#بدء_التداول #تداول_2026 #فوركس_للمبتدئين #نجاح"
     },
 
     fr: {
@@ -471,7 +521,7 @@ window.i18nData = {
         // Navbar
         "nav.tools": "Outils",
         "nav.charts": "Graphiques",
-        "nav.videos": "Vidéos",
+        "nav.blogs": "Blogs",
         "nav.about": "À Propos",
         "nav.setups": "Configurations",
         "nav.results": "Résultats",
@@ -626,6 +676,31 @@ window.i18nData = {
         "blog.loadmore": "Charger Plus",
         "blog.watchnow": "Regarder",
         "blog.duration": "Durée",
-        "blog.loading": "Chargement..."
+        "blog.loading": "Chargement...",
+
+        // New Blog Articles
+        "blog.vid1.title": "Gagnant de la 1ère place sur 8 000 traders au championnat XM Maroc",
+        "blog.vid1.article": "Un parcours inspirant pour remporter la 1ère place parmi 8 000 traders lors du championnat marocain XM. Nous partageons les stratégies, la patience et l'état d'esprit qui ont conduit à cet exploit.",
+        "blog.vid1.tags": "#Trading #XM #Forex #Maroc #Championnat",
+
+        "blog.vid2.title": "Les marchés les plus importants en 2026 et guide rapide des fondamentaux",
+        "blog.vid2.article": "Découvrez les marchés les plus importants à trader en 2026. Cette vidéo donne une explication rapide de l'analyse fondamentale, couvrant les principaux indicateurs économiques.",
+        "blog.vid2.tags": "#Trading2026 #Fondamentaux #Forex #Investissement",
+
+        "blog.vid3.title": "Stragégies Classiques Les Plus Puissantes Pour Débutants 2026 - P4",
+        "blog.vid3.article": "Partie 4 de notre guide complet sur les stratégies classiques les plus puissantes pour les débutants. Apprenez le support, la résistance et le price action.",
+        "blog.vid3.tags": "#StrategiesTrading #Débutants #PriceAction",
+
+        "blog.vid4.title": "Comment identifier la tendance et choisir votre style de trading - P3",
+        "blog.vid4.article": "Dans la 3ème partie, nous nous concentrons sur l'identification de la vraie tendance du marché et sur le style de trading qui correspond à votre psychologie.",
+        "blog.vid4.tags": "#TendanceMarche #StyleTrading #Profit #Forex",
+
+        "blog.vid5.title": "Comment les professionnels gèrent leur capital - Partie 2",
+        "blog.vid5.article": "La partie 2 plonge dans la gestion des risques, la préservation des capitaux et le calcul efficace de la taille des positions pour survivre et prospérer.",
+        "blog.vid5.tags": "#GestionRisque #Capital #TradingPro",
+
+        "blog.vid6.title": "Vous voulez commencer à trader en 2026 ? Voici le bon départ - P1",
+        "blog.vid6.article": "Vous voulez commencer le trading en 2026 ? C'est le bon départ ! La 1ère partie couvre tout ce dont un trader débutant a besoin.",
+        "blog.vid6.tags": "#DebutTrading #Trading2026 #ForexDébutant"
     }
 };
