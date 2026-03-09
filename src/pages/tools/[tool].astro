@@ -34,7 +34,7 @@ const toolTitle = currentTool.split('-').map(w => w.charAt(0).toUpperCase() + w.
       <aside class="tools-sidebar" id="toolsSidebar">
         <div class="sidebar-header">
           <i data-lucide="calculator" class="sidebar-icon"></i>
-          <h2>Trading Tools</h2>
+          <h2 data-i18n="tools.sidebar.title">Trading Tools</h2>
         </div>
         <nav class="sidebar-nav" id="sidebarNav"></nav>
       </aside>
@@ -46,7 +46,7 @@ const toolTitle = currentTool.split('-').map(w => w.charAt(0).toUpperCase() + w.
             <div class="tool-results" id="toolResults">
               <div class="results-placeholder">
                 <i data-lucide="bar-chart-3"></i>
-                <p>Results will appear here</p>
+                <p data-i18n="tools.results.placeholder">Results will appear here</p>
               </div>
             </div>
           </div>
@@ -487,9 +487,21 @@ const TOOLS = [
 // Get active tool from the data attribute (set by Astro server-side)
 let activeTool = document.getElementById('activeToolData')?.dataset.tool || TOOLS[0].id;
 
+function _t(text) {
+  if (!text) return '';
+  if (typeof text !== 'string') text = String(text);
+  const lang = window.currentLang || 'en';
+  if (lang === 'en') return text;
+  
+  if (window.i18nData && window.i18nData[lang] && window.i18nData[lang][text]) {
+    return window.i18nData[lang][text];
+  }
+  return text;
+}
+
 function init(){
   const nav=document.getElementById('sidebarNav');
-  nav.innerHTML=TOOLS.map(t=>`<a href="/tools/${t.id}" class="sidebar-btn${t.id===activeTool?' active':''}" data-tool="${t.id}"><i data-lucide="${t.icon}"></i><span>${t.name}</span></a>`).join('');
+  nav.innerHTML=TOOLS.map(t=>`<a href="/tools/${t.id}" class="sidebar-btn${t.id===activeTool?' active':''}" data-tool="${t.id}"><i data-lucide="${t.icon}"></i><span>${_t(t.name)}</span></a>`).join('');
   renderTool();
   if(window.lucide)window.lucide.createIcons();
 }
@@ -497,22 +509,24 @@ function init(){
 function renderTool(){
   const t=TOOLS.find(x=>x.id===activeTool);if(!t)return;
   const isCOT=t.id==='zero-strategy-calculator';
-  document.getElementById('toolHeader').innerHTML=`<div class="tool-title-row"><i data-lucide="${t.icon}"></i><h1>${t.name}</h1></div><p class="tool-desc">${t.desc}</p>`;
+  document.getElementById('toolHeader').innerHTML=`<div class="tool-title-row"><i data-lucide="${t.icon}"></i><h1>${_t(t.name)}</h1></div><p class="tool-desc">${_t(t.desc)}</p>`;
   const form=document.getElementById('toolForm');
   form.innerHTML=t.fields.map(f=>{
+    const fLabel = _t(f.label);
+    const fPlaceholder = _t(f.placeholder||'');
     if(f.type==='select'){
-      const opts=(f.options||[]).map(o=>`<option value="${o}"${o===f.val?' selected':''}>${o}</option>`).join('');
-      return`<div class="form-group"><label for="${f.id}">${f.label}</label><select id="${f.id}" class="form-control">${opts}</select></div>`;
+      const opts=(f.options||[]).map(o=>`<option value="${o}"${o===f.val?' selected':''}>${_t(o)}</option>`).join('');
+      return`<div class="form-group"><label for="${f.id}">${fLabel}</label><select id="${f.id}" class="form-control">${opts}</select></div>`;
     }
     if(isCOT && f.type==='number'){
       let extra='';
       if(f.id==='rrRatio'){
         extra=`<div class="rr-presets"><button type="button" class="rr-preset-btn" data-rr="2">RR 1:2</button><button type="button" class="rr-preset-btn" data-rr="3">RR 1:3</button></div>`;
       }
-      return`<div class="form-group"><label for="${f.id}">${f.label}</label><div class="stepper-row"><input id="${f.id}" type="number" class="form-control stepper-input" placeholder="${f.placeholder||''}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}><button type="button" class="stepper-btn stepper-minus" data-target="${f.id}" data-step="${f.step||1}">−</button><button type="button" class="stepper-btn stepper-plus" data-target="${f.id}" data-step="${f.step||1}">+</button></div>${extra}</div>`;
+      return`<div class="form-group"><label for="${f.id}">${fLabel}</label><div class="stepper-row"><input id="${f.id}" type="number" class="form-control stepper-input" placeholder="${fPlaceholder}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}><button type="button" class="stepper-btn stepper-minus" data-target="${f.id}" data-step="${f.step||1}">−</button><button type="button" class="stepper-btn stepper-plus" data-target="${f.id}" data-step="${f.step||1}">+</button></div>${extra}</div>`;
     }
-    return`<div class="form-group"><label for="${f.id}">${f.label}</label><input id="${f.id}" type="${f.type}" class="form-control" placeholder="${f.placeholder||''}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}></div>`;
-  }).join('')+'<button type="submit" class="calc-btn"><i data-lucide="calculator"></i> Calculate</button>'+(isCOT?'<button type="button" class="clear-btn" id="cotClearBtn"><i data-lucide="eraser"></i> Clear all</button>':'');
+    return`<div class="form-group"><label for="${f.id}">${fLabel}</label><input id="${f.id}" type="${f.type}" class="form-control" placeholder="${fPlaceholder}" step="${f.step||'any'}" ${f.val?'value="'+f.val+'"':''}></div>`;
+  }).join('')+`<button type="submit" class="calc-btn"><i data-lucide="calculator"></i> ${_t("Calculate")}</button>`+(isCOT?`<button type="button" class="clear-btn" id="cotClearBtn"><i data-lucide="eraser"></i> ${_t("Clear all")}</button>`:'');
   form.onsubmit=e=>{e.preventDefault();calculate(t);};
   // Wire up COT-specific controls
   if(isCOT){
@@ -538,12 +552,12 @@ function renderTool(){
           const el=document.getElementById(f.id);
           if(el)el.value='0';
         });
-        document.getElementById('toolResults').innerHTML='<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>Enter values and click Calculate</p></div>';
+        document.getElementById('toolResults').innerHTML=`<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>${_t("Enter values and click Calculate")}</p></div>`;
         if(window.lucide)window.lucide.createIcons();
       });
     }
   }
-  document.getElementById('toolResults').innerHTML='<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>Enter values and click Calculate</p></div>';
+  document.getElementById('toolResults').innerHTML=`<div class="results-placeholder"><i data-lucide="bar-chart-3"></i><p>${_t("Enter values and click Calculate")}</p></div>`;
   if(window.lucide)window.lucide.createIcons();
 }
 
@@ -553,16 +567,17 @@ function calculate(t){
   });
   const res=t.calc(vals);
   const panel=document.getElementById('toolResults');
-  if(!res){panel.innerHTML='<div class="results-placeholder error"><i data-lucide="alert-circle"></i><p>Please fill in all required fields</p></div>';if(window.lucide)window.lucide.createIcons();return;}
+  if(!res){panel.innerHTML=`<div class="results-placeholder error"><i data-lucide="alert-circle"></i><p>${_t("Please fill in all required fields")}</p></div>`;if(window.lucide)window.lucide.createIcons();return;}
   panel.innerHTML='<div class="results-grid">'+res.map(r=>{
-    if(r.cls==='section')return`<div class="result-section">${r.l}</div>`;
-    return`<div class="result-item${r.cls?' '+r.cls:''}"><span class="result-label">${r.l}</span><span class="result-value">${r.v}</span></div>`;
+    if(r.cls==='section')return`<div class="result-section">${_t(r.l)}</div>`;
+    return`<div class="result-item${r.cls?' '+r.cls:''}"><span class="result-label">${_t(r.l)}</span><span class="result-value">${_t(r.v)}</span></div>`;
   }).join('')+'</div>';
   panel.classList.add('has-results');
   if(window.lucide)window.lucide.createIcons();
 }
 
 document.addEventListener('DOMContentLoaded',init);
+window.addEventListener('languageChanged',init);
 
 // Mobile sidebar toggle
 document.addEventListener('DOMContentLoaded',()=>{

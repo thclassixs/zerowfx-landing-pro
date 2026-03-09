@@ -7,34 +7,34 @@
   </button>
   <div class="countdown-header">
     <i data-lucide="timer" class="countdown-icon-lucide"></i>
-    <span class="countdown-label">OFFER ENDS IN</span>
+    <span class="countdown-label" data-i18n="sticky.badge">OFFER ENDS IN</span>
     <button class="countdown-close" id="countdownClose" aria-label="Close"><i data-lucide="x" style="width:14px;height:14px"></i></button>
   </div>
   <div class="countdown-timer" id="countdownTimer">
     <div class="time-unit">
       <span class="time-value" id="cdDays">01</span>
-      <span class="time-label">D</span>
+      <span class="time-label" data-i18n="sticky.days">D</span>
     </div>
     <span class="time-sep">:</span>
     <div class="time-unit">
       <span class="time-value" id="cdHours">01</span>
-      <span class="time-label">H</span>
+      <span class="time-label" data-i18n="sticky.hours">H</span>
     </div>
     <span class="time-sep">:</span>
     <div class="time-unit">
       <span class="time-value" id="cdMins">59</span>
-      <span class="time-label">M</span>
+      <span class="time-label" data-i18n="sticky.mins">M</span>
     </div>
     <span class="time-sep">:</span>
     <div class="time-unit">
       <span class="time-value" id="cdSecs">59</span>
-      <span class="time-label">S</span>
+      <span class="time-label" data-i18n="sticky.secs">S</span>
     </div>
   </div>
   <div class="countdown-perks">
-    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> Free Masterclass</div>
-    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> VIP Inner Circle</div>
-    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> 100% XM Bonus</div>
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> <span data-i18n="sticky.perk1">Free Masterclass</span></div>
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> <span data-i18n="sticky.perk2">VIP Inner Circle</span></div>
+    <div class="perk"><i data-lucide="check" class="perk-check-icon"></i> <span data-i18n="sticky.perk3">100% XM Bonus</span></div>
   </div>
 </div>
 
@@ -42,9 +42,9 @@
 <div class="bottom-bar" id="bottomBar">
   <div class="bottom-bar-inner">
     <p class="bottom-text">
-      <strong>⚡ LIMITED SPOTS</strong> — Double Your Deposit + Get a $247 Masterclass FREE
+      <strong data-i18n="sticky.bottext1">⚡ LIMITED SPOTS</strong><span data-i18n="sticky.bottext2"> — Double Your Deposit + Get a $247 Masterclass FREE</span>
     </p>
-    <a href="#heroFormAnchor" class="bottom-cta">CLAIM MY BONUS</a>
+    <a href="#heroFormAnchor" class="bottom-cta" data-i18n="sticky.botcta">CLAIM MY BONUS</a>
   </div>
 </div>
 
@@ -52,32 +52,32 @@
 <div class="modal-overlay" id="brokerModal">
   <div class="modal-card">
     <button class="modal-close" id="modalClose" aria-label="Close modal"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-    <div class="modal-badge"><i data-lucide="shield-check" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:4px"></i> TRUSTED BY 50,000+ TRADERS</div>
+    <div class="modal-badge"><i data-lucide="shield-check" style="width:14px;height:14px;display:inline;vertical-align:middle;margin-right:4px"></i> <span data-i18n="modal.badge">TRUSTED BY 50,000+ TRADERS</span></div>
     <h3 class="modal-title">
-      Your <em class="modal-accent">100% Bonus</em> Is Reserved
+      <span data-i18n="modal.title1">Your </span><em class="modal-accent" data-i18n="modal.title2">100% Bonus</em><span data-i18n="modal.title3"> Is Reserved</span>
     </h3>
-    <p class="modal-desc">
+    <p class="modal-desc" data-i18n="modal.desc">
       Double your first deposit instantly with XM — the broker trusted by traders worldwide. Enter your email below to lock in your bonus before spots fill up.
     </p>
     <div class="modal-features">
-      <span><i data-lucide="check" class="mf-check-icon"></i> Double Your Deposit</span>
-      <span><i data-lucide="check" class="mf-check-icon"></i> Gold Spreads from 0.1</span>
-      <span><i data-lucide="check" class="mf-check-icon"></i> Withdraw Anytime</span>
+      <span><i data-lucide="check" class="mf-check-icon"></i> <span data-i18n="modal.feat1">Double Your Deposit</span></span>
+      <span><i data-lucide="check" class="mf-check-icon"></i> <span data-i18n="modal.feat2">Gold Spreads from 0.1</span></span>
+      <span><i data-lucide="check" class="mf-check-icon"></i> <span data-i18n="modal.feat3">Withdraw Anytime</span></span>
     </div>
     
     <div class="modal-promo">
-      <span class="promo-badge">Your Exclusive Code: <strong>CQMHK</strong></span>
-      <span class="promo-slots" id="promoSlots">🔥 Only <strong id="slotsCount">47</strong> codes left today</span>
+      <span class="promo-badge"><span data-i18n="modal.promo1">Your Exclusive Code:</span> <strong>CQMHK</strong></span>
+      <span class="promo-slots" id="promoSlots"><span data-i18n="modal.slots1">🔥 Only </span><strong id="slotsCount">47</strong><span data-i18n="modal.slots2"> codes left today</span></span>
     </div>
     <form class="modal-form" id="modalForm">
       <div class="modal-input-row">
-        <input type="email" id="modalEmail" placeholder="Enter your best email to lock in bonus" class="modal-input" required />
-        <button type="submit" class="modal-submit">SUBMIT</button>
+        <input type="email" id="modalEmail" placeholder="Enter your best email to lock in bonus" data-i18n-placeholder="modal.placeholder" class="modal-input" required />
+        <button type="submit" class="modal-submit" id="modalSubmitBtn" data-i18n="modal.submit">SUBMIT</button>
       </div>
       <a href="https://affs.click/X3LJB" target="_blank" rel="noopener noreferrer" class="affiliate-button">
-        CLAIM MY 100% BONUS <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-left:6px"></i>
+        <span data-i18n="modal.cta">CLAIM MY 100% BONUS</span> <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-left:6px"></i>
       </a>
-      <p class="modal-micro">⚡ 2,340 traders claimed this today · Bonus expires soon</p>
+      <p class="modal-micro" data-i18n="modal.micro">⚡ 2,340 traders claimed this today · Bonus expires soon</p>
     </form>
   </div>
 </div>
@@ -185,7 +185,7 @@
         emailInput.value = '';
         document.getElementById('brokerModal')?.classList.remove('visible');
         localStorage.setItem('brokerModalClosed', 'true');
-        alert('✅ Successfully joined!');
+        alert(window.currentLang === 'ar' ? '✅ تم الاشتراك بنجاح!' : '✅ Successfully joined!');
       } else {
         alert(data.error || 'Something went wrong');
       }

@@ -21,10 +21,10 @@ const allVideos = [...videos, ...videos];
     <div class="members-header">
       <div class="members-badge">
         <i data-lucide="message-circle" style="width:14px;height:14px"></i>
-        <span>REAL TESTIMONIALS</span>
+        <span data-i18n="members.badge">REAL TESTIMONIALS</span>
       </div>
-      <h2 class="section-title">What Our Members Say</h2>
-      <p class="section-subtitle">Hear directly from our community — real people, real results, real transformations.</p>
+      <h2 class="section-title" data-i18n="members.title">What Our Members Say</h2>
+      <p class="section-subtitle" data-i18n="members.subtitle">Hear directly from our community — real people, real results, real transformations.</p>
     </div>
 
     <div class="video-carousel-wrapper">
@@ -63,7 +63,7 @@ const allVideos = [...videos, ...videos];
               </div>
               <div class="video-card-badge">
                 <i data-lucide="star" style="width:10px;height:10px;fill:currentColor"></i>
-                <span>Member</span>
+                <span data-i18n="members.cardbadge">Member</span>
               </div>
             </div>
           ))}
@@ -90,7 +90,7 @@ const allVideos = [...videos, ...videos];
 
     <a href="https://t.me/zerowfx" target="_blank" rel="noopener" class="telegram-btn">
       <i data-lucide="send" style="width:20px;height:20px"></i>
-      JOIN TELEGRAM COMMUNITY
+      <span data-i18n="members.btn">JOIN TELEGRAM COMMUNITY</span>
     </a>
   </div>
 </section>

@@ -6,13 +6,13 @@
     <div class="hero-left">
       <div class="hero-badge">
         <span class="badge-dot"></span>
-        <span>FREE MASTERCLASS — LIMITED SPOTS</span>
+        <span data-i18n="hero.badge">FREE MASTERCLASS — LIMITED SPOTS</span>
       </div>
       <h1 class="hero-title">
-        ZEROWFX<br />
-        <span class="title-accent">COMMUNITY</span>
+        <span data-i18n="hero.title1">ZEROWFX</span><br />
+        <span class="title-accent" data-i18n="hero.title2">COMMUNITY</span>
       </h1>
-      <p class="hero-subtitle">
+      <p class="hero-subtitle" data-i18n="hero.subtitle">
         Join an exclusive professional trading community led by ZerowFX. Get real-time GOLD, US INDICES & CRYPTO signals, precise trading setups, live sessions, and clear daily analysis that help you truly understand the market not just follow it. With ZerowFX, you're accessing a methodology backed by 10+ years of experience and consistent performance across different market conditions.
         <br /><br />
         Get market insights + enter our $50 giveaway every 2 weeks&nbsp;🎁
@@ -25,10 +25,11 @@
             type="email"
             id="heroEmail"
             placeholder="Enter your email"
+            data-i18n-placeholder="hero.placeholder"
             required
             class="form-input"
           />
-          <button type="submit" class="form-btn" id="heroSubmitBtn">
+          <button type="submit" class="form-btn" id="heroSubmitBtn" data-i18n="hero.btn">
             Submit
           </button>
         </div>
@@ -37,21 +38,21 @@
 
       <a href="#heroFormAnchor" class="cta-main" id="ctaJoin">
         <i data-lucide="send" style="width:20px;height:20px"></i>
-        JOIN ZFX PRO NOW!
+        <span data-i18n="hero.cta">JOIN ZFX PRO NOW!</span>
       </a>
 
       <div class="hero-badges">
         <div class="badge-item">
           <i data-lucide="badge-check" class="badge-icon-lucide"></i>
-          <span>Verified Results</span>
+          <span data-i18n="hero.verified">Verified Results</span>
         </div>
         <div class="badge-item">
           <i data-lucide="shield-check" class="badge-icon-lucide"></i>
-          <span>100% Transparent</span>
+          <span data-i18n="hero.transparent">100% Transparent</span>
         </div>
         <div class="badge-item">
           <i data-lucide="zap" class="badge-icon-lucide"></i>
-          <span>Real-Time Setups</span>
+          <span data-i18n="hero.realtime">Real-Time Setups</span>
         </div>
       </div>
     </div>
@@ -137,7 +138,9 @@
       message.className = 'form-message error';
     }
 
+    // Refresh translation just in case
     btn.textContent = 'Submit';
+    if (typeof window.applyTranslations === 'function') window.applyTranslations();
     btn.removeAttribute('disabled');
 
     // Keep form in view after submit on mobile
@@ -215,7 +218,7 @@
     align-items: center;
     position: relative;
     z-index: 1;
-    padding-left: 220px;
+    padding-inline-start: 220px;
   }
   .hero-badge {
     display: inline-flex;
@@ -276,8 +279,9 @@
     padding: 14px 20px;
     background: var(--color-bg-card);
     border: 1px solid var(--color-border-strong);
-    border-right: none;
-    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    border-inline-end: none;
+    border-start-start-radius: var(--radius-md);
+    border-end-start-radius: var(--radius-md);
     color: var(--color-text);
     font-size: 0.95rem;
     transition: var(--transition);
@@ -295,7 +299,8 @@
     color: #000;
     font-weight: 700;
     font-size: 0.95rem;
-    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    border-start-end-radius: var(--radius-md);
+    border-end-end-radius: var(--radius-md);
     transition: var(--transition);
     white-space: nowrap;
     text-transform: uppercase;
@@ -480,7 +485,7 @@
       grid-template-columns: 1fr;
       text-align: center;
       gap: 40px;
-      padding-left: 0;
+      padding-inline-start: 0;
     }
     .hero-subtitle {
       margin-left: auto;
@@ -513,7 +518,9 @@
     }
     .form-input {
       border-radius: var(--radius-md);
-      border-right: 1px solid var(--color-border-strong);
+      border-inline-end: 1px solid var(--color-border-strong);
+      border-start-start-radius: var(--radius-md);
+      border-end-start-radius: var(--radius-md);
     }
     .form-btn {
       border-radius: var(--radius-md);

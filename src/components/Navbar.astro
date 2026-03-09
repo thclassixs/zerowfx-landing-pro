@@ -9,44 +9,58 @@ import ThemeSelector from './ThemeSelector.astro';
     </a>
 
     <div class="nav-links" id="navLinks">
-    <div class="nav-dropdown" id="toolsDropdown">
+      <div class="nav-dropdown" id="toolsDropdown">
         <button class="nav-link dropdown-trigger">
-          Tools <i data-lucide="chevron-down" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:2px;"></i>
+          <span data-i18n="nav.tools">Tools</span> <i data-lucide="chevron-down" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:2px;"></i>
         </button>
         <div class="dropdown-panel">
           <div class="dropdown-grid">
-            <a href="/tools/pip-calculator" class="dropdown-item"><i data-lucide="trending-up"></i>Pip Calculator</a>
-            <a href="/tools/pip-value-calculator" class="dropdown-item"><i data-lucide="dollar-sign"></i>Pip Value Calculator</a>
-            <a href="/tools/lot-size-calculator" class="dropdown-item"><i data-lucide="layers"></i>Lot Size Calculator</a>
-            <a href="/tools/margin-calculator" class="dropdown-item"><i data-lucide="lock"></i>Margin Calculator</a>
-            <a href="/tools/position-size-calculator" class="dropdown-item"><i data-lucide="target"></i>Position Size Calculator</a>
-            <a href="/tools/profit-calculator" class="dropdown-item"><i data-lucide="badge-dollar-sign"></i>Profit Calculator</a>
-            <a href="/tools/risk-calculator" class="dropdown-item"><i data-lucide="shield-alert"></i>Risk Calculator</a>
-            <a href="/tools/sl-tp-calculator" class="dropdown-item"><i data-lucide="arrow-down-up"></i>SL &amp; TP Calculator</a>
-            <a href="/tools/spread-calculator" class="dropdown-item"><i data-lucide="arrow-left-right"></i>Spread Cost Calculator</a>
-            <a href="/tools/swap-calculator" class="dropdown-item"><i data-lucide="repeat"></i>Swap Calculator</a>
-            <a href="/tools/drawdown-calculator" class="dropdown-item"><i data-lucide="trending-down"></i>Drawdown Calculator</a>
-            <a href="/tools/fibonacci-calculator" class="dropdown-item"><i data-lucide="git-branch"></i>Fibonacci Calculator</a>
-            <a href="/tools/pivot-points-calculator" class="dropdown-item"><i data-lucide="navigation"></i>Pivot Points Calculator</a>
-            <a href="/tools/leverage-calculator" class="dropdown-item"><i data-lucide="zap"></i>Leverage Calculator</a>
-            <a href="/tools/commission-calculator" class="dropdown-item"><i data-lucide="receipt"></i>Commission Calculator</a>
-            <a href="/tools/zero-strategy-calculator" class="dropdown-item"><i data-lucide="line-chart"></i>ZERO-Strategy Calculator</a>
+            <a href="/tools/pip-calculator" class="dropdown-item"><i data-lucide="trending-up"></i><span data-i18n="tools.pip-calculator.name">Pip Calculator</span></a>
+            <a href="/tools/pip-value-calculator" class="dropdown-item"><i data-lucide="dollar-sign"></i><span data-i18n="tools.pip-value-calculator.name">Pip Value Calculator</span></a>
+            <a href="/tools/lot-size-calculator" class="dropdown-item"><i data-lucide="layers"></i><span data-i18n="tools.lot-size-calculator.name">Lot Size Calculator</span></a>
+            <a href="/tools/margin-calculator" class="dropdown-item"><i data-lucide="lock"></i><span data-i18n="tools.margin-calculator.name">Margin Calculator</span></a>
+            <a href="/tools/position-size-calculator" class="dropdown-item"><i data-lucide="target"></i><span data-i18n="tools.position-size-calculator.name">Position Size Calculator</span></a>
+            <a href="/tools/profit-calculator" class="dropdown-item"><i data-lucide="badge-dollar-sign"></i><span data-i18n="tools.profit-calculator.name">Profit Calculator</span></a>
+            <a href="/tools/risk-calculator" class="dropdown-item"><i data-lucide="shield-alert"></i><span data-i18n="tools.risk-calculator.name">Risk Calculator</span></a>
+            <a href="/tools/sl-tp-calculator" class="dropdown-item"><i data-lucide="arrow-down-up"></i><span data-i18n="tools.sl-tp-calculator.name">SL &amp; TP Calculator</span></a>
+            <a href="/tools/spread-calculator" class="dropdown-item"><i data-lucide="arrow-left-right"></i><span data-i18n="tools.spread-calculator.name">Spread Cost Calculator</span></a>
+            <a href="/tools/swap-calculator" class="dropdown-item"><i data-lucide="repeat"></i><span data-i18n="tools.swap-calculator.name">Swap Calculator</span></a>
+            <a href="/tools/drawdown-calculator" class="dropdown-item"><i data-lucide="trending-down"></i><span data-i18n="tools.drawdown-calculator.name">Drawdown Calculator</span></a>
+            <a href="/tools/fibonacci-calculator" class="dropdown-item"><i data-lucide="git-branch"></i><span data-i18n="tools.fibonacci-calculator.name">Fibonacci Calculator</span></a>
+            <a href="/tools/pivot-points-calculator" class="dropdown-item"><i data-lucide="navigation"></i><span data-i18n="tools.pivot-points-calculator.name">Pivot Points Calculator</span></a>
+            <a href="/tools/leverage-calculator" class="dropdown-item"><i data-lucide="zap"></i><span data-i18n="tools.leverage-calculator.name">Leverage Calculator</span></a>
+            <a href="/tools/commission-calculator" class="dropdown-item"><i data-lucide="receipt"></i><span data-i18n="tools.commission-calculator.name">Commission Calculator</span></a>
+            <a href="/tools/zero-strategy-calculator" class="dropdown-item"><i data-lucide="line-chart"></i><span data-i18n="tools.zero-strategy-calculator.name">ZERO-Strategy Calculator</span></a>
           </div>
         </div>
       </div>
-      <a href="/charts" class="nav-link">Charts</a>
-      <a href="/#about" class="nav-link">About</a>
-      <a href="/#setups" class="nav-link">Setups</a>
-      <a href="/#results" class="nav-link">Results</a>
-      <a href="/#partners" class="nav-link">Partners</a>
+      <a href="/charts" class="nav-link" data-i18n="nav.charts">Charts</a>
+      <a href="/#about" class="nav-link" data-i18n="nav.about">About</a>
+      <a href="/#setups" class="nav-link" data-i18n="nav.setups">Setups</a>
+      <a href="/#results" class="nav-link" data-i18n="nav.results">Results</a>
+      <a href="/#partners" class="nav-link" data-i18n="nav.partners">Partners</a>
     </div>
 
     <div class="nav-right">
       <ThemeSelector />
-      <div class="lang-toggle">
-        <span class="lang-flag">🇬🇧</span>
-        <span class="lang-code">EN</span>
+      
+      <!-- Language Dropdown -->
+      <div class="nav-dropdown" id="langDropdown">
+        <button class="lang-toggle dropdown-trigger" id="langToggleBtn">
+          <i data-lucide="globe" style="width:16px;height:16px;"></i>
+          <span class="lang-code" id="activeLangText">EN</span>
+          <i data-lucide="chevron-down" style="width:12px;height:12px;margin-left:2px;"></i>
+        </button>
+        <div class="dropdown-panel lang-panel">
+          <button class="lang-option" data-lang="en">
+            <span class="lang-flag">🇬🇧</span> English
+          </button>
+          <button class="lang-option" data-lang="ar">
+            <span class="lang-flag">🇸🇦</span> العربية
+          </button>
+        </div>
       </div>
+
       <button class="hamburger" id="hamburger" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -57,31 +71,31 @@ import ThemeSelector from './ThemeSelector.astro';
 
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
-    <a href="/charts" class="mobile-link">Charts</a>
-    <a href="/#about" class="mobile-link">About</a>
-    <a href="/#setups" class="mobile-link">Setups</a>
-    <a href="/#results" class="mobile-link">Results</a>
-    <a href="/#partners" class="mobile-link">Partners</a>
+    <a href="/charts" class="mobile-link" data-i18n="nav.charts">Charts</a>
+    <a href="/#about" class="mobile-link" data-i18n="nav.about">About</a>
+    <a href="/#setups" class="mobile-link" data-i18n="nav.setups">Setups</a>
+    <a href="/#results" class="mobile-link" data-i18n="nav.results">Results</a>
+    <a href="/#partners" class="mobile-link" data-i18n="nav.partners">Partners</a>
     <button class="mobile-link mobile-tools-toggle" id="mobileToolsToggle">
-      Tools <i data-lucide="chevron-down" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:4px;transition:transform 0.3s;"></i>
+      <span data-i18n="nav.tools">Tools</span> <i data-lucide="chevron-down" style="width:14px;height:14px;display:inline-block;vertical-align:middle;margin-left:4px;transition:transform 0.3s;"></i>
     </button>
     <div class="mobile-tools-list" id="mobileToolsList">
-      <a href="/tools/pip-calculator" class="mobile-tool-link">Pip Calculator</a>
-      <a href="/tools/pip-value-calculator" class="mobile-tool-link">Pip Value Calculator</a>
-      <a href="/tools/lot-size-calculator" class="mobile-tool-link">Lot Size Calculator</a>
-      <a href="/tools/margin-calculator" class="mobile-tool-link">Margin Calculator</a>
-      <a href="/tools/position-size-calculator" class="mobile-tool-link">Position Size Calculator</a>
-      <a href="/tools/profit-calculator" class="mobile-tool-link">Profit Calculator</a>
-      <a href="/tools/risk-calculator" class="mobile-tool-link">Risk Calculator</a>
-      <a href="/tools/sl-tp-calculator" class="mobile-tool-link">SL &amp; TP Calculator</a>
-      <a href="/tools/spread-calculator" class="mobile-tool-link">Spread Cost Calculator</a>
-      <a href="/tools/swap-calculator" class="mobile-tool-link">Swap Calculator</a>
-      <a href="/tools/drawdown-calculator" class="mobile-tool-link">Drawdown Calculator</a>
-      <a href="/tools/fibonacci-calculator" class="mobile-tool-link">Fibonacci Calculator</a>
-      <a href="/tools/pivot-points-calculator" class="mobile-tool-link">Pivot Points Calculator</a>
-      <a href="/tools/leverage-calculator" class="mobile-tool-link">Leverage Calculator</a>
-      <a href="/tools/commission-calculator" class="mobile-tool-link">Commission Calculator</a>
-      <a href="/tools/zero-strategy-calculator" class="mobile-tool-link">ZERO-Strategy Calculator</a>
+      <a href="/tools/pip-calculator" class="mobile-tool-link" data-i18n="tools.pip-calculator.name">Pip Calculator</a>
+      <a href="/tools/pip-value-calculator" class="mobile-tool-link" data-i18n="tools.pip-value-calculator.name">Pip Value Calculator</a>
+      <a href="/tools/lot-size-calculator" class="mobile-tool-link" data-i18n="tools.lot-size-calculator.name">Lot Size Calculator</a>
+      <a href="/tools/margin-calculator" class="mobile-tool-link" data-i18n="tools.margin-calculator.name">Margin Calculator</a>
+      <a href="/tools/position-size-calculator" class="mobile-tool-link" data-i18n="tools.position-size-calculator.name">Position Size Calculator</a>
+      <a href="/tools/profit-calculator" class="mobile-tool-link" data-i18n="tools.profit-calculator.name">Profit Calculator</a>
+      <a href="/tools/risk-calculator" class="mobile-tool-link" data-i18n="tools.risk-calculator.name">Risk Calculator</a>
+      <a href="/tools/sl-tp-calculator" class="mobile-tool-link" data-i18n="tools.sl-tp-calculator.name">SL &amp; TP Calculator</a>
+      <a href="/tools/spread-calculator" class="mobile-tool-link" data-i18n="tools.spread-calculator.name">Spread Cost Calculator</a>
+      <a href="/tools/swap-calculator" class="mobile-tool-link" data-i18n="tools.swap-calculator.name">Swap Calculator</a>
+      <a href="/tools/drawdown-calculator" class="mobile-tool-link" data-i18n="tools.drawdown-calculator.name">Drawdown Calculator</a>
+      <a href="/tools/fibonacci-calculator" class="mobile-tool-link" data-i18n="tools.fibonacci-calculator.name">Fibonacci Calculator</a>
+      <a href="/tools/pivot-points-calculator" class="mobile-tool-link" data-i18n="tools.pivot-points-calculator.name">Pivot Points Calculator</a>
+      <a href="/tools/leverage-calculator" class="mobile-tool-link" data-i18n="tools.leverage-calculator.name">Leverage Calculator</a>
+      <a href="/tools/commission-calculator" class="mobile-tool-link" data-i18n="tools.commission-calculator.name">Commission Calculator</a>
+      <a href="/tools/zero-strategy-calculator" class="mobile-tool-link" data-i18n="tools.zero-strategy-calculator.name">ZERO-Strategy Calculator</a>
     </div>
   </div>
 </nav>
@@ -117,6 +131,43 @@ import ThemeSelector from './ThemeSelector.astro';
     link.addEventListener('click', () => {
       hamburger?.classList.remove('active');
       mobileMenu?.classList.remove('open');
+    });
+  });
+
+  // Language Selection Logic
+  const validLangs = ['en', 'ar'];
+  let currentLang = localStorage.getItem('language') || 'en';
+  if (!validLangs.includes(currentLang)) currentLang = 'en';
+
+  const activeLangText = document.getElementById('activeLangText');
+  if (activeLangText) {
+    activeLangText.textContent = currentLang.toUpperCase();
+  }
+
+  const langOptions = document.querySelectorAll('.lang-option');
+  langOptions.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const selectedLang = (e.currentTarget as HTMLElement).getAttribute('data-lang');
+      if (selectedLang && validLangs.includes(selectedLang)) {
+        localStorage.setItem('language', selectedLang);
+        window.currentLang = selectedLang;
+        document.documentElement.lang = selectedLang;
+        document.documentElement.dir = selectedLang === 'ar' ? 'rtl' : 'ltr';
+        
+        if (activeLangText) {
+          activeLangText.textContent = selectedLang.toUpperCase();
+        }
+
+        // Apply translations via global function
+        if (typeof window.applyTranslations === 'function') {
+          window.applyTranslations();
+        }
+
+        // Force reload TradingView widgets if we are on charts page
+        // A simple way is to dispatch an event or just reload, but requirements say "no page reload"
+        // Let's fire a custom event just in case charts need to re-render
+        window.dispatchEvent(new Event('languageChanged'));
+      }
     });
   });
 
@@ -285,6 +336,22 @@ import ThemeSelector from './ThemeSelector.astro';
     align-items: center;
     gap: 16px;
   }
+  /* Language Dropdown Customizations */
+  .lang-panel {
+    width: 160px;
+    padding: 8px;
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(8px);
+  }
+  .nav-dropdown:hover .lang-panel {
+    transform: translateX(0) translateY(0);
+  }
+  html[dir="rtl"] .lang-panel {
+    right: auto;
+    left: 0;
+  }
+
   .lang-toggle {
     display: flex;
     align-items: center;
@@ -296,13 +363,38 @@ import ThemeSelector from './ThemeSelector.astro';
     font-size: 0.85rem;
     color: var(--color-text-muted);
     transition: var(--transition);
+    background: transparent;
+    font-family: inherit;
   }
   .lang-toggle:hover {
     border-color: var(--color-green);
     color: var(--color-text);
   }
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+  }
+  html[dir="rtl"] .lang-option {
+    text-align: right;
+  }
+  .lang-option:hover {
+    background: var(--color-bg-elevated);
+    color: var(--color-green);
+  }
   .lang-flag {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
   .hamburger {
     display: none;

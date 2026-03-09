@@ -28,10 +28,12 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <title>{title}</title>
-    <!-- Apply saved theme immediately to prevent FOUC -->
+    <!-- i18n Data -->
+    <script src="/i18n.js" is:inline></script>
+    <!-- Apply saved theme and language immediately to prevent FOUC -->
     <script is:inline>
       (function() {
         var valid = ['emerald-night','clean-white'];
@@ -43,6 +45,14 @@ const {
         if (saved !== 'emerald-night') {
           document.documentElement.classList.add('theme-' + saved);
         }
+
+        var savedLang = localStorage.getItem('language') || 'en';
+        var validLangs = ['en', 'ar'];
+        if (validLangs.indexOf(savedLang) === -1) savedLang = 'en';
+        
+        document.documentElement.lang = savedLang;
+        document.documentElement.dir = savedLang === 'ar' ? 'rtl' : 'ltr';
+        window.currentLang = savedLang;
       })();
     </script>
   </head>
@@ -53,6 +63,38 @@ const {
       document.addEventListener('DOMContentLoaded', () => {
         if (window.lucide) window.lucide.createIcons();
       });
+
+      // Apply translations instantly
+      (function() {
+        window.applyTranslations = function applyTranslations() {
+          const lang = window.currentLang || 'en';
+          const texts = document.querySelectorAll('[data-i18n]');
+          texts.forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (window.i18nData && window.i18nData[lang] && window.i18nData[lang][key]) {
+              el.innerHTML = window.i18nData[lang][key];
+            }
+          });
+          const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+          placeholders.forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (window.i18nData && window.i18nData[lang] && window.i18nData[lang][key]) {
+              el.setAttribute('placeholder', window.i18nData[lang][key]);
+            }
+          });
+          
+          if (window.i18nData && window.i18nData[lang]) {
+            if (window.i18nData[lang]['meta.title']) {
+              document.title = window.i18nData[lang]['meta.title'];
+            }
+            const descMeta = document.querySelector('meta[name="description"]');
+            if (descMeta && window.i18nData[lang]['meta.desc']) {
+              descMeta.setAttribute('content', window.i18nData[lang]['meta.desc']);
+            }
+          }
+        };
+        window.applyTranslations();
+      })();
     </script>
   </body>
 </html>
@@ -144,5 +186,14 @@ const {
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-green);
+  }
+
+  /* RTL & Font Swap */
+  html[lang="ar"] body {
+    font-family: 'Cairo', var(--font-family);
+  }
+  
+  html[dir="rtl"] body {
+    text-align: right;
   }
 </style>
