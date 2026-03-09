@@ -7,6 +7,7 @@ window.i18nData = {
         // Navbar
         "nav.tools": "Tools",
         "nav.charts": "Charts",
+        "nav.videos": "Videos",
         "nav.about": "About",
         "nav.setups": "Setups",
         "nav.results": "Results",
@@ -143,7 +144,24 @@ window.i18nData = {
         "tools.pivot-points-calculator.name": "Pivot Points Calculator",
         "tools.leverage-calculator.name": "Leverage Calculator",
         "tools.commission-calculator.name": "Commission Calculator",
-        "tools.zero-strategy-calculator.name": "ZERO-Strategy Calculator"
+        "tools.zero-strategy-calculator.name": "ZERO-Strategy Calculator",
+
+        // Blog / Videos
+        "blog.title": "Trading Videos & Market Analysis",
+        "blog.desc": "Watch our latest updates on Gold, US Indices, Crypto, and Forex.",
+        "blog.subscribe": "Subscribe on YouTube",
+        "blog.filter.all": "All Videos",
+        "blog.filter.gold": "Gold / XAU",
+        "blog.filter.indices": "US Indices",
+        "blog.filter.crypto": "Crypto",
+        "blog.filter.forex": "Forex Pairs",
+        "blog.filter.live": "Live Sessions",
+        "blog.filter.edu": "Education / Courses",
+        "blog.filter.outlook": "Market Outlook",
+        "blog.loadmore": "Load More Videos",
+        "blog.watchnow": "Watch Now",
+        "blog.duration": "Duration",
+        "blog.loading": "Loading videos..."
     },
 
     ar: {
@@ -154,6 +172,7 @@ window.i18nData = {
         // Navbar
         "nav.tools": "الأدوات",
         "nav.charts": "الرسوم",
+        "nav.videos": "الفيديوهات",
         "nav.about": "عن الموقع",
         "nav.setups": "الإعدادات",
         "nav.results": "النتائج",
@@ -424,6 +443,189 @@ window.i18nData = {
         "Win Rate": "معدل الربح",
         "Profit Factor": "عامل الربح",
         "Avg Trade": "متوسط الصفقة",
-        "Max Drawdown": "أقصى تراجع"
+        "Max Drawdown": "أقصى تراجع",
+
+        // Blog / Videos
+        "blog.title": "فيديوهات التداول وتحليل السوق",
+        "blog.desc": "شاهد أحدث تحديثاتنا حول الذهب ومؤشرات السوق الأمريكية والعملات المشفرة والفوركس.",
+        "blog.subscribe": "اشترك في يوتيوب",
+        "blog.filter.all": "جميع الفيديوهات",
+        "blog.filter.gold": "الذهب / XAU",
+        "blog.filter.indices": "المؤشرات الأمريكية",
+        "blog.filter.crypto": "العملات الرقمية",
+        "blog.filter.forex": "أزواج الفوركس",
+        "blog.filter.live": "جلسات البث المباشر",
+        "blog.filter.edu": "تعليم / دورات",
+        "blog.filter.outlook": "نظرة على الأسواق",
+        "blog.loadmore": "تحميل المزيد من الفيديوهات",
+        "blog.watchnow": "شاهد الآن",
+        "blog.duration": "المدة",
+        "blog.loading": "جاري تحميل الفيديوهات..."
+    },
+
+    fr: {
+        // Layout
+        "meta.title": "Zerowfx - Maîtrisez le Trading Forex",
+        "meta.desc": "Maîtrisez les marchés du Forex avec des stratégies éprouvées et un mentorat d'experts. Rejoignez des centaines de traders qui ont transformé leur parcours avec Zerowfx.",
+
+        // Navbar
+        "nav.tools": "Outils",
+        "nav.charts": "Graphiques",
+        "nav.videos": "Vidéos",
+        "nav.about": "À Propos",
+        "nav.setups": "Configurations",
+        "nav.results": "Résultats",
+        "nav.partners": "Partenaires",
+
+        // Hero
+        "hero.badge": "MASTERCLASS GRATUITE — PLACES LIMITÉES",
+        "hero.title1": "COMMUNAUTÉ",
+        "hero.title2": "ZEROWFX",
+        "hero.subtitle": "Rejoignez une communauté de trading professionnelle. Obtenez des signaux OR, INDICES US & CRYPTO en temps réel. Méthodologie avec 10+ ans d'expérience.",
+        "hero.placeholder": "Entrez votre email",
+        "hero.btn": "Soumettre",
+        "hero.cta": "REJOIGNEZ ZFX PRO !",
+        "hero.verified": "Résultats Vérifiés",
+        "hero.transparent": "100% Transparent",
+        "hero.realtime": "Temps Réel",
+
+        // About
+        "about.feat1": "Accès à la Communauté Telegram Zfx",
+        "about.feat2": "Sessions live hebdomadaires",
+        "about.feat3": "Mises à jour du marché",
+        "about.feat4": "Configurations de trading de haute qualité",
+        "about.feat5": "Sessions live quotidiennes",
+        "about.feat6": "Sessions mensuelles sur l'investissement",
+        "about.feat7": "Astuces de psychologie",
+        "about.cta": "REJOINDRE LA COMMUNAUTÉ",
+
+        // Members
+        "members.badge": "TÉMOIGNAGES RÉELS",
+        "members.title": "Ce que disent nos membres",
+        "members.subtitle": "Écoutez directement notre communauté — personnes réelles, résultats réels.",
+        "members.cardbadge": "Membre",
+        "members.btn": "REJOINDRE SUR TELEGRAM",
+
+        // Setups
+        "setups.badge": "RÉSULTATS VÉRIFIÉS",
+        "setups.title": "Nos Configurations",
+        "setups.subtitle": "Découvrez nos analyses précises qui mènent à des trades gagnants.",
+        "setups.label.setup": "CONFIG",
+        "setups.label.result": "RÉSULTAT",
+        "setups.hint": "Faites glisser pour comparer",
+
+        // Lifestyle
+        "life.title1": "Zerowfx Au-delà du trading,<br />",
+        "life.title2": "votre partenaire",
+        "life.desc1": "Notre communauté se développe grâce à la collaboration.",
+        "life.desc2": "Nous croyons aux connexions réelles au-delà de l'écran.",
+        "life.cta": "REJOINDRE LA COMMUNAUTÉ",
+        "life.bonus": "BONUS 100%",
+        "life.register": "S'INSCRIRE",
+
+        // Results
+        "results.title": "Résultats des Membres",
+        "results.subtitle": "Des résultats réels de membres réels",
+        "results.ctatext": "Voulez-vous simuler vos performances ?",
+        "results.ctabtn": "Essayer le Calculateur Stratégie ZERO",
+
+        // Partners
+        "partners.badge": "COURTIER RECOMMANDÉ",
+        "partners.title1": "Commencez avec ",
+        "partners.title2": "un Bonus 100%",
+        "partners.desc": "Obtenez un bonus de dépôt de 100% avec XM.",
+        "partners.feat1": "Bonus de 100%",
+        "partners.feat2": "Spreads serrés sur l'Or",
+        "partners.feat3": "Retraits Rapides",
+        "partners.cta": "RÉCLAMER LE BONUS",
+        "partners.disclaimer": "Le trading comporte des risques.",
+
+        // Footer
+        "footer.rights": "© 2026 Zerowfx. Tous droits réservés.",
+        "footer.disc": "Le trading comporte des risques substantiels.",
+
+        // Sticky
+        "sticky.badge": "OFFRE PREND FIN DANS",
+        "sticky.days": "J",
+        "sticky.hours": "H",
+        "sticky.mins": "M",
+        "sticky.secs": "S",
+        "sticky.perk1": "Masterclass Gratuite",
+        "sticky.perk2": "Cercle VIP",
+        "sticky.perk3": "100% Bonus XM",
+        "sticky.bottext1": "⚡ PLACES LIMITÉES",
+        "sticky.bottext2": " — Doublez votre dépôt + Masterclass OFFERTE",
+        "sticky.botcta": "RÉCLAMER MON BONUS",
+
+        "modal.badge": "PLUS DE 50 000 TRADERS",
+        "modal.title1": "Votre ",
+        "modal.title2": "Bonus 100%",
+        "modal.title3": " est Réservé",
+        "modal.desc": "Doublez votre premier dépôt.",
+        "modal.feat1": "Doublez votre dépôt",
+        "modal.feat2": "Spreads Or dès 0.1",
+        "modal.feat3": "Retraits 24/7",
+        "modal.promo1": "Votre Code Exclusif :",
+        "modal.slots1": "🔥 Seulement ",
+        "modal.slots2": " codes restants",
+        "modal.placeholder": "Entrez votre meilleur email",
+        "modal.submit": "SOUMETTRE",
+        "modal.cta": "RÉCLAMER MON BONUS",
+        "modal.micro": "⚡ 2 340 traders l'ont réclamé aujourd'hui",
+
+        // Charts
+        "charts.badge": "<i data-lucide='activity' style='width:14px;height:14px;'></i> Données en direct",
+        "charts.title": "Graphiques & <span class='title-accent'>Outils de Marché</span>",
+        "charts.subtitle": "Graphiques TradingView professionnels et données en temps réel — intégrés à Zerowfx.",
+        "charts.w1.title": "Graphique Avancé Temps Réel",
+        "charts.w1.desc": "Graphique puissant pour visualiser les marchés.",
+        "charts.w2.title": "Aperçu du Symbole",
+        "charts.w2.desc": "Dernières cotations et graphique simple.",
+        "charts.w3.title": "Aperçu du Symbole — Forex",
+        "charts.w3.desc": "Suivez vos paires de devises préférées.",
+        "charts.w4.title": "Résumé du Marché",
+        "charts.w4.badge": "NOUVEAU",
+        "charts.w4.desc": "Liste de surveillance qui visualise plusieurs symboles à la fois.",
+        "charts.w5.title": "Marché Boursier",
+        "charts.w5.desc": "Les meilleures actions gagnantes, perdantes et actives.",
+        "charts.w6.title": "Aperçu Global",
+        "charts.w6.desc": "Créé pour avoir une vue d'ensemble macro des marchés.",
+
+        // Tools
+        "tools.sidebar.title": "Outils de Trading",
+        "tools.results.placeholder": "Les résultats apparaîtront ici",
+        "tools.pip-calculator.name": "Calculateur de Pips",
+        "tools.pip-value-calculator.name": "Valeur du Pip",
+        "tools.lot-size-calculator.name": "Taille de Lot",
+        "tools.margin-calculator.name": "Marge Requise",
+        "tools.position-size-calculator.name": "Taille de Position",
+        "tools.profit-calculator.name": "Calculateur G/P",
+        "tools.risk-calculator.name": "Calculateur de Risque",
+        "tools.sl-tp-calculator.name": "Stop/Take Profit",
+        "tools.spread-calculator.name": "Coût du Spread",
+        "tools.swap-calculator.name": "Calcul de Swap",
+        "tools.drawdown-calculator.name": "Drawdown",
+        "tools.fibonacci-calculator.name": "Fibonacci",
+        "tools.pivot-points-calculator.name": "Points Pivots",
+        "tools.leverage-calculator.name": "Effet de Levier",
+        "tools.commission-calculator.name": "Commissions",
+        "tools.zero-strategy-calculator.name": "Stratégie ZERO",
+
+        // Blog / Videos
+        "blog.title": "Vidéos de Trading & Analyses",
+        "blog.desc": "Regardez nos dernières analyses sur l'Or, les Indices US, la Crypto et le Forex.",
+        "blog.subscribe": "S'abonner sur YouTube",
+        "blog.filter.all": "Toutes",
+        "blog.filter.gold": "Or / XAU",
+        "blog.filter.indices": "Indices US",
+        "blog.filter.crypto": "Crypto",
+        "blog.filter.forex": "Forex",
+        "blog.filter.live": "Direct",
+        "blog.filter.edu": "Formation",
+        "blog.filter.outlook": "Analyses",
+        "blog.loadmore": "Charger Plus",
+        "blog.watchnow": "Regarder",
+        "blog.duration": "Durée",
+        "blog.loading": "Chargement..."
     }
 };

@@ -31,6 +31,7 @@ const {
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <title>{title}</title>
+    <slot name="head" />
     <!-- i18n Data -->
     <script src="/i18n.js" is:inline></script>
     <!-- Apply saved theme and language immediately to prevent FOUC -->
@@ -47,7 +48,7 @@ const {
         }
 
         var savedLang = localStorage.getItem('language') || 'en';
-        var validLangs = ['en', 'ar'];
+        var validLangs = ['en', 'ar', 'fr'];
         if (validLangs.indexOf(savedLang) === -1) savedLang = 'en';
         
         document.documentElement.lang = savedLang;

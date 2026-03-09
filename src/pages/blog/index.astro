@@ -1,0 +1,771 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+
+// SITEMAP URL REPOSITORY:
+// Video URLs for sitemap generation
+// https://zerofx.com/blog/#ভিديo1
+// https://zerofx.com/blog/#ভিديo2
+// etc.
+---
+
+<Layout title="ZeroFX Trading Videos - Gold, Forex & Crypto Analysis">
+  <Fragment slot="head">
+    <link rel="alternate" hreflang="en" href="https://zerofx.com/blog" />
+    <link rel="alternate" hreflang="ar" href="https://zerofx.com/ar/blog" />
+    <link rel="alternate" hreflang="fr" href="https://zerofx.com/fr/blog" />
+    <script type="application/ld+json" id="video-schema">
+      {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": []
+      }
+    </script>
+    <meta property="og:title" content="ZeroFX Trading Videos" id="og-title" />
+    <meta property="og:description" content="Watch ZeroFX trading videos on Gold, Crypto, Forex and US Indices." id="og-desc" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://img.youtube.com/vi/placeholder/maxresdefault.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+  </Fragment>
+
+  <Navbar />
+
+  <main class="blog-page">
+    <!-- Header Section -->
+    <section class="blog-hero">
+      <div class="hero-glow"></div>
+      <div class="blog-hero-inner">
+        <h1 class="blog-title" data-i18n="blog.title">Trading Videos & Market Analysis</h1>
+        <p class="blog-subtitle" data-i18n="blog.desc">Watch our latest updates on Gold, US Indices, Crypto, and Forex.</p>
+        <a href="https://www.youtube.com/@zerowfx1" target="_blank" rel="noopener noreferrer" class="youtube-btn">
+          <i data-lucide="youtube" style="width:20px;height:20px;"></i>
+          <span data-i18n="blog.subscribe">Subscribe on YouTube</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Filter/Category Bar -->
+    <section class="filter-section">
+      <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all" data-i18n="blog.filter.all">All Videos</button>
+        <button class="filter-btn" data-filter="gold" data-i18n="blog.filter.gold">Gold / XAU</button>
+        <button class="filter-btn" data-filter="indices" data-i18n="blog.filter.indices">US Indices</button>
+        <button class="filter-btn" data-filter="crypto" data-i18n="blog.filter.crypto">Crypto</button>
+        <button class="filter-btn" data-filter="forex" data-i18n="blog.filter.forex">Forex Pairs</button>
+        <button class="filter-btn" data-filter="live" data-i18n="blog.filter.live">Live Sessions</button>
+        <button class="filter-btn" data-filter="edu" data-i18n="blog.filter.edu">Education / Courses</button>
+        <button class="filter-btn" data-filter="outlook" data-i18n="blog.filter.outlook">Market Outlook</button>
+      </div>
+    </section>
+
+    <!-- Video Grid Section -->
+    <section class="video-section">
+      <div id="video-grid" class="video-grid">
+        <!-- Videos will be injected here via JavaScript -->
+      </div>
+      
+      <div class="load-more-container">
+        <button id="load-more-btn" class="load-more-btn" data-i18n="blog.loadmore" style="display: none;">
+          Load More Videos
+        </button>
+        <p id="loading-text" data-i18n="blog.loading">Loading videos...</p>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <!-- Video Modal -->
+  <div class="video-modal" id="videoModal">
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">
+        <i data-lucide="x" style="width:24px;height:24px;"></i>
+      </button>
+      <div class="iframe-container" id="iframeContainer"></div>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // --- CONFIGURATION ---
+  // ADD YOUR YOUTUBE API KEY HERE
+  const YOUTUBE_API_KEY = ""; 
+  // ADD YOUR CHANNEL ID HERE (Required for API to work)
+  const CHANNEL_ID = ""; 
+  
+  const MAX_RESULTS = 12;
+  let nextPageToken = "";
+  let currentFilter = "all";
+  
+  // Translation store for videos
+  const videoTranslations = {
+    "SAMPLE_ID_1": {
+      en: { title: "Gold Analysis - Weekly Outlook", desc: "In-depth XAU/USD analysis and key levels." },
+      ar: { title: "تحليل الذهب - النظرة الأسبوعية", desc: "تحليل معمّق لزوج XAU/USD ومستويات مهمة." },
+      fr: { title: "Analyse de l'Or - Perspectives Hebdomadaires", desc: "Analyse approfondie XAU/USD et niveaux clés." }
+    }
+  };
+
+  // Fallback data if API is not working or not configured
+  const fallbackVideos = [
+    { id: "dQw4w9WgXcQ", snippet: { title: "Gold Analysis - Weekly Outlook", description: "In-depth XAU/USD analysis and key levels.", publishedAt: "2025-01-15T12:00:00Z" }, tags: ["gold", "outlook"] },
+    { id: "3JZ_D3ELwOQ", snippet: { title: "US Indices Crash Avoided?", description: "Nasdaq and SP500 key levels to watch this week.", publishedAt: "2025-01-10T12:00:00Z" }, tags: ["indices"] },
+    { id: "L_jWHffIx5E", snippet: { title: "Crypto Bull Run - Bitcoin to 100k?", description: "Checking the charts for BTC and major altcoins.", publishedAt: "2025-01-08T12:00:00Z" }, tags: ["crypto"] },
+    { id: "eVTXPUF4Oz4", snippet: { title: "Live Trading Session - London Open", description: "Trading live with the ZeroFX community.", publishedAt: "2025-01-05T12:00:00Z" }, tags: ["live", "forex"] },
+    { id: "kJQP7kiw5Fk", snippet: { title: "Forex Basics: Lot Size & Risk", description: "Learn how to manage your risk correctly.", publishedAt: "2024-12-28T12:00:00Z" }, tags: ["edu", "forex"] },
+    { id: "9bZkp7q19f0", snippet: { title: "Market Review: A Crazy Week", description: "Reviewing the best setups from last week.", publishedAt: "2024-12-20T12:00:00Z" }, tags: ["outlook"] }
+  ];
+
+  let allVideos = [];
+  let displayedVideos = [];
+  let isFetching = false;
+
+  const grid = document.getElementById('video-grid');
+  const loadBtn = document.getElementById('load-more-btn');
+  const loadingText = document.getElementById('loading-text');
+
+  // Multi-language SEO updates specific for Blog page
+  function updateBlogSEO() {
+    const lang = window.currentLang || 'en';
+    const titles = {
+      en: "ZeroFX Trading Videos - Gold, Forex & Crypto Analysis",
+      ar: "فيديوهات تداول ZeroFX - تحليل الذهب والفوركس والعملات الرقمية",
+      fr: "Vidéos de Trading ZeroFX - Analyse Or, Forex & Crypto"
+    };
+    const descs = {
+      en: "Watch ZeroFX trading videos on Gold, Crypto, Forex and US Indices.",
+      ar: "شاهد فيديوهات تداول ZeroFX حول الذهب والعملات الرقمية والفوركس ومؤشرات السوق الأمريكية.",
+      fr: "Regardez les vidéos de trading ZeroFX sur l'Or, la Crypto, le Forex et les Indices US."
+    };
+    
+    document.title = titles[lang] || titles.en;
+    
+    // Attempt to override global title update
+    setTimeout(() => {
+        document.title = titles[lang] || titles.en;
+    }, 50);
+
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', descs[lang] || descs.en);
+    
+    const ogTitle = document.getElementById('og-title');
+    if (ogTitle) ogTitle.setAttribute('content', titles[lang] || titles.en);
+    
+    const ogDesc = document.getElementById('og-desc');
+    if (ogDesc) ogDesc.setAttribute('content', descs[lang] || descs.en);
+    
+    renderVideos(); // Re-render to update the texts of loaded videos
+    generateSchema(); // Update schema.org data
+  }
+
+  // Bind to custom languageChanged event if available, else monkey patch window.applyTranslations
+  window.addEventListener('languageChanged', updateBlogSEO);
+  
+  const originalApplyTranslations = window.applyTranslations;
+  if (originalApplyTranslations) {
+    window.applyTranslations = function() {
+        originalApplyTranslations();
+        updateBlogSEO();
+    };
+    // Initialize SEO immediately since window.applyTranslations already ran
+    updateBlogSEO();
+  }
+
+  async function fetchVideos(pageToken = "") {
+    if (isFetching) return;
+    isFetching = true;
+    loadingText.style.display = "block";
+    loadBtn.style.display = "none";
+
+    try {
+      if (!YOUTUBE_API_KEY || !CHANNEL_ID) {
+        // Use fallback if no API configured
+        console.warn("YouTube API Key or Channel ID missing. Using fallback data.");
+        if (pageToken === "") {
+          allVideos = fallbackVideos.map(v => mapVideoData(v));
+        }
+        nextPageToken = null;
+      } else {
+        const url = `https://www.googleapis.com/youtube/v3/search?key=${YOUTUBE_API_KEY}&channelId=${CHANNEL_ID}&part=snippet&order=date&maxResults=${MAX_RESULTS}&type=video${pageToken ? '&pageToken='+pageToken : ''}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.items) {
+          const mapped = data.items.map(item => mapVideoData({
+            id: item.id.videoId,
+            snippet: item.snippet,
+            tags: guessTags(item.snippet.title)
+          }));
+          
+          if (pageToken === "") {
+            allVideos = mapped;
+          } else {
+            allVideos = [...allVideos, ...mapped];
+          }
+          nextPageToken = data.nextPageToken || null;
+        } else {
+          throw new Error("Invalid API response");
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching videos:", err);
+      if (allVideos.length === 0) {
+        allVideos = fallbackVideos.map(v => mapVideoData(v));
+      }
+    } finally {
+      isFetching = false;
+      loadingText.style.display = "none";
+      applyFilters();
+    }
+  }
+
+  function mapVideoData(item) {
+    return {
+      id: item.id,
+      originalTitle: item.snippet.title,
+      originalDesc: item.snippet.description,
+      thumbnail: `https://img.youtube.com/vi/${item.id}/maxresdefault.jpg`,
+      date: item.snippet.publishedAt,
+      tags: item.tags || []
+    };
+  }
+
+  function guessTags(title) {
+    // Basic utility to map tags for API responses
+    const t = title.toLowerCase();
+    const tags = [];
+    if (t.includes('gold') || t.includes('xau')) tags.push('gold');
+    if (t.includes('nas') || t.includes('spx') || t.includes('us30') || t.includes('indices')) tags.push('indices');
+    if (t.includes('btc') || t.includes('crypto') || t.includes('bitcoin')) tags.push('crypto');
+    if (t.includes('eur') || t.includes('usd') || t.includes('forex') || t.includes('gbp')) tags.push('forex');
+    if (t.includes('live')) tags.push('live');
+    if (t.includes('learn') || t.includes('course') || t.includes('how to')) tags.push('edu');
+    if (t.includes('outlook') || t.includes('review') || t.includes('weekly')) tags.push('outlook');
+    return tags.length ? tags : ['outlook']; // default
+  }
+
+  function getTranslation(videoId, field, originalValue) {
+    const lang = window.currentLang || 'en';
+    if (videoTranslations[videoId] && videoTranslations[videoId][lang] && videoTranslations[videoId][lang][field]) {
+      return videoTranslations[videoId][lang][field];
+    }
+    return originalValue;
+  }
+
+  function formatDate(isoString) {
+    const lang = window.currentLang || 'en';
+    const date = new Date(isoString);
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString(lang === 'ar' ? 'ar-SA' : (lang === 'fr' ? 'fr-FR' : 'en-US'), options);
+  }
+
+  function applyFilters() {
+    if (currentFilter === 'all') {
+      displayedVideos = allVideos;
+    } else {
+      displayedVideos = allVideos.filter(v => v.tags.includes(currentFilter));
+    }
+    renderVideos();
+    
+    if (nextPageToken && currentFilter === 'all') {
+      loadBtn.style.display = "inline-flex";
+    } else {
+      loadBtn.style.display = "none";
+    }
+  }
+
+  function renderVideos() {
+    grid.innerHTML = "";
+    displayedVideos.forEach(video => {
+      const title = getTranslation(video.id, 'title', video.originalTitle);
+      const desc = getTranslation(video.id, 'desc', video.originalDesc);
+      
+      const article = document.createElement('article');
+      article.className = 'video-card';
+      article.innerHTML = `
+        <div class="video-thumb-container" data-id="${video.id}">
+          <img src="${video.thumbnail}" alt="${title.replace(/"/g, '&quot;')}" class="video-thumb" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${video.id}/hqdefault.jpg'" />
+          <div class="play-overlay">
+            <i data-lucide="play-circle" style="width:48px;height:48px;color:#fff;"></i>
+          </div>
+          <span class="duration-badge" data-i18n="blog.watchnow">Watch Now</span>
+        </div>
+        <div class="video-content">
+          <div class="video-meta">
+            <time datetime="${video.date}">${formatDate(video.date)}</time>
+          </div>
+          <h3 class="video-title">${title}</h3>
+          <p class="video-desc">${desc.substring(0, 100)}${desc.length > 100 ? '...' : ''}</p>
+        </div>
+      `;
+      grid.appendChild(article);
+    });
+
+    if (window.lucide) window.lucide.createIcons();
+    
+    // Add click events
+    document.querySelectorAll('.video-thumb-container').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const id = e.currentTarget.getAttribute('data-id');
+        openModal(id);
+      });
+    });
+
+    // We do not re-apply window.applyTranslations() completely because video content might be overridden.
+    // Instead we just set the specific static data-i18n keys manually for the new badges
+    const lang = window.currentLang || 'en';
+    document.querySelectorAll('.duration-badge').forEach(el => {
+       const key = el.getAttribute('data-i18n');
+       if (window.i18nData && window.i18nData[lang] && window.i18nData[lang][key]) {
+         el.innerHTML = window.i18nData[lang][key];
+       }
+    });
+  }
+
+  function generateSchema() {
+    const lang = window.currentLang || 'en';
+    const schemaEl = document.getElementById('video-schema');
+    if (!schemaEl) return;
+    
+    const items = displayedVideos.map((video, idx) => {
+      const title = getTranslation(video.id, 'title', video.originalTitle);
+      const desc = getTranslation(video.id, 'desc', video.originalDesc);
+      return {
+        "@type": "ListItem",
+        "position": idx + 1,
+        "item": {
+          "@type": "VideoObject",
+          "name": title,
+          "description": desc,
+          "thumbnailUrl": video.thumbnail,
+          "uploadDate": video.date,
+          "contentUrl": `https://www.youtube.com/watch?v=${video.id}`,
+          "embedUrl": `https://www.youtube.com/embed/${video.id}`,
+          "inLanguage": lang
+        }
+      };
+    });
+
+    const schemaData = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": items
+    };
+    
+    schemaEl.textContent = JSON.stringify(schemaData);
+  }
+
+  // Filtering Logic
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      const target = e.currentTarget;
+      target.classList.add('active');
+      currentFilter = target.getAttribute('data-filter');
+      applyFilters();
+    });
+  });
+
+  // Load More
+  loadBtn.addEventListener('click', () => {
+    if (nextPageToken) fetchVideos(nextPageToken);
+  });
+
+  // Modal Logic
+  const modal = document.getElementById('videoModal');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalClose = document.getElementById('modalClose');
+  const iframeContainer = document.getElementById('iframeContainer');
+
+  function openModal(id) {
+    iframeContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    iframeContainer.innerHTML = ''; // Stop video
+    document.body.style.overflow = '';
+  }
+
+  modalClose.addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', closeModal);
+
+  // Init
+  fetchVideos();
+});
+</script>
+
+<style>
+  /* ── General Page Styles ── */
+  .blog-page {
+    padding-top: 64px;
+    min-height: 100vh;
+  }
+
+  /* ── Hero ── */
+  .blog-hero {
+    position: relative;
+    padding: 80px 24px 60px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, var(--color-green-glow) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .blog-hero-inner {
+    position: relative;
+    max-width: 720px;
+    margin: 0 auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .blog-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+
+  .blog-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .youtube-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #ff0000;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: var(--transition);
+  }
+  
+  .youtube-btn:hover {
+    background: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3);
+  }
+
+  /* ── Filters ── */
+  .filter-section {
+    padding: 30px 24px;
+    background: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 64px;
+    z-index: 100;
+  }
+
+  .filter-bar {
+    max-width: 1440px;
+    margin: 0 auto;
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px; /* For scrollbar space */
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .filter-bar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+
+  .filter-btn {
+    white-space: nowrap;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+
+  .filter-btn:hover {
+    background: var(--color-bg-card);
+    color: var(--color-text);
+    border-color: var(--color-border-strong);
+  }
+
+  .filter-btn.active {
+    background: var(--color-green-glow);
+    border-color: var(--color-green);
+    color: var(--color-green-light);
+  }
+
+  /* ── Video Grid ── */
+  .video-section {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
+  .video-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .video-card:hover {
+    border-color: var(--color-border-strong);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-4px);
+  }
+
+  .video-thumb-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    cursor: pointer;
+    overflow: hidden;
+  }
+
+  .video-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .video-thumb-container:hover .video-thumb {
+    transform: scale(1.05);
+  }
+
+  .play-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .video-thumb-container:hover .play-overlay {
+    opacity: 1;
+  }
+
+  .duration-badge {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.8);
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    pointer-events: none;
+  }
+
+  /* Flip badge direction if RTL is active globally */
+  html[dir="rtl"] .duration-badge {
+    right: auto;
+    left: 12px;
+  }
+
+  .video-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .video-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+    margin-bottom: 8px;
+  }
+
+  .video-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: 10px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .video-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    line-height: 1.5;
+    margin-bottom: 0; /* Let flex handle space if needed */
+  }
+
+  /* ── Pagination ── */
+  .load-more-container {
+    text-align: center;
+    margin-top: 50px;
+  }
+
+  .load-more-btn {
+    background: transparent;
+    border: 1px solid var(--color-green);
+    color: var(--color-green);
+    padding: 12px 32px;
+    border-radius: 100px;
+    font-weight: 600;
+    transition: var(--transition);
+  }
+
+  .load-more-btn:hover {
+    background: var(--color-green-glow);
+    color: var(--color-green-light);
+  }
+
+  #loading-text {
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+  }
+
+  /* ── Modal ── */
+  .video-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .video-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(5px);
+  }
+
+  .modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    z-index: 10000;
+    transform: scale(0.95);
+    transition: transform 0.3s ease;
+  }
+
+  .video-modal.open .modal-content {
+    transform: scale(1);
+  }
+
+  .iframe-container {
+    width: 100%;
+    height: 100%;
+  }
+
+  .iframe-container iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: var(--transition);
+  }
+
+  .modal-close:hover {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  /* ── Clean White Theme Overrides ── */
+  :global(html.theme-clean-white) .filter-section {
+    background: #f7f8fa;
+  }
+  :global(html.theme-clean-white) .filter-btn {
+    background: #ffffff;
+  }
+  :global(html.theme-clean-white) .video-card {
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  }
+  :global(html.theme-clean-white) .video-title {
+    color: #111;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .video-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .video-grid {
+      grid-template-columns: 1fr;
+    }
+    .blog-title {
+      font-size: 2rem;
+    }
+    .modal-close {
+      top: 10px;
+      right: 10px;
+      padding: 8px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 50%;
+    }
+  }
+</style>

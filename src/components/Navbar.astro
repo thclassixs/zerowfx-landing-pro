@@ -35,6 +35,7 @@ import ThemeSelector from './ThemeSelector.astro';
         </div>
       </div>
       <a href="/charts" class="nav-link" data-i18n="nav.charts">Charts</a>
+      <a href="/blog" class="nav-link" data-i18n="nav.videos">Videos</a>
       <a href="/#about" class="nav-link" data-i18n="nav.about">About</a>
       <a href="/#setups" class="nav-link" data-i18n="nav.setups">Setups</a>
       <a href="/#results" class="nav-link" data-i18n="nav.results">Results</a>
@@ -58,6 +59,9 @@ import ThemeSelector from './ThemeSelector.astro';
           <button class="lang-option" data-lang="ar">
             <span class="lang-flag">🇸🇦</span> العربية
           </button>
+          <button class="lang-option" data-lang="fr">
+            <span class="lang-flag">🇫🇷</span> Français
+          </button>
         </div>
       </div>
 
@@ -72,6 +76,7 @@ import ThemeSelector from './ThemeSelector.astro';
   <!-- Mobile menu -->
   <div class="mobile-menu" id="mobileMenu">
     <a href="/charts" class="mobile-link" data-i18n="nav.charts">Charts</a>
+    <a href="/blog" class="mobile-link" data-i18n="nav.videos">Videos</a>
     <a href="/#about" class="mobile-link" data-i18n="nav.about">About</a>
     <a href="/#setups" class="mobile-link" data-i18n="nav.setups">Setups</a>
     <a href="/#results" class="mobile-link" data-i18n="nav.results">Results</a>
@@ -135,7 +140,7 @@ import ThemeSelector from './ThemeSelector.astro';
   });
 
   // Language Selection Logic
-  const validLangs = ['en', 'ar'];
+  const validLangs = ['en', 'ar', 'fr'];
   let currentLang = localStorage.getItem('language') || 'en';
   if (!validLangs.includes(currentLang)) currentLang = 'en';
 
