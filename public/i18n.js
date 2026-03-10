@@ -102,7 +102,7 @@ window.i18nData = {
         "modal.feat3": "Withdraw Anytime",
         "modal.promo1": "Your Exclusive Code:",
         "modal.slots1": "🔥 Only ",
-        "modal.slots2": " codes left today",
+        "modal.slots2": " places left today",
         "modal.placeholder": "Enter your best email to lock in bonus",
         "modal.submits": "SUBMIT",
         "modal.cta": "CLAIM MY 100% BONUS",
