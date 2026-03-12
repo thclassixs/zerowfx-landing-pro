@@ -20,7 +20,7 @@ window.i18nData = {
         "hero.subtitle": "Join an exclusive professional trading community led by ZerowFX. Get real-time GOLD, US INDICES & CRYPTO signals, precise trading setups, live sessions, and clear daily analysis that help you truly understand the market not just follow it. With ZerowFX, you're accessing a methodology backed by 10+ years of experience and consistent performance across different market conditions.<br /><br />Get market insights + enter our $50 giveaway every 2 weeks&nbsp;🎁",
         "hero.placeholder": "Enter your email",
         "hero.btn": "Submit",
-        "hero.cta": "JOIN ZFX PRO NOW!",
+        "hero.cta": "JOIN LIVE ROOM NOW!",
         "hero.verified": "Verified Results",
         "hero.transparent": "100% Transparent",
         "hero.realtime": "Real-Time Setups",
@@ -33,14 +33,14 @@ window.i18nData = {
         "about.feat5": "Daily Live Sessions and Q&A with WTW Seniors",
         "about.feat6": "Monthly Live Sessions on Investments and Stocks",
         "about.feat7": "Best Tips to Strengthen Your Psychology",
-        "about.cta": "JOIN ZFX COMMUNITY",
+        "about.cta": "JOIN ZEROWFX COMMUNITY",
 
         // Members
         "members.badge": "REAL TESTIMONIALS",
         "members.title": "What Our Members Say",
         "members.subtitle": "Hear directly from our community — real people, real results, real transformations.",
         "members.cardbadge": "Member",
-        "members.btn": "JOIN TELEGRAM COMMUNITY",
+        "members.btn": "JOIN LIVE ROOM NOW!",
 
         // Setups
         "setups.badge": "VERIFIED RESULTS",
@@ -55,7 +55,7 @@ window.i18nData = {
         "life.title2": "your success partner",
         "life.desc1": "Our community thrives on collaboration and mutual growth. We organize regular giveaways to give back to our members, host group chats where traders share insights and strategies, and create spaces where everyone helps each other succeed. Knowledge flows freely here from beginner questions to advanced market analysis.",
         "life.desc2": "We believe in real connections beyond the screen. That's why we organize city meetups where members can network, share experiences, and build lasting friendships. This isn't just about signals and profits it's about building a supportive family of like-minded traders who celebrate wins together and provide support during challenges.",
-        "life.cta": "JOIN ZFX COMMUNITY",
+        "life.cta": "JOIN ZEROWFX COMMUNITY",
         "life.bonus": "100% BONUS",
         "life.register": "REGISTER NOW",
 
@@ -210,7 +210,7 @@ window.i18nData = {
         "hero.subtitle": "انضم إلى مجتمع تداول احترافي وحصري بقيادة ZerowFX. احصل على إشارات الذهب والمؤشرات الأمريكية والعملات المشفرة في الوقت الفعلي، بالإضافة إلى إعدادات تداول دقيقة وجلسات حية وتحليل يومي. مع ZerowFX، أنت تصل إلى منهجية مدعومة بأكثر من 10 سنوات من الخبرة.<br /><br />احصل على رؤى السوق + ادخل سحبنا على 50 دولارًا كل أسبوعين 🎁",
         "hero.placeholder": "أدخل بريدك الإلكتروني",
         "hero.btn": "إرسال",
-        "hero.cta": "انضم إلى ZFX PRO الآن!",
+        "hero.cta": "انضم إلى غرفه البث المباشر الآن:",
         "hero.verified": "نتائج موثقة",
         "hero.transparent": "شفافية 100%",
         "hero.realtime": "إعدادات في الوقت الفعلي",
@@ -223,14 +223,14 @@ window.i18nData = {
         "about.feat5": "جلسات حية يومية وأسئلة وأجوبة",
         "about.feat6": "جلسات شهرية حول الاستثمارات والأسهم",
         "about.feat7": "أفضل النصائح لتعزيز نفسية التداول",
-        "about.cta": "انضم لمجتمع ZFX",
+        "about.cta": "انضم لمجتمع ZEROWFX",
 
         // Members
         "members.badge": "آراء حقيقية",
         "members.title": "ماذا يقول أعضاؤنا",
         "members.subtitle": "استمع مباشرة من مجتمعنا — أشخاص حقيقيون، نتائج حقيقية، تحولات حقيقية.",
         "members.cardbadge": "عضو",
-        "members.btn": "انضم لمجتمع التليجرام",
+        "members.btn": "انضم لغرفة البث المباشر!",
 
         // Setups
         "setups.badge": "نتائج موثقة",
@@ -245,7 +245,7 @@ window.i18nData = {
         "life.title2": "شريك نجاحك",
         "life.desc1": "يزدهر مجتمعنا بالتعاون والنمو المتبادل. ننظم هدايا منتظمة لرد الجميل لأعضائنا، ونستضيف محادثات جماعية حيث يشارك المتداولون الرؤى والاستراتيجيات.",
         "life.desc2": "نحن نؤمن بالروابط الحقيقية وراء الشاشة. لهذا السبب ننظم لقاءات في المدن حيث يمكن للأعضاء التواصل وتبادل التجارب وبناء صداقات دائمة.",
-        "life.cta": "انضم لمجتمع ZFX",
+        "life.cta": "انضم لمجتمع ZEROWFX",
         "life.bonus": "بونص 100%",
         "life.register": "سجل الآن",
 
@@ -534,7 +534,7 @@ window.i18nData = {
         "hero.subtitle": "Rejoignez une communauté de trading professionnelle. Obtenez des signaux OR, INDICES US & CRYPTO en temps réel. Méthodologie avec 10+ ans d'expérience.",
         "hero.placeholder": "Entrez votre email",
         "hero.btn": "Soumettre",
-        "hero.cta": "REJOIGNEZ ZFX PRO !",
+        "hero.cta": "REJOIGNEZ LA SALLE EN DIRECT :",
         "hero.verified": "Résultats Vérifiés",
         "hero.transparent": "100% Transparent",
         "hero.realtime": "Temps Réel",
@@ -554,7 +554,7 @@ window.i18nData = {
         "members.title": "Ce que disent nos membres",
         "members.subtitle": "Écoutez directement notre communauté — personnes réelles, résultats réels.",
         "members.cardbadge": "Membre",
-        "members.btn": "REJOINDRE SUR TELEGRAM",
+        "members.btn": "REJOIGNEZ LA SALLE EN DIRECT !",
 
         // Setups
         "setups.badge": "RÉSULTATS VÉRIFIÉS",

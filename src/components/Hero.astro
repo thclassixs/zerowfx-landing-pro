@@ -36,9 +36,9 @@
         <p class="form-message" id="heroMessage"></p>
       </form>
 
-      <a href="https://t.me/Zerowfxgold" class="cta-main" id="ctaJoin">
+      <a href="https://t.me/Zerowfxgold" class="cta-main" id="ctaJoin" target="_blank" rel="noopener noreferrer">
         <i data-lucide="send" style="width:20px;height:20px"></i>
-        <span data-i18n="hero.cta">JOIN ZFX PRO NOW!</span>
+        <span data-i18n="hero.cta">JOIN LIVE ROOM NOW!</span>
       </a>
 
       <div class="hero-badges">
@@ -93,11 +93,7 @@
     }
   }
 
-  // CTA button scroll
-  document.getElementById('ctaJoin')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    scrollToForm();
-  });
+
 
   document.getElementById('heroForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -526,8 +522,13 @@
       border-radius: var(--radius-md);
     }
     .hero-badges {
-      flex-direction: column;
-      align-items: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+    .badge-item {
+      font-size: 0.75rem;
     }
   }
 </style>
