@@ -75,7 +75,7 @@ function getPipValue(pair, lots) {
   const isJpy = pair.includes('JPY');
   const isXau = pair.startsWith('XAU');
   const isXag = pair.startsWith('XAG');
-  const pipSize = isJpy ? 0.01 : 0.0001;
+  const pipSize = (isJpy || isXau || isXag) ? 0.01 : 0.0001;
   const contractSize = isXau ? 100 : isXag ? 5000 : 100000;
   const quote = pair.split('/')[1];
   // Convert pip to USD: pip × contractSize, then convert from quote currency to USD
@@ -107,7 +107,9 @@ const TOOLS = [
       const pair=f.pair,entry=parseFloat(f.entry),exit=parseFloat(f.exit);
       if(isNaN(entry)||isNaN(exit))return null;
       const isJpy=pair.includes('JPY');
-      const pipSize=isJpy?0.01:0.0001;
+      const isXau=pair.startsWith('XAU');
+      const isXag=pair.startsWith('XAG');
+      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
       const pips=((exit-entry)/pipSize);
       const dir=pips>=0?'Buy (Long)':'Sell (Short)';
       return[{l:'Pips',v:pips.toFixed(1)},{l:'Direction',v:dir},{l:'Pip Size',v:pipSize},{l:'Price Difference',v:(exit-entry).toFixed(5)}];
@@ -121,8 +123,9 @@ const TOOLS = [
     ],
     calc:f=>{
       const lots=parseFloat(f.lots);if(isNaN(lots))return null;
-      const isJpy=f.pair.includes('JPY');const pipSize=isJpy?0.01:0.0001;
+      const isJpy=f.pair.includes('JPY');
       const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
       const contractSize=isXau?100:isXag?5000:100000;
       const units=lots*contractSize;
       const pipVal=getPipValueInAcc(f.pair, lots, f.acc);
@@ -154,7 +157,9 @@ const TOOLS = [
     calc:f=>{
       const lots=parseFloat(f.lots),price=parseFloat(f.price),lev=parseInt(f.leverage.split(':')[1]);
       if(isNaN(lots)||isNaN(price)||isNaN(lev)||lev===0)return null;
-      const units=lots*100000;const notional=units*price;const margin=notional/lev;
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const contractSize=isXau?100:isXag?5000:100000;
+      const units=lots*contractSize;const notional=units*price;const margin=notional/lev;
       return[{l:'Required Margin',v:'$'+margin.toFixed(2)},{l:'Notional Value',v:'$'+notional.toFixed(2)},{l:'Leverage',v:f.leverage},{l:'Units',v:units.toLocaleString()}];
     }
   },
@@ -188,8 +193,9 @@ const TOOLS = [
     calc:f=>{
       const entry=parseFloat(f.entry),exit=parseFloat(f.exit),lots=parseFloat(f.lots);
       if([entry,exit,lots].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');const pipSize=isJpy?0.01:0.0001;
+      const isJpy=f.pair.includes('JPY');
       const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
       const contractSize=isXau?100:isXag?5000:100000;
       let priceDiff=exit-entry;if(f.direction==='Sell')priceDiff=-priceDiff;
       const pips=priceDiff/pipSize;
@@ -230,7 +236,9 @@ const TOOLS = [
     calc:f=>{
       const entry=parseFloat(f.entry),slP=parseFloat(f.slPips),tpP=parseFloat(f.tpPips);
       if([entry,slP,tpP].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');const pip=isJpy?0.01:0.0001;
+      const isJpy=f.pair.includes('JPY');
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const pip=(isJpy||isXau||isXag)?0.01:0.0001;
       const isBuy=f.direction==='Buy';
       const sl=isBuy?entry-slP*pip:entry+slP*pip;const tp=isBuy?entry+tpP*pip:entry-tpP*pip;
       const rr=slP!==0?(tpP/slP):0;
@@ -265,7 +273,11 @@ const TOOLS = [
     calc:f=>{
       const lots=parseFloat(f.lots),rate=parseFloat(f.swapRate),days=parseFloat(f.days);
       if([lots,rate,days].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');const pointVal=isJpy?100000*0.001:100000*0.00001;
+      const isJpy=f.pair.includes('JPY');
+      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
+      const contractSize=isXau?100:isXag?5000:100000;
+      const pointSize=(isJpy||isXau||isXag)?0.001:0.00001;
+      const pointVal=contractSize*pointSize;
       const daily=rate*pointVal*lots;const total=daily*days;
       const wed=days>=3?daily*3:0;
       return[{l:'Daily Swap',v:(daily>=0?'+$':'−$')+Math.abs(daily).toFixed(2),cls:daily>=0?'positive':'negative'},{l:'Total Swap ('+days+' days)',v:(total>=0?'+$':'−$')+Math.abs(total).toFixed(2),cls:total>=0?'positive':'negative'},{l:'Triple Wednesday',v:(wed>=0?'+$':'−$')+Math.abs(wed).toFixed(2)},{l:'Swap Rate',v:rate+' points'}];
