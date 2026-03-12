@@ -38,7 +38,7 @@
     </a>
 
     <p class="partners-disclaimer">
-      <span data-i18n="partners.disclaimer">Trading involves risk. Partner code:</span> <strong>734PT</strong>
+      <span data-i18n="partners.disclaimer">Trading involves risk. Partner code:</span> <strong style="font-weight: 900; color: #fff;">734PT</strong>
     </p>
   </div>
 </section>
@@ -132,9 +132,17 @@
       padding: 60px 16px;
     }
     .partners-features {
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: nowrap;
+      gap: 8px;
+    }
+    .partners-feature {
+      font-size: 0.65rem;
+    }
+    .feature-check-icon {
+      width: 14px;
+      height: 14px;
     }
   }
 </style>

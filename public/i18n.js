@@ -33,14 +33,14 @@ window.i18nData = {
         "about.feat5": "Daily Live Sessions and Q&A with WTW Seniors",
         "about.feat6": "Monthly Live Sessions on Investments and Stocks",
         "about.feat7": "Best Tips to Strengthen Your Psychology",
-        "about.cta": "JOIN ZEROWFX COMMUNITY",
+        "about.cta": "JOIN LIVE ROOM NOW!",
 
         // Members
         "members.badge": "REAL TESTIMONIALS",
         "members.title": "What Our Members Say",
         "members.subtitle": "Hear directly from our community — real people, real results, real transformations.",
         "members.cardbadge": "Member",
-        "members.btn": "JOIN LIVE ROOM NOW!",
+        "members.btn": "JOIN PRIVITE ROOM NOW!",
 
         // Setups
         "setups.badge": "VERIFIED RESULTS",
@@ -223,14 +223,14 @@ window.i18nData = {
         "about.feat5": "جلسات حية يومية وأسئلة وأجوبة",
         "about.feat6": "جلسات شهرية حول الاستثمارات والأسهم",
         "about.feat7": "أفضل النصائح لتعزيز نفسية التداول",
-        "about.cta": "انضم لمجتمع ZEROWFX",
+        "about.cta": "انضم إلى غرفه البث المباشر الآن:",
 
         // Members
         "members.badge": "آراء حقيقية",
         "members.title": "ماذا يقول أعضاؤنا",
         "members.subtitle": "استمع مباشرة من مجتمعنا — أشخاص حقيقيون، نتائج حقيقية، تحولات حقيقية.",
         "members.cardbadge": "عضو",
-        "members.btn": "انضم لغرفة البث المباشر!",
+        "members.btn": "انضم للغرفة الخاصة الآن!",
 
         // Setups
         "setups.badge": "نتائج موثقة",
@@ -547,14 +547,14 @@ window.i18nData = {
         "about.feat5": "Sessions live quotidiennes",
         "about.feat6": "Sessions mensuelles sur l'investissement",
         "about.feat7": "Astuces de psychologie",
-        "about.cta": "REJOINDRE LA COMMUNAUTÉ",
+        "about.cta": "REJOIGNEZ LA SALLE EN DIRECT :",
 
         // Members
         "members.badge": "TÉMOIGNAGES RÉELS",
         "members.title": "Ce que disent nos membres",
         "members.subtitle": "Écoutez directement notre communauté — personnes réelles, résultats réels.",
         "members.cardbadge": "Membre",
-        "members.btn": "REJOIGNEZ LA SALLE EN DIRECT !",
+        "members.btn": "REJOIGNEZ LA SALLE PRIVÉE !",
 
         // Setups
         "setups.badge": "RÉSULTATS VÉRIFIÉS",
