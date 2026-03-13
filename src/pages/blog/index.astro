@@ -39,11 +39,52 @@ import Footer from '../../components/Footer.astro';
       </div>
     </section>
 
-    <!-- Articles Section -->
-    <section class="articles-section">
-      <div class="articles-container">
+    <!-- Tab Bar + Search -->
+    <div class="tab-bar-wrapper">
+      <div class="tab-bar">
+        <div class="tab-group">
+          <button class="tab-btn active" id="tab-videos" data-tab="videos" aria-selected="true">
+            <i data-lucide="play-circle" style="width:16px;height:16px;"></i>
+            <span data-i18n="blog.tab.videos">Videos</span>
+          </button>
+          <button class="tab-btn" id="tab-live" data-tab="live" aria-selected="false">
+            <span class="live-dot"></span>
+            <span data-i18n="blog.tab.live">Live</span>
+          </button>
+        </div>
+        <div class="search-box" id="search-box" role="search">
+          <i data-lucide="search" style="width:16px;height:16px;" class="search-icon"></i>
+          <input
+            type="search"
+            id="blog-search"
+            class="search-input"
+            placeholder="Search videos..."
+            data-i18n-placeholder="blog.search.placeholder"
+            aria-label="Search videos"
+            autocomplete="off"
+          />
+          <button class="search-clear" id="search-clear" aria-label="Clear search" style="display:none;">
+            <i data-lucide="x" style="width:14px;height:14px;"></i>
+          </button>
+        </div>
+      </div>
+      <div class="tab-underline"></div>
+    </div>
+
+    <!-- Videos Panel -->
+    <section class="panel-videos articles-section" id="panel-videos">
+      <!-- No Results -->
+      <div class="no-results" id="no-results" style="display:none;">
+        <i data-lucide="video-off" style="width:48px;height:48px;opacity:0.3;"></i>
+        <p data-i18n="blog.search.noresults">No videos found. Try a different search.</p>
+      </div>
+
+      <div class="articles-container" id="articles-container">
         <!-- Article 1 -->
-        <article class="blog-article" id="article-vid1">
+        <article class="blog-article" id="article-vid1"
+          data-title="1st Place Winner Among 8,000 Traders in XM Morocco Championship"
+          data-desc="An inspiring journey of winning 1st place among 8,000 traders in the XM Morocco Trading Championship. We share the strategies, patience, and mindset that led to this remarkable achievement."
+          data-tags="#Trading #XM #Forex #Morocco #Championship">
           <h2 class="article-title" data-i18n="blog.vid1.title">1st Place Winner Among 8,000 Traders in XM Morocco Championship</h2>
           <div class="article-content">
             <p data-i18n="blog.vid1.article">An inspiring journey of winning 1st place among 8,000 traders in the XM Morocco Trading Championship. We share the strategies, patience, and mindset that led to this remarkable achievement.</p>
@@ -55,7 +96,10 @@ import Footer from '../../components/Footer.astro';
         </article>
 
         <!-- Article 2 -->
-        <article class="blog-article" id="article-vid2">
+        <article class="blog-article" id="article-vid2"
+          data-title="Most Important Markets in 2026 & Quick Fundamentals Guide"
+          data-desc="Discover the most important markets to trade in 2026. This video provides a quick and effective explanation of fundamental analysis in trading, covering key economic indicators and market trends."
+          data-tags="#Trading2026 #Fundamentals #Forex #Investing">
           <h2 class="article-title" data-i18n="blog.vid2.title">Most Important Markets in 2026 & Quick Fundamentals Guide</h2>
           <div class="article-content">
             <p data-i18n="blog.vid2.article">Discover the most important markets to trade in 2026. This video provides a quick and effective explanation of fundamental analysis in trading, covering key economic indicators and market trends to watch out for.</p>
@@ -67,7 +111,10 @@ import Footer from '../../components/Footer.astro';
         </article>
 
         <!-- Article 3 -->
-        <article class="blog-article" id="article-vid3">
+        <article class="blog-article" id="article-vid3"
+          data-title="Most Powerful Classic Strategies for Beginners 2026 - Part 4"
+          data-desc="Part 4 of our comprehensive guide to the most powerful classic trading strategies for beginners in 2026. Support, resistance, and price action."
+          data-tags="#TradingStrategies #Beginners #PriceAction #ClassicTrading">
           <h2 class="article-title" data-i18n="blog.vid3.title">Most Powerful Classic Strategies for Beginners 2026 - Part 4</h2>
           <div class="article-content">
             <p data-i18n="blog.vid3.article">Part 4 of our comprehensive guide to the most powerful classic trading strategies for beginners in 2026. Learn how to effectively apply support, resistance, and price action to maximize your setups.</p>
@@ -79,7 +126,10 @@ import Footer from '../../components/Footer.astro';
         </article>
 
         <!-- Article 4 -->
-        <article class="blog-article" id="article-vid4">
+        <article class="blog-article" id="article-vid4"
+          data-title="How to Identify the Trend and Choose Your Profitable Style - Part 3"
+          data-desc="In Part 3, we focus on identifying the true market trend and selecting the trading style that fits your psychology and maximizes your profitability."
+          data-tags="#MarketTrend #TradingStyle #Profit #ForexTrends">
           <h2 class="article-title" data-i18n="blog.vid4.title">How to Identify the Trend and Choose Your Profitable Style - Part 3</h2>
           <div class="article-content">
             <p data-i18n="blog.vid4.article">In Part 3 of our series, we focus on identifying the true market trend and selecting the trading style that fits your psychology and maximizes your profitability in today's dynamic markets.</p>
@@ -91,7 +141,10 @@ import Footer from '../../components/Footer.astro';
         </article>
 
         <!-- Article 5 -->
-        <article class="blog-article" id="article-vid5">
+        <article class="blog-article" id="article-vid5"
+          data-title="How Professional Traders Manage Capital - Part 2"
+          data-desc="How do professional traders manage their capital? Part 2 dives deep into risk management, preserving equity, and calculating position sizes effectively."
+          data-tags="#RiskManagement #Capital #ProTrading #Finance">
           <h2 class="article-title" data-i18n="blog.vid5.title">How Professional Traders Manage Capital - Part 2</h2>
           <div class="article-content">
             <p data-i18n="blog.vid5.article">How do professional traders manage their capital? Part 2 dives deep into risk management, preserving equity, and calculating position sizes effectively to survive and thrive in trading.</p>
@@ -103,7 +156,10 @@ import Footer from '../../components/Footer.astro';
         </article>
 
         <!-- Article 6 -->
-        <article class="blog-article" id="article-vid6">
+        <article class="blog-article" id="article-vid6"
+          data-title="Want to Start Trading in 2026? This is the Right Start - Part 1"
+          data-desc="Do you want to start trading in 2026? Part 1 of our ultimate start guide covers everything a novice trader needs to set a solid foundation."
+          data-tags="#StartTrading #Trading2026 #ForexBeginners #Success">
           <h2 class="article-title" data-i18n="blog.vid6.title">Want to Start Trading in 2026? This is the Right Start - Part 1</h2>
           <div class="article-content">
             <p data-i18n="blog.vid6.article">Do you want to start trading in 2026? This is the right beginning! Part 1 of our ultimate start guide covers everything a novice trader needs to set a solid foundation.</p>
@@ -115,6 +171,113 @@ import Footer from '../../components/Footer.astro';
         </article>
       </div>
     </section>
+
+    <!-- Live Panel -->
+    <section class="panel-live articles-section" id="panel-live" style="display:none;">
+      <div class="live-panel-inner">
+
+        <!-- Live Header -->
+        <div class="live-badge-wrap">
+          <span class="live-badge-pill">
+            <span class="live-dot-lg"></span>
+            <span data-i18n="blog.live.badge">LIVE SESSIONS</span>
+          </span>
+          <p class="live-desc" data-i18n="blog.live.desc">Recent live trading sessions — SMC, Price Action, London &amp; New York sessions.</p>
+        </div>
+
+        <!-- Live Stream Grid -->
+        <div class="articles-container live-grid">
+
+          <!-- Live 1 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">LIVE MEETING WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR!</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/bXnHwN5X2ZM" title="LIVE MEETING WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
+          </article>
+
+          <!-- Live 2 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/hHw2esrE020" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
+          </article>
+
+          <!-- Live 3 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR, TARIFS</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/xPMM9NbXIps" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR, TARIFS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Tarifs</div>
+          </article>
+
+          <!-- Live 4 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">LIVE TRADING : GOLD, BTC, NASDAQ WITH ZEROWFX</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/xQRp0-R5JYU" title="LIVE TRADING : GOLD, BTC, NASDAQ WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
+          </article>
+
+          <!-- Live 5 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">LIVE 2 WITH ZEROWFX</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/trSSL1uxyM4" title="LIVE 2 WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #Forex #ZeroWFX</div>
+          </article>
+
+          <!-- Live 6 -->
+          <article class="blog-article live-card">
+            <div class="live-card-label">
+              <span class="live-dot"></span>
+              <span>Live Session</span>
+            </div>
+            <h2 class="article-title">GOLD LIVE TRADING WITH ZEROWFX</h2>
+            <div class="video-container">
+              <iframe src="https://www.youtube.com/embed/HEh8M4XIdtY" title="GOLD LIVE TRADING WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+            <div class="article-tags">#LiveTrading #Gold #Forex #ZeroWFX</div>
+          </article>
+
+        </div>
+
+        <!-- CTA -->
+        <div class="live-cta">
+          <a href="https://www.youtube.com/@zerowfx1/streams" target="_blank" rel="noopener noreferrer" class="youtube-btn">
+            <i data-lucide="radio" style="width:18px;height:18px;"></i>
+            <span data-i18n="blog.live.cta">View All Live Streams</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
   </main>
 
   <Footer />
@@ -123,7 +286,75 @@ import Footer from '../../components/Footer.astro';
 <script is:inline>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Multi-language SEO updates specific for Blog page
+  // ── Tab Switching ──────────────────────────────────────────────────────────
+  const tabBtns  = document.querySelectorAll('.tab-btn');
+  const panelVideos = document.getElementById('panel-videos');
+  const panelLive   = document.getElementById('panel-live');
+  const searchBox   = document.getElementById('search-box');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab;
+
+      tabBtns.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-selected', 'false');
+      });
+      btn.classList.add('active');
+      btn.setAttribute('aria-selected', 'true');
+
+      if (tab === 'videos') {
+        panelVideos.style.display = '';
+        panelLive.style.display   = 'none';
+        searchBox.style.display   = '';
+      } else {
+        panelVideos.style.display = 'none';
+        panelLive.style.display   = '';
+        searchBox.style.display   = 'none';
+      }
+    });
+  });
+
+  // ── Search ────────────────────────────────────────────────────────────────
+  const searchInput = document.getElementById('blog-search');
+  const clearBtn    = document.getElementById('search-clear');
+  const noResults   = document.getElementById('no-results');
+  const articles    = document.querySelectorAll('.blog-article');
+
+  function doSearch(query) {
+    const q = query.trim().toLowerCase();
+    let visibleCount = 0;
+
+    articles.forEach(article => {
+      const title = (article.dataset.title || '').toLowerCase();
+      const desc  = (article.dataset.desc  || '').toLowerCase();
+      const tags  = (article.dataset.tags  || '').toLowerCase();
+      // Also search translated text currently rendered
+      const renderedTitle = (article.querySelector('.article-title')?.textContent || '').toLowerCase();
+      const renderedDesc  = (article.querySelector('.article-content')?.textContent || '').toLowerCase();
+      const renderedTags  = (article.querySelector('.article-tags')?.textContent   || '').toLowerCase();
+
+      const matches = !q ||
+        title.includes(q) || desc.includes(q) || tags.includes(q) ||
+        renderedTitle.includes(q) || renderedDesc.includes(q) || renderedTags.includes(q);
+
+      article.style.display = matches ? '' : 'none';
+      if (matches) visibleCount++;
+    });
+
+    noResults.style.display = visibleCount === 0 ? 'flex' : 'none';
+    clearBtn.style.display  = q ? 'flex' : 'none';
+  }
+
+  searchInput.addEventListener('input', e => doSearch(e.target.value));
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    doSearch('');
+    searchInput.focus();
+  });
+
+  // ── Multi-language SEO ────────────────────────────────────────────────────
   function updateBlogSEO() {
     const lang = window.currentLang || 'en';
     const titles = {
@@ -136,35 +367,37 @@ document.addEventListener('DOMContentLoaded', () => {
       ar: "شاهد واقرأ مقالات وفيديوهات تداول ZeroFX حول الذهب والعملات الرقمية والفوركس ومؤشرات السوق الأمريكية.",
       fr: "Lisez et regardez les articles et vidéos de trading ZeroFX sur l'Or, la Crypto, le Forex et les Indices US."
     };
-    
+    const placeholders = {
+      en: "Search videos...",
+      ar: "ابحث عن فيديوهات...",
+      fr: "Rechercher des vidéos..."
+    };
+
     document.title = titles[lang] || titles.en;
-    
-    // Attempt to override global title update
-    setTimeout(() => {
-        document.title = titles[lang] || titles.en;
-    }, 50);
+    setTimeout(() => { document.title = titles[lang] || titles.en; }, 50);
 
     const metaDesc = document.querySelector('meta[name="description"]');
     if (metaDesc) metaDesc.setAttribute('content', descs[lang] || descs.en);
-    
+
     const ogTitle = document.getElementById('og-title');
     if (ogTitle) ogTitle.setAttribute('content', titles[lang] || titles.en);
-    
+
     const ogDesc = document.getElementById('og-desc');
     if (ogDesc) ogDesc.setAttribute('content', descs[lang] || descs.en);
 
-    generateSchema(); // Update schema.org data
+    if (searchInput) searchInput.setAttribute('placeholder', placeholders[lang] || placeholders.en);
+
+    generateSchema();
   }
 
   window.addEventListener('languageChanged', updateBlogSEO);
-  
+
   const originalApplyTranslations = window.applyTranslations;
   if (originalApplyTranslations) {
     window.applyTranslations = function() {
-        originalApplyTranslations();
-        updateBlogSEO();
+      originalApplyTranslations();
+      updateBlogSEO();
     };
-    // Initialize SEO immediately since window.applyTranslations might have already run
     updateBlogSEO();
   } else {
     updateBlogSEO();
@@ -174,8 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lang = window.currentLang || 'en';
     const schemaEl = document.getElementById('video-schema');
     if (!schemaEl) return;
-    
-    // We only create basic schema for the featured videos
+
     const videos = [
        { id: "FvIj7Y6OgOo", key: "vid1" },
        { id: "PJzcUsbD-d4", key: "vid2" },
@@ -186,12 +418,11 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     const items = videos.map((video, idx) => {
-      // get translation from global bundle
       let title = "";
-      let desc = "";
+      let desc  = "";
       if (window.i18nData && window.i18nData[lang]) {
          title = window.i18nData[lang][`blog.${video.key}.title`] || "";
-         desc = window.i18nData[lang][`blog.${video.key}.article`] || "";
+         desc  = window.i18nData[lang][`blog.${video.key}.article`] || "";
       }
       return {
         "@type": "ListItem",
@@ -201,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
           "name": title,
           "description": desc,
           "thumbnailUrl": `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`,
-          "uploadDate": "2026-01-01T00:00:00Z", // arbitrary fallback date
+          "uploadDate": "2026-01-01T00:00:00Z",
           "contentUrl": `https://www.youtube.com/watch?v=${video.id}`,
           "embedUrl": `https://www.youtube.com/embed/${video.id}`,
           "inLanguage": lang
@@ -209,13 +440,11 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     });
 
-    const schemaData = {
+    schemaEl.textContent = JSON.stringify({
       "@context": "https://schema.org",
       "@type": "ItemList",
       "itemListElement": items
-    };
-    
-    schemaEl.textContent = JSON.stringify(schemaData);
+    });
   }
 
   if (window.lucide) window.lucide.createIcons();
@@ -288,11 +517,150 @@ document.addEventListener('DOMContentLoaded', () => {
     font-size: 1rem;
     transition: var(--transition);
   }
-  
+
   .youtube-btn:hover {
     background: #cc0000;
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(255, 0, 0, 0.3);
+  }
+
+  /* ── Tab Bar ── */
+  .tab-bar-wrapper {
+    position: sticky;
+    top: 64px;
+    z-index: 40;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tab-bar {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    justify-content: space-between;
+  }
+
+  .tab-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 16px 20px 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    margin-bottom: -1px;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .tab-btn:hover {
+    color: var(--color-text);
+  }
+
+  .tab-btn.active {
+    color: var(--color-text);
+    border-bottom-color: var(--color-green, #10b981);
+  }
+
+  /* Live pulsing dot on tab */
+  .live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: pulse-dot 1.5s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.5; transform: scale(0.75); }
+  }
+
+  /* ── Search Box ── */
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    min-width: 220px;
+    max-width: 320px;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--color-green, #10b981);
+    box-shadow: 0 0 0 3px var(--color-green-glow, rgba(16,185,129,0.15));
+  }
+
+  .search-icon {
+    color: var(--color-text-muted);
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    min-width: 0;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  .search-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-border);
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    padding: 0;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .search-clear:hover {
+    background: var(--color-border-strong);
+    color: var(--color-text);
+  }
+
+  /* ── No Results ── */
+  .no-results {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 24px;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+    text-align: center;
   }
 
   /* ── Articles Section ── */
@@ -345,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
   .video-container {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    padding-bottom: 56.25%; /* 16:9 */
     background: #000;
     border-radius: var(--radius-md);
     overflow: hidden;
@@ -372,29 +740,110 @@ document.addEventListener('DOMContentLoaded', () => {
     padding-top: 20px;
   }
 
-  /* ── Clean White Theme Overrides ── */
+  /* ── Live Panel ── */
+  .live-panel-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .live-badge-wrap {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .live-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    padding: 6px 16px;
+    border-radius: 999px;
+  }
+
+  .live-dot-lg {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ef4444;
+    animation: pulse-dot 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+
+  .live-desc {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    max-width: 550px;
+    line-height: 1.6;
+  }
+
+  /* Live card label ("Live Session" badge on each card) */
+  .live-card-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 999px;
+    padding: 3px 10px;
+    margin-bottom: 14px;
+    width: fit-content;
+    text-transform: uppercase;
+  }
+
+  .live-card .video-container {
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.1);
+  }
+
+  .live-cta {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* ── Clean White Theme ── */
   :global(html.theme-clean-white) .blog-article {
     background: #ffffff;
     border: 1px solid #e1e4e8;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
-  :global(html.theme-clean-white) .article-title {
-    color: #111;
-  }
-  :global(html.theme-clean-white) .article-content {
-    color: #4b5563;
-  }
+  :global(html.theme-clean-white) .article-title { color: #111; }
+  :global(html.theme-clean-white) .article-content { color: #4b5563; }
   :global(html.theme-clean-white) .article-tags {
     color: #10b981;
     border-top-color: #e1e4e8;
   }
-
-  /* ── RTL Support for Arabic ── */
-  html[dir="rtl"] .blog-article {
-    text-align: right;
+  :global(html.theme-clean-white) .tab-bar-wrapper {
+    background: #ffffff;
+  }
+  :global(html.theme-clean-white) .search-box {
+    background: #f9fafb;
+    border-color: #e1e4e8;
   }
 
+  /* ── RTL Support ── */
+  html[dir="rtl"] .blog-article { text-align: right; }
+  html[dir="rtl"] .tab-bar { flex-direction: row-reverse; }
+
   /* ── Responsive ── */
+  @media (max-width: 1200px) {
+    .live-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
   @media (max-width: 1024px) {
     .articles-container {
       grid-template-columns: repeat(2, 1fr);
@@ -409,14 +858,15 @@ document.addEventListener('DOMContentLoaded', () => {
     .blog-article {
       padding: 24px;
     }
-    .article-title {
-      font-size: 1.3rem;
-    }
-    .article-content {
-      font-size: 0.95rem;
-    }
-    .blog-title {
-      font-size: 2rem;
-    }
+    .article-title { font-size: 1.3rem; }
+    .article-content { font-size: 0.95rem; }
+    .blog-title { font-size: 2rem; }
+    .tab-btn { padding: 14px 14px 12px; font-size: 0.9rem; }
+    .search-box { min-width: 160px; }
+  }
+
+  @media (max-width: 480px) {
+    .tab-bar { gap: 0; }
+    .search-box { min-width: 130px; max-width: 170px; }
   }
 </style>
