@@ -127,35 +127,7 @@ html.theme-clean-white .countdown-widget {
   border-color: rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Theme selector dropdown fix for light */
-html.theme-clean-white .theme-dropdown {
-  background: rgba(255, 255, 255, 0.97) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.04) inset !important;
-}
-
-html.theme-clean-white .theme-option:hover {
-  background: rgba(0, 0, 0, 0.04) !important;
-}
-
-html.theme-clean-white .theme-option.active {
-  background: rgba(16, 185, 129, 0.08) !important;
-  border-color: #10b981 !important;
-}
-
-html.theme-clean-white .theme-name {
-  color: #111827 !important;
-}
-
-html.theme-clean-white .theme-desc {
-  color: #9ca3af !important;
-}
-
-html.theme-clean-white .dropdown-header,
-html.theme-clean-white .dropdown-footer {
-  border-color: rgba(0, 0, 0, 0.06) !important;
-  color: #9ca3af !important;
-}
+/* Theme toggle switch — no overrides needed, self-contained */
 
 /* Subtle gradient for hero instead of dark bg */
 html.theme-clean-white .hero-bg-gradient {

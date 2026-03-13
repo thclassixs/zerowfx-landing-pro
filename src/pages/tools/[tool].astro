@@ -55,7 +55,6 @@ const toolTitle = currentTool.split('-').map(w => w.charAt(0).toUpperCase() + w.
                 <p class="xm-affiliate-desc">Get 100% deposit bonus and maximize your pip value</p>
                 <a href="https://clicks.pipaffiliates.com/c?c=1186199&l=en&p=1" target="_blank" rel="noopener noreferrer" class="xm-claim-btn">Claim Bonus</a>
               </div>
-              <p class="xm-affiliate-note">Affiliate link</p>
             </div>
             <div class="tool-results" id="toolResults">
               <div class="results-placeholder">
@@ -156,13 +155,17 @@ const TOOLS = [
       {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
       {id:'risk',label:'Risk Percentage (%)',type:'number',placeholder:'2',step:'0.1',val:'2'},
       {id:'slPips',label:'Stop Loss (Pips)',type:'number',placeholder:'50',step:'1'},
-      {id:'pipVal',label:'Pip Value per Lot ($)',type:'number',placeholder:'10',step:'0.01',val:'10'}
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'}
     ],
     calc:f=>{
-      const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips),pv=parseFloat(f.pipVal);
-      if([b,r,sl,pv].some(isNaN)||sl===0||pv===0)return null;
-      const riskAmt=b*(r/100);const lots=riskAmt/(sl*pv);
-      return[{l:'Lot Size',v:lots.toFixed(2)},{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'Units',v:Math.round(lots*100000).toLocaleString()},{l:'Mini Lots',v:(lots*10).toFixed(2)},{l:'Micro Lots',v:(lots*100).toFixed(2)}];
+      const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips);
+      if([b,r,sl].some(isNaN)||sl===0)return null;
+      const spec=getInstrumentSpec(f.pair);
+      const pipValPerLot=getPipValue(f.pair, 1);
+      if(pipValPerLot===0)return null;
+      const riskAmt=b*(r/100);const lots=riskAmt/(sl*pipValPerLot);
+      const units=Math.round(lots*spec.contractSize);
+      return[{l:'Lot Size',v:lots.toFixed(2)},{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'Units',v:units.toLocaleString()},{l:'Pip Value',v:'$'+pipValPerLot.toFixed(2)+'/lot'},{l:'Mini Lots',v:(lots*10).toFixed(2)},{l:'Micro Lots',v:(lots*100).toFixed(2)}];
     }
   },
   {id:'margin-calculator',name:'Margin Calculator',icon:'lock',desc:'Calculate required margin for any position based on lot size, leverage, and price',
@@ -175,9 +178,8 @@ const TOOLS = [
     calc:f=>{
       const lots=parseFloat(f.lots),price=parseFloat(f.price),lev=parseInt(f.leverage.split(':')[1]);
       if(isNaN(lots)||isNaN(price)||isNaN(lev)||lev===0)return null;
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const contractSize=isXau?100:isXag?5000:100000;
-      const units=lots*contractSize;const notional=units*price;const margin=notional/lev;
+      const spec=getInstrumentSpec(f.pair);
+      const units=lots*spec.contractSize;const notional=units*price;const margin=notional/lev;
       return[{l:'Required Margin',v:'$'+margin.toFixed(2)},{l:'Notional Value',v:'$'+notional.toFixed(2)},{l:'Leverage',v:f.leverage},{l:'Units',v:units.toLocaleString()}];
     }
   },
@@ -191,12 +193,11 @@ const TOOLS = [
     calc:f=>{
       const b=parseFloat(f.balance),r=parseFloat(f.risk),sl=parseFloat(f.slPips);
       if([b,r,sl].some(isNaN)||sl===0)return null;
+      const spec=getInstrumentSpec(f.pair);
       const pipValPerLot=getPipValue(f.pair, 1);
       const riskAmt=b*(r/100);
       const lots=riskAmt/(sl*pipValPerLot);
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const contractSize=isXau?100:isXag?5000:100000;
-      const units=Math.round(lots*contractSize);
+      const units=Math.round(lots*spec.contractSize);
       return[{l:'Position Size',v:lots.toFixed(2)+' lots'},{l:'Units',v:units.toLocaleString()},{l:'Risk Amount',v:'$'+riskAmt.toFixed(2)},{l:'Pip Value',v:'$'+pipValPerLot.toFixed(2)+'/lot'}];
     }
   },
@@ -407,13 +408,15 @@ const TOOLS = [
     fields:[
       {id:'balance',label:'Account Balance ($)',type:'number',placeholder:'10000',step:'1'},
       {id:'leverage',label:'Leverage',type:'select',options:['1:10','1:20','1:30','1:50','1:100','1:200','1:500','1:1000'],val:'1:100'},
-      {id:'price',label:'Asset Price',type:'number',placeholder:'1.08500',step:'0.00001'}
+      {id:'price',label:'Asset Price',type:'number',placeholder:'1.08500',step:'0.00001'},
+      {id:'pair',label:'Currency Pair',type:'select',options:PAIRS,val:'EUR/USD'}
     ],
     calc:f=>{
       const bal=parseFloat(f.balance),lev=parseInt(f.leverage.split(':')[1]),price=parseFloat(f.price);
       if([bal,lev,price].some(isNaN)||price===0)return null;
-      const power=bal*lev;const maxUnits=Math.floor(power/price);const maxLots=(maxUnits/100000);
-      const marginPerLot=(100000*price)/lev;
+      const spec=getInstrumentSpec(f.pair);
+      const power=bal*lev;const maxUnits=Math.floor(power/price);const maxLots=(maxUnits/spec.contractSize);
+      const marginPerLot=(spec.contractSize*price)/lev;
       return[{l:'Buying Power',v:'$'+power.toLocaleString()},{l:'Max Position',v:maxLots.toFixed(2)+' lots'},{l:'Max Units',v:maxUnits.toLocaleString()},{l:'Margin per Lot',v:'$'+marginPerLot.toFixed(2)},{l:'Leverage Ratio',v:f.leverage}];
     }
   },
@@ -883,12 +886,6 @@ document.addEventListener('DOMContentLoaded',()=>{
     background: var(--color-green-dark);
     box-shadow: var(--shadow-glow);
     transform: translateY(-1px);
-  }
-  .xm-affiliate-note {
-    font-size: 0.72rem;
-    color: var(--color-text-dim);
-    margin-top: 6px;
-    padding-left: 2px;
   }
 
   .tool-results {
