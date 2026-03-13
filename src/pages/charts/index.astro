@@ -2,9 +2,25 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
+
+const schemaData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Zerowfx — Live Charts & Market Data",
+  "description": "Professional-grade TradingView charts and real-time market data for Forex, Crypto, Stocks, and Commodities.",
+  "url": "https://zerowfx.com/charts",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Zerowfx",
+    "url": "https://zerowfx.com"
+  }
+});
 ---
 
-<Layout title="Zerowfx — Live Charts & Market Data">
+<Layout title="Zerowfx — Live Charts & Market Data" description="Professional-grade TradingView charts and real-time market data for Forex, Crypto, Stocks, and Commodities. Monitor, analyze, and stay ahead of the markets.">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={schemaData} />
+  </Fragment>
   <Navbar />
 
   <main class="charts-page">
@@ -182,283 +198,196 @@ document.addEventListener('DOMContentLoaded', function () {
     return localStorage.getItem('language') === 'ar' ? 'ar_AE' : 'en';
   }
 
-  function initWidgets() {
+  // Helper for inserting scripts
+  function createWidgetScript(id, widgetSrc, configObj) {
+    const container = document.getElementById(id);
+    if (!container) return;
+    container.innerHTML = '';
+    var script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.src = widgetSrc;
+    script.async = true;
+    script.textContent = JSON.stringify(configObj);
+    container.appendChild(script);
+  }
+
+  // Lazy-load widgets using IntersectionObserver
+  var widgetSections = document.querySelectorAll('.widget-section');
+  var initializedSections = new Set();
+
+  function initSection(section) {
+    var id = section.id;
+    if (initializedSections.has(id)) return;
+    initializedSections.add(id);
+    initWidgetForSection(id);
+  }
+
+  function initWidgetForSection(sectionId) {
     var colorTheme = getTVColorTheme();
     var tvLocale = getTVLocale();
 
-    // Clear previous widgets
-    const containers = [
-      'tv-advanced-chart', 
-      'symbolOverview1', 
-      'symbolOverview2', 
-      'marketSummary', 
-      'stockMarket', 
-      'marketOverview'
-    ];
-    containers.forEach(id => {
-       const el = document.getElementById(id);
-       if (el) el.innerHTML = '';
-    });
+    if (sectionId === 'advanced-chart') {
+      var advContainer = document.getElementById('tv-advanced-chart');
+      if (advContainer) {
+        advContainer.innerHTML = '';
+        var advInner = document.createElement('div');
+        advInner.className = 'tradingview-widget-container';
+        advInner.style = 'height:800px;width:100%;';
+        var advDiv = document.createElement('div');
+        advDiv.id = 'tradingview_advanced';
+        advDiv.style = 'height:100%;width:100%;';
+        advInner.appendChild(advDiv);
+        advContainer.appendChild(advInner);
 
-    // ── 1. Advanced Real-Time Chart ──
-    const advContainer = document.getElementById('tv-advanced-chart');
-    if (advContainer) {
-      const advInner = document.createElement('div');
-      advInner.className = 'tradingview-widget-container';
-      advInner.style = 'height:800px;width:100%;';
-      const advDiv = document.createElement('div');
-      advDiv.id = 'tradingview_advanced';
-      advDiv.style = 'height:100%;width:100%;';
-      advInner.appendChild(advDiv);
-      advContainer.appendChild(advInner);
-
-      var advScript = document.createElement('script');
-      advScript.src = 'https://s3.tradingview.com/tv.js';
-      advScript.onload = function () {
-        if (window.TradingView) {
-          new TradingView.widget({
-            container_id: 'tradingview_advanced',
-            autosize: true,
-            symbol: 'FX:EURUSD',
-            interval: '60',
-            timezone: 'Etc/UTC',
-            theme: colorTheme,
-            style: '1',
-            locale: tvLocale,
-            toolbar_bg: colorTheme === 'dark' ? '#141618' : '#ffffff',
-            enable_publishing: false,
-            allow_symbol_change: true,
-            hide_side_toolbar: false,
-            withdateranges: true,
-            details: true,
-            studies: ['MASimple@tv-basicstudies'],
-            backgroundColor: colorTheme === 'dark' ? '#0f1114' : '#ffffff',
-            gridColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-          });
-        }
-      };
-      advContainer.appendChild(advScript);
+        var advScript = document.createElement('script');
+        advScript.src = 'https://s3.tradingview.com/tv.js';
+        advScript.onload = function () {
+          if (window.TradingView) {
+            new TradingView.widget({
+              container_id: 'tradingview_advanced',
+              autosize: true,
+              symbol: 'FX:EURUSD',
+              interval: '60',
+              timezone: 'Etc/UTC',
+              theme: colorTheme,
+              style: '1',
+              locale: tvLocale,
+              toolbar_bg: colorTheme === 'dark' ? '#141618' : '#ffffff',
+              enable_publishing: false,
+              allow_symbol_change: true,
+              hide_side_toolbar: false,
+              withdateranges: true,
+              details: true,
+              studies: ['MASimple@tv-basicstudies'],
+              backgroundColor: colorTheme === 'dark' ? '#0f1114' : '#ffffff',
+              gridColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+            });
+          }
+        };
+        advContainer.appendChild(advScript);
+      }
     }
 
-    // Helper for inserting scripts
-    function createWidgetScript(id, widgetSrc, configObj) {
-      const container = document.getElementById(id);
-      if (!container) return;
-      var script = document.createElement('script');
-      script.type = 'text/javascript';
-      script.src = widgetSrc;
-      script.async = true;
-      script.textContent = JSON.stringify(configObj);
-      container.appendChild(script);
+    if (sectionId === 'symbol-overview-1') {
+      createWidgetScript('symbolOverview1', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js', {
+        symbols: [["Apple", "AAPL|1D"],["Google", "GOOGL|1D"],["Microsoft", "MSFT|1D"]],
+        chartOnly: false, width: "100%", height: "100%", locale: tvLocale, colorTheme: colorTheme,
+        autosize: true, showVolume: true, showMA: false, hideDateRanges: false, hideMarketStatus: false,
+        hideSymbolLogo: false, scalePosition: "right", scaleMode: "Normal",
+        fontFamily: "Inter, -apple-system, sans-serif", fontSize: "10", noTimeScale: false,
+        valuesTracking: "1", changeMode: "price-and-percent", chartType: "area",
+        lineWidth: 2, lineType: 0, dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
+      });
     }
 
-    // ── 2. Symbol Overview (Stock) ──
-    createWidgetScript('symbolOverview1', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js', {
-      symbols: [
-        ["Apple", "AAPL|1D"],
-        ["Google", "GOOGL|1D"],
-        ["Microsoft", "MSFT|1D"]
-      ],
-      chartOnly: false,
-      width: "100%",
-      height: "100%",
-      locale: tvLocale,
-      colorTheme: colorTheme,
-      autosize: true,
-      showVolume: true,
-      showMA: false,
-      hideDateRanges: false,
-      hideMarketStatus: false,
-      hideSymbolLogo: false,
-      scalePosition: "right",
-      scaleMode: "Normal",
-      fontFamily: "Inter, -apple-system, sans-serif",
-      fontSize: "10",
-      noTimeScale: false,
-      valuesTracking: "1",
-      changeMode: "price-and-percent",
-      chartType: "area",
-      lineWidth: 2,
-      lineType: 0,
-      dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
-    });
+    if (sectionId === 'symbol-overview-2') {
+      createWidgetScript('symbolOverview2', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js', {
+        symbols: [["EUR/USD", "FX:EURUSD|1D"],["GBP/USD", "FX:GBPUSD|1D"],["USD/JPY", "FX:USDJPY|1D"],["XAU/USD", "OANDA:XAUUSD|1D"]],
+        chartOnly: false, width: "100%", height: "100%", locale: tvLocale, colorTheme: colorTheme,
+        autosize: true, showVolume: true, showMA: false, hideDateRanges: false, hideMarketStatus: false,
+        hideSymbolLogo: false, scalePosition: "right", scaleMode: "Normal",
+        fontFamily: "Inter, -apple-system, sans-serif", fontSize: "10", noTimeScale: false,
+        valuesTracking: "1", changeMode: "price-and-percent", chartType: "area",
+        lineWidth: 2, lineType: 0, dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
+      });
+    }
 
-    // ── 3. Symbol Overview (Forex) ──
-    createWidgetScript('symbolOverview2', 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js', {
-      symbols: [
-        ["EUR/USD", "FX:EURUSD|1D"],
-        ["GBP/USD", "FX:GBPUSD|1D"],
-        ["USD/JPY", "FX:USDJPY|1D"],
-        ["XAU/USD", "OANDA:XAUUSD|1D"]
-      ],
-      chartOnly: false,
-      width: "100%",
-      height: "100%",
-      locale: tvLocale,
-      colorTheme: colorTheme,
-      autosize: true,
-      showVolume: true,
-      showMA: false,
-      hideDateRanges: false,
-      hideMarketStatus: false,
-      hideSymbolLogo: false,
-      scalePosition: "right",
-      scaleMode: "Normal",
-      fontFamily: "Inter, -apple-system, sans-serif",
-      fontSize: "10",
-      noTimeScale: false,
-      valuesTracking: "1",
-      changeMode: "price-and-percent",
-      chartType: "area",
-      lineWidth: 2,
-      lineType: 0,
-      dateRanges: ["1d|1", "1m|30", "3m|60", "12m|1D", "60m|1W", "all|1M"]
-    });
-
-    // ── 4. Market Summary (Watchlist) ──
-    createWidgetScript('marketSummary', 'https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js', {
-      width: "100%",
-      height: "100%",
-      symbolsGroups: [
-        {
-          name: "Forex",
-          originalName: "Forex",
-          symbols: [
-            { name: "FX:EURUSD", displayName: "EUR/USD" },
-            { name: "FX:GBPUSD", displayName: "GBP/USD" },
-            { name: "FX:USDJPY", displayName: "USD/JPY" },
-            { name: "FX:AUDUSD", displayName: "AUD/USD" },
+    if (sectionId === 'market-summary') {
+      createWidgetScript('marketSummary', 'https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js', {
+        width: "100%", height: "100%",
+        symbolsGroups: [
+          { name: "Forex", originalName: "Forex", symbols: [
+            { name: "FX:EURUSD", displayName: "EUR/USD" },{ name: "FX:GBPUSD", displayName: "GBP/USD" },
+            { name: "FX:USDJPY", displayName: "USD/JPY" },{ name: "FX:AUDUSD", displayName: "AUD/USD" },
             { name: "FX:USDCAD", displayName: "USD/CAD" }
-          ]
-        },
-        {
-          name: "Indices",
-          originalName: "Indices",
-          symbols: [
-            { name: "FOREXCOM:SPXUSD", displayName: "S&P 500" },
-            { name: "FOREXCOM:NSXUSD", displayName: "NASDAQ" },
-            { name: "FOREXCOM:DJI", displayName: "Dow Jones" },
-            { name: "INDEX:DEU40", displayName: "DAX" },
+          ]},
+          { name: "Indices", originalName: "Indices", symbols: [
+            { name: "FOREXCOM:SPXUSD", displayName: "S&P 500" },{ name: "FOREXCOM:NSXUSD", displayName: "NASDAQ" },
+            { name: "FOREXCOM:DJI", displayName: "Dow Jones" },{ name: "INDEX:DEU40", displayName: "DAX" },
             { name: "INDEX:NKY", displayName: "Nikkei 225" }
-          ]
-        },
-        {
-          name: "Commodities",
-          originalName: "Commodities",
-          symbols: [
-            { name: "OANDA:XAUUSD", displayName: "Gold" },
-            { name: "OANDA:XAGUSD", displayName: "Silver" },
-            { name: "TVC:USOIL", displayName: "Crude Oil" },
-            { name: "NYMEX:NG1!", displayName: "Natural Gas" }
-          ]
-        },
-        {
-          name: "Crypto",
-          originalName: "Crypto",
-          symbols: [
-            { name: "BINANCE:BTCUSDT", displayName: "BTC/USDT" },
-            { name: "BINANCE:ETHUSDT", displayName: "ETH/USDT" },
+          ]},
+          { name: "Commodities", originalName: "Commodities", symbols: [
+            { name: "OANDA:XAUUSD", displayName: "Gold" },{ name: "OANDA:XAGUSD", displayName: "Silver" },
+            { name: "TVC:USOIL", displayName: "Crude Oil" },{ name: "NYMEX:NG1!", displayName: "Natural Gas" }
+          ]},
+          { name: "Crypto", originalName: "Crypto", symbols: [
+            { name: "BINANCE:BTCUSDT", displayName: "BTC/USDT" },{ name: "BINANCE:ETHUSDT", displayName: "ETH/USDT" },
             { name: "BINANCE:SOLUSDT", displayName: "SOL/USDT" }
-          ]
-        }
-      ],
-      showSymbolLogo: true,
-      isTransparent: true,
-      colorTheme: colorTheme,
-      locale: tvLocale
-    });
+          ]}
+        ],
+        showSymbolLogo: true, isTransparent: true, colorTheme: colorTheme, locale: tvLocale
+      });
+    }
 
-    // ── 5. Stock Market (Hotlists) ──
-    createWidgetScript('stockMarket', 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js', {
-      colorTheme: colorTheme,
-      dateRange: "12M",
-      exchange: "US",
-      showChart: true,
-      locale: tvLocale,
-      largeChartUrl: "",
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: true,
-      width: "100%",
-      height: "100%",
-      plotLineColorGrowing: "rgba(34,197,94,1)",
-      plotLineColorFalling: "rgba(239,68,68,1)",
-      gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-      scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
-      belowLineFillColorGrowing: "rgba(34,197,94,0.05)",
-      belowLineFillColorFalling: "rgba(239,68,68,0.05)"
-    });
+    if (sectionId === 'stock-market') {
+      createWidgetScript('stockMarket', 'https://s3.tradingview.com/external-embedding/embed-widget-hotlists.js', {
+        colorTheme: colorTheme, dateRange: "12M", exchange: "US", showChart: true, locale: tvLocale,
+        largeChartUrl: "", isTransparent: true, showSymbolLogo: true, showFloatingTooltip: true,
+        width: "100%", height: "100%",
+        plotLineColorGrowing: "rgba(34,197,94,1)", plotLineColorFalling: "rgba(239,68,68,1)",
+        gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+        scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+        belowLineFillColorGrowing: "rgba(34,197,94,0.05)", belowLineFillColorFalling: "rgba(239,68,68,0.05)"
+      });
+    }
 
-    // ── 6. Market Overview ──
-    createWidgetScript('marketOverview', 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js', {
-      colorTheme: colorTheme,
-      dateRange: "12M",
-      showChart: true,
-      locale: tvLocale,
-      largeChartUrl: "",
-      isTransparent: true,
-      showSymbolLogo: true,
-      showFloatingTooltip: true,
-      width: "100%",
-      height: "100%",
-      plotLineColorGrowing: "rgba(34,197,94,1)",
-      plotLineColorFalling: "rgba(239,68,68,1)",
-      gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
-      scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
-      belowLineFillColorGrowing: "rgba(34,197,94,0.05)",
-      belowLineFillColorFalling: "rgba(239,68,68,0.05)",
-      tabs: [
-        {
-          title: "Forex",
-          symbols: [
-            { s: "FX:EURUSD", d: "EUR/USD" },
-            { s: "FX:GBPUSD", d: "GBP/USD" },
-            { s: "FX:USDJPY", d: "USD/JPY" },
-            { s: "FX:AUDUSD", d: "AUD/USD" },
-            { s: "FX:USDCHF", d: "USD/CHF" },
-            { s: "FX:USDCAD", d: "USD/CAD" }
-          ],
-          originalTitle: "Forex"
-        },
-        {
-          title: "Indices",
-          symbols: [
-            { s: "FOREXCOM:SPXUSD", d: "S&P 500" },
-            { s: "FOREXCOM:NSXUSD", d: "NASDAQ" },
-            { s: "FOREXCOM:DJI", d: "Dow Jones" },
-            { s: "INDEX:DEU40", d: "DAX" },
+    if (sectionId === 'market-overview') {
+      createWidgetScript('marketOverview', 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js', {
+        colorTheme: colorTheme, dateRange: "12M", showChart: true, locale: tvLocale,
+        largeChartUrl: "", isTransparent: true, showSymbolLogo: true, showFloatingTooltip: true,
+        width: "100%", height: "100%",
+        plotLineColorGrowing: "rgba(34,197,94,1)", plotLineColorFalling: "rgba(239,68,68,1)",
+        gridLineColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+        scaleFontColor: colorTheme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+        belowLineFillColorGrowing: "rgba(34,197,94,0.05)", belowLineFillColorFalling: "rgba(239,68,68,0.05)",
+        tabs: [
+          { title: "Forex", symbols: [
+            { s: "FX:EURUSD", d: "EUR/USD" },{ s: "FX:GBPUSD", d: "GBP/USD" },
+            { s: "FX:USDJPY", d: "USD/JPY" },{ s: "FX:AUDUSD", d: "AUD/USD" },
+            { s: "FX:USDCHF", d: "USD/CHF" },{ s: "FX:USDCAD", d: "USD/CAD" }
+          ], originalTitle: "Forex" },
+          { title: "Indices", symbols: [
+            { s: "FOREXCOM:SPXUSD", d: "S&P 500" },{ s: "FOREXCOM:NSXUSD", d: "NASDAQ" },
+            { s: "FOREXCOM:DJI", d: "Dow Jones" },{ s: "INDEX:DEU40", d: "DAX" },
             { s: "INDEX:NKY", d: "Nikkei 225" }
-          ],
-          originalTitle: "Indices"
-        },
-        {
-          title: "Commodities",
-          symbols: [
-            { s: "OANDA:XAUUSD", d: "Gold" },
-            { s: "OANDA:XAGUSD", d: "Silver" },
-            { s: "TVC:USOIL", d: "Crude Oil" },
-            { s: "NYMEX:NG1!", d: "Natural Gas" }
-          ],
-          originalTitle: "Commodities"
-        },
-        {
-          title: "Crypto",
-          symbols: [
-            { s: "BINANCE:BTCUSDT", d: "BTC/USDT" },
-            { s: "BINANCE:ETHUSDT", d: "ETH/USDT" },
+          ], originalTitle: "Indices" },
+          { title: "Commodities", symbols: [
+            { s: "OANDA:XAUUSD", d: "Gold" },{ s: "OANDA:XAGUSD", d: "Silver" },
+            { s: "TVC:USOIL", d: "Crude Oil" },{ s: "NYMEX:NG1!", d: "Natural Gas" }
+          ], originalTitle: "Commodities" },
+          { title: "Crypto", symbols: [
+            { s: "BINANCE:BTCUSDT", d: "BTC/USDT" },{ s: "BINANCE:ETHUSDT", d: "ETH/USDT" },
             { s: "BINANCE:SOLUSDT", d: "SOL/USDT" }
-          ],
-          originalTitle: "Crypto"
-        }
-      ]
-    });
+          ], originalTitle: "Crypto" }
+        ]
+      });
+    }
   }
 
-  // Initialize on load
-  initWidgets();
+  // Use IntersectionObserver to lazy-load each widget when it comes into view
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          initSection(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '200px' });
+
+    widgetSections.forEach(function(section) {
+      observer.observe(section);
+    });
+  } else {
+    // Fallback: load all widgets immediately
+    widgetSections.forEach(function(section) { initSection(section); });
+  }
 
   // Re-initialize on language change
-  window.addEventListener('languageChanged', initWidgets);
+  window.addEventListener('languageChanged', function() {
+    initializedSections.clear();
+    widgetSections.forEach(function(section) { initSection(section); });
+  });
 
 });
 </script>

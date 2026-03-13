@@ -2,25 +2,44 @@
 import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
+
+// Server-side video data for SEO schema markup
+const videos = [
+  { id: 'FvIj7Y6OgOo', title: '1st Place Winner Among 8,000 Traders in XM Morocco Championship', desc: 'An inspiring journey of winning 1st place among 8,000 traders in the XM Morocco Trading Championship.' },
+  { id: 'PJzcUsbD-d4', title: 'Most Important Markets in 2026 & Quick Fundamentals Guide', desc: 'Discover the most important markets to trade in 2026 with a quick fundamentals guide.' },
+  { id: 'qkAXCxVWp3I', title: 'Most Powerful Classic Strategies for Beginners 2026 - Part 4', desc: 'Part 4 of our comprehensive guide to the most powerful classic trading strategies for beginners.' },
+  { id: 'GliF_2oY850', title: 'How to Identify the Trend and Choose Your Profitable Style - Part 3', desc: 'Learn to identify the true market trend and select the trading style that maximizes your profitability.' },
+  { id: 'sIzDtkp-6LQ', title: 'How Professional Traders Manage Capital - Part 2', desc: 'Deep dive into risk management, preserving equity, and calculating position sizes effectively.' },
+  { id: 'vkAfQrAN5qg', title: 'Want to Start Trading in 2026? This is the Right Start - Part 1', desc: 'The ultimate start guide covering everything a novice trader needs to set a solid foundation.' },
+];
+
+const schemaData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": videos.map((video, idx) => ({
+    "@type": "ListItem",
+    "position": idx + 1,
+    "item": {
+      "@type": "VideoObject",
+      "name": video.title,
+      "description": video.desc,
+      "thumbnailUrl": `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`,
+      "uploadDate": "2026-01-01T00:00:00Z",
+      "contentUrl": `https://www.youtube.com/watch?v=${video.id}`,
+      "embedUrl": `https://www.youtube.com/embed/${video.id}`,
+      "inLanguage": "en"
+    }
+  }))
+});
 ---
 
-<Layout title="ZeroFX Trading Videos & Articles - Gold, Forex & Crypto Analysis">
+<Layout title="ZeroFX Trading Videos & Articles - Gold, Forex & Crypto Analysis" description="Watch and read ZeroFX trading articles and videos on Gold, Crypto, Forex and US Indices.">
   <Fragment slot="head">
-    <link rel="alternate" hreflang="en" href="https://zerofx.com/blog" />
-    <link rel="alternate" hreflang="ar" href="https://zerofx.com/ar/blog" />
-    <link rel="alternate" hreflang="fr" href="https://zerofx.com/fr/blog" />
-    <script type="application/ld+json" id="video-schema">
-      {
-        "@context": "https://schema.org",
-        "@type": "ItemList",
-        "itemListElement": []
-      }
-    </script>
-    <meta property="og:title" content="ZeroFX Trading Videos & Articles" id="og-title" />
-    <meta property="og:description" content="Read and watch ZeroFX trading articles and videos on Gold, Crypto, Forex and US Indices." id="og-desc" />
-    <meta property="og:type" content="website" />
+    <link rel="alternate" hreflang="en" href="https://zerowfx.com/blog" />
+    <link rel="alternate" hreflang="ar" href="https://zerowfx.com/ar/blog" />
+    <link rel="alternate" hreflang="fr" href="https://zerowfx.com/fr/blog" />
+    <script type="application/ld+json" id="video-schema" set:html={schemaData} />
     <meta property="og:image" content="https://img.youtube.com/vi/FvIj7Y6OgOo/maxresdefault.jpg" />
-    <meta name="twitter:card" content="summary_large_image" />
   </Fragment>
 
   <Navbar />
@@ -90,7 +109,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid1.article">An inspiring journey of winning 1st place among 8,000 traders in the XM Morocco Trading Championship. We share the strategies, patience, and mindset that led to this remarkable achievement.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/FvIj7Y6OgOo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/FvIj7Y6OgOo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid1.tags">#Trading #XM #Forex #Morocco #Championship</div>
         </article>
@@ -105,7 +124,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid2.article">Discover the most important markets to trade in 2026. This video provides a quick and effective explanation of fundamental analysis in trading, covering key economic indicators and market trends to watch out for.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/PJzcUsbD-d4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/PJzcUsbD-d4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid2.tags">#Trading2026 #Fundamentals #Forex #Investing</div>
         </article>
@@ -120,7 +139,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid3.article">Part 4 of our comprehensive guide to the most powerful classic trading strategies for beginners in 2026. Learn how to effectively apply support, resistance, and price action to maximize your setups.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/qkAXCxVWp3I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/qkAXCxVWp3I" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid3.tags">#TradingStrategies #Beginners #PriceAction #ClassicTrading</div>
         </article>
@@ -135,7 +154,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid4.article">In Part 3 of our series, we focus on identifying the true market trend and selecting the trading style that fits your psychology and maximizes your profitability in today's dynamic markets.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/GliF_2oY850" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/GliF_2oY850" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid4.tags">#MarketTrend #TradingStyle #Profit #ForexTrends</div>
         </article>
@@ -150,7 +169,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid5.article">How do professional traders manage their capital? Part 2 dives deep into risk management, preserving equity, and calculating position sizes effectively to survive and thrive in trading.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/sIzDtkp-6LQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/sIzDtkp-6LQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid5.tags">#RiskManagement #Capital #ProTrading #Finance</div>
         </article>
@@ -165,7 +184,7 @@ import Footer from '../../components/Footer.astro';
             <p data-i18n="blog.vid6.article">Do you want to start trading in 2026? This is the right beginning! Part 1 of our ultimate start guide covers everything a novice trader needs to set a solid foundation.</p>
           </div>
           <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/vkAfQrAN5qg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/vkAfQrAN5qg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
           </div>
           <div class="article-tags" data-i18n="blog.vid6.tags">#StartTrading #Trading2026 #ForexBeginners #Success</div>
         </article>
@@ -196,7 +215,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">LIVE MEETING WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR!</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/bXnHwN5X2ZM" title="LIVE MEETING WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/bXnHwN5X2ZM" title="LIVE MEETING WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR!" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
           </article>
@@ -209,7 +228,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/hHw2esrE020" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/hHw2esrE020" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
           </article>
@@ -222,7 +241,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR, TARIFS</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/xPMM9NbXIps" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR, TARIFS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/xPMM9NbXIps" title="LIVE WITH ZEROWFX : GOLD, BTC, NASDAQ, TRUMP, WAR, TARIFS" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Tarifs</div>
           </article>
@@ -235,7 +254,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">LIVE TRADING : GOLD, BTC, NASDAQ WITH ZEROWFX</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/xQRp0-R5JYU" title="LIVE TRADING : GOLD, BTC, NASDAQ WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/xQRp0-R5JYU" title="LIVE TRADING : GOLD, BTC, NASDAQ WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #BTC #Nasdaq #Forex</div>
           </article>
@@ -248,7 +267,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">LIVE 2 WITH ZEROWFX</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/trSSL1uxyM4" title="LIVE 2 WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/trSSL1uxyM4" title="LIVE 2 WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #Forex #ZeroWFX</div>
           </article>
@@ -261,7 +280,7 @@ import Footer from '../../components/Footer.astro';
             </div>
             <h2 class="article-title">GOLD LIVE TRADING WITH ZEROWFX</h2>
             <div class="video-container">
-              <iframe src="https://www.youtube.com/embed/HEh8M4XIdtY" title="GOLD LIVE TRADING WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+              <iframe src="https://www.youtube.com/embed/HEh8M4XIdtY" title="GOLD LIVE TRADING WITH ZEROWFX" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>
             </div>
             <div class="article-tags">#LiveTrading #Gold #Forex #ZeroWFX</div>
           </article>
