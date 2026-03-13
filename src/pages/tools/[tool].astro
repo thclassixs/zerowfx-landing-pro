@@ -74,7 +74,7 @@ const toolTitle = currentTool.split('-').map(w => w.charAt(0).toUpperCase() + w.
 <div id="activeToolData" data-tool={currentTool} style="display:none;"></div>
 
 <script is:inline>
-const PAIRS = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','NZD/USD','USD/CAD','EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CAD','EUR/CHF','GBP/AUD','GBP/CAD','GBP/CHF','AUD/CAD','AUD/CHF','AUD/NZD','NZD/CAD','NZD/CHF','NZD/JPY','CAD/JPY','CAD/CHF','CHF/JPY','XAU/USD','XAG/USD'];
+const PAIRS = ['EUR/USD','GBP/USD','USD/JPY','USD/CHF','AUD/USD','NZD/USD','USD/CAD','EUR/GBP','EUR/JPY','GBP/JPY','AUD/JPY','EUR/AUD','EUR/CAD','EUR/CHF','GBP/AUD','GBP/CAD','GBP/CHF','AUD/CAD','AUD/CHF','AUD/NZD','NZD/CAD','NZD/CHF','NZD/JPY','CAD/JPY','CAD/CHF','CHF/JPY','XAU/USD','XAG/USD','BTC/USD','ETH/USD','SOL/USD','LTC/USD','XRP/USD'];
 const ACCS = ['USD','EUR','GBP','JPY','CHF','AUD','NZD','CAD'];
 
 // Approximate exchange rates for conversion (when live rates unavailable)
@@ -82,20 +82,29 @@ const APPROX_RATES = {
   'USD':1,'EUR':1.08,'GBP':1.27,'JPY':0.0067,'CHF':1.13,'AUD':0.65,'NZD':0.61,'CAD':0.74
 };
 
+// Central instrument specification — single source of truth for pip/contract sizes
+function getInstrumentSpec(pair) {
+  const SPECS = {
+    'XAU/USD': {pipSize:0.10,  contractSize:100,   pointSize:0.01,    dec:2},
+    'XAG/USD': {pipSize:0.01,  contractSize:5000,  pointSize:0.001,   dec:3},
+    'BTC/USD': {pipSize:1.0,   contractSize:1,     pointSize:0.1,     dec:2},
+    'ETH/USD': {pipSize:0.10,  contractSize:1,     pointSize:0.01,    dec:2},
+    'SOL/USD': {pipSize:0.01,  contractSize:1,     pointSize:0.001,   dec:3},
+    'LTC/USD': {pipSize:0.01,  contractSize:1,     pointSize:0.001,   dec:3},
+    'XRP/USD': {pipSize:0.0001,contractSize:10000, pointSize:0.00001, dec:5},
+  };
+  if (SPECS[pair]) return SPECS[pair];
+  if (pair.includes('/JPY')) return {pipSize:0.01, contractSize:100000, pointSize:0.001,   dec:3};
+  return                           {pipSize:0.0001,contractSize:100000, pointSize:0.00001, dec:5};
+}
+
 // Shared helper: get pip value per standard lot in USD for any pair
-// Formula: Pip Value = (One Pip / Quote Rate to USD) × Contract Size
 function getPipValue(pair, lots) {
   lots = lots || 1;
-  const isJpy = pair.includes('JPY');
-  const isXau = pair.startsWith('XAU');
-  const isXag = pair.startsWith('XAG');
-  const pipSize = (isJpy || isXau || isXag) ? 0.01 : 0.0001;
-  const contractSize = isXau ? 100 : isXag ? 5000 : 100000;
+  const spec = getInstrumentSpec(pair);
   const quote = pair.split('/')[1];
-  // Convert pip to USD: pip × contractSize, then convert from quote currency to USD
-  let pipValueUSD = pipSize * contractSize;
+  let pipValueUSD = spec.pipSize * spec.contractSize;
   if (quote !== 'USD') {
-    // Convert from quote currency to USD
     const quoteToUSD = APPROX_RATES[quote] || 1;
     pipValueUSD = pipValueUSD * quoteToUSD;
   }
@@ -120,13 +129,10 @@ const TOOLS = [
     calc:f=>{
       const pair=f.pair,entry=parseFloat(f.entry),exit=parseFloat(f.exit);
       if(isNaN(entry)||isNaN(exit))return null;
-      const isJpy=pair.includes('JPY');
-      const isXau=pair.startsWith('XAU');
-      const isXag=pair.startsWith('XAG');
-      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
-      const pips=((exit-entry)/pipSize);
+      const spec=getInstrumentSpec(pair);
+      const pips=((exit-entry)/spec.pipSize);
       const dir=pips>=0?'Buy (Long)':'Sell (Short)';
-      return[{l:'Pips',v:pips.toFixed(1)},{l:'Direction',v:dir},{l:'Pip Size',v:pipSize},{l:'Price Difference',v:(exit-entry).toFixed(5)}];
+      return[{l:'Pips',v:pips.toFixed(1)},{l:'Direction',v:dir},{l:'Pip Size',v:spec.pipSize},{l:'Price Difference',v:(exit-entry).toFixed(spec.dec)}];
     }
   },
   {id:'pip-value-calculator',name:'Pip Value Calculator',icon:'dollar-sign',desc:'Calculate how much 1 pip is worth in your account currency',
@@ -137,14 +143,12 @@ const TOOLS = [
     ],
     calc:f=>{
       const lots=parseFloat(f.lots);if(isNaN(lots))return null;
-      const isJpy=f.pair.includes('JPY');
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
-      const contractSize=isXau?100:isXag?5000:100000;
-      const units=lots*contractSize;
+      const spec=getInstrumentSpec(f.pair);
+      const units=lots*spec.contractSize;
       const pipVal=getPipValueInAcc(f.pair, lots, f.acc);
+      const pipVal10=getPipValueInAcc(f.pair, lots*10, f.acc);
       const symbol=f.acc==='USD'?'$':f.acc+' ';
-      return[{l:'Pip Value',v:symbol+pipVal.toFixed(2)},{l:'Units',v:units.toLocaleString()},{l:'Pip Size',v:pipSize},{l:'Lot Size',v:lots+' lot(s)'},{l:'Contract Size',v:contractSize.toLocaleString()+' units/lot'}];
+      return[{l:'Pip Value (1 pip)',v:symbol+pipVal.toFixed(2)},{l:'Value for 10 pips',v:symbol+pipVal10.toFixed(2)},{l:'Units',v:units.toLocaleString()},{l:'Pip Size',v:spec.pipSize},{l:'Lot Size',v:lots+' lot(s)'},{l:'Contract Size',v:spec.contractSize.toLocaleString()+' units/lot'}];
     }
   },
   {id:'lot-size-calculator',name:'Lot Size Calculator',icon:'layers',desc:'Calculate correct lot size based on account balance, risk %, and stop loss pips',
@@ -207,10 +211,8 @@ const TOOLS = [
     calc:f=>{
       const entry=parseFloat(f.entry),exit=parseFloat(f.exit),lots=parseFloat(f.lots);
       if([entry,exit,lots].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const pipSize=(isJpy||isXau||isXag)?0.01:0.0001;
-      const contractSize=isXau?100:isXag?5000:100000;
+      const spec=getInstrumentSpec(f.pair);
+      const {pipSize,contractSize}=spec;
       let priceDiff=exit-entry;if(f.direction==='Sell')priceDiff=-priceDiff;
       const pips=priceDiff/pipSize;
       // Profit = price diff × lots × contract size (then convert from quote to USD if needed)
@@ -250,13 +252,12 @@ const TOOLS = [
     calc:f=>{
       const entry=parseFloat(f.entry),slP=parseFloat(f.slPips),tpP=parseFloat(f.tpPips);
       if([entry,slP,tpP].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const pip=(isJpy||isXau||isXag)?0.01:0.0001;
+      const spec=getInstrumentSpec(f.pair);
+      const pip=spec.pipSize;
       const isBuy=f.direction==='Buy';
       const sl=isBuy?entry-slP*pip:entry+slP*pip;const tp=isBuy?entry+tpP*pip:entry-tpP*pip;
       const rr=slP!==0?(tpP/slP):0;
-      return[{l:'Stop Loss Price',v:sl.toFixed(5),cls:'negative'},{l:'Take Profit Price',v:tp.toFixed(5),cls:'positive'},{l:'Risk:Reward',v:'1:'+rr.toFixed(2)},{l:'SL Distance',v:slP+' pips'},{l:'TP Distance',v:tpP+' pips'}];
+      return[{l:'Stop Loss Price',v:sl.toFixed(spec.dec),cls:'negative'},{l:'Take Profit Price',v:tp.toFixed(spec.dec),cls:'positive'},{l:'Risk:Reward',v:'1:'+rr.toFixed(2)},{l:'SL Distance',v:slP+' pips'},{l:'TP Distance',v:tpP+' pips'}];
     }
   },
   {id:'spread-calculator',name:'Spread Cost Calculator',icon:'arrow-left-right',desc:'Calculate spread cost in your account currency for any lot size',
@@ -287,11 +288,8 @@ const TOOLS = [
     calc:f=>{
       const lots=parseFloat(f.lots),rate=parseFloat(f.swapRate),days=parseFloat(f.days);
       if([lots,rate,days].some(isNaN))return null;
-      const isJpy=f.pair.includes('JPY');
-      const isXau=f.pair.startsWith('XAU');const isXag=f.pair.startsWith('XAG');
-      const contractSize=isXau?100:isXag?5000:100000;
-      const pointSize=(isJpy||isXau||isXag)?0.001:0.00001;
-      const pointVal=contractSize*pointSize;
+      const spec=getInstrumentSpec(f.pair);
+      const pointVal=spec.contractSize*spec.pointSize;
       const daily=rate*pointVal*lots;const total=daily*days;
       const wed=days>=3?daily*3:0;
       return[{l:'Daily Swap',v:(daily>=0?'+$':'−$')+Math.abs(daily).toFixed(2),cls:daily>=0?'positive':'negative'},{l:'Total Swap ('+days+' days)',v:(total>=0?'+$':'−$')+Math.abs(total).toFixed(2),cls:total>=0?'positive':'negative'},{l:'Triple Wednesday',v:(wed>=0?'+$':'−$')+Math.abs(wed).toFixed(2)},{l:'Swap Rate',v:rate+' points'}];
