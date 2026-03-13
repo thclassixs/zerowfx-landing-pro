@@ -11,42 +11,48 @@
 
 
 /* ============================================================
-   THEME 2: CLEAN WHITE — Light, minimal, Apple-esque
-   Completely light theme with soft grays and crisp green
+   THEME 2: DEEP GREEN & GOLD — Premium White Mode
+   White background · Deep green (#0B3D2E) primary · Gold (#C8A84E) accent
+   Based on zerowfx_white_deep_green_gold_styleguide
    ============================================================ */
 html.theme-clean-white {
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f7f8fa;
-  --color-bg-card: #ffffff;
-  --color-bg-elevated: #f0f2f5;
-  --color-green: #10b981;
-  --color-green-light: #34d399;
-  --color-green-dark: #059669;
-  --color-green-glow: rgba(16, 185, 129, 0.15);
-  --color-gold: #f59e0b;
-  --color-gold-light: #fbbf24;
-  --color-text: #111827;
-  --color-text-muted: #6b7280;
-  --color-text-dim: #9ca3af;
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-strong: rgba(0, 0, 0, 0.15);
-  --color-red: #ef4444;
-  --color-red-dim: rgba(239, 68, 68, 0.1);
-  --shadow-glow: 0 2px 16px rgba(16, 185, 129, 0.12);
-  --shadow-glow-strong: 0 4px 30px rgba(16, 185, 129, 0.2);
+  --color-bg: #F0F2F5;
+  --color-bg-secondary: rgba(255, 255, 255, 0.5);
+  --color-bg-card: rgba(255, 255, 255, 0.55);
+  --color-bg-elevated: rgba(255, 255, 255, 0.7);
+  --color-green: #0B3D2E;
+  --color-green-light: #145C43;
+  --color-green-dark: #0A2F22;
+  --color-green-glow: rgba(11, 61, 46, 0.10);
+  --color-gold: #C8A84E;
+  --color-gold-light: #E8D9A0;
+  --color-text: #1A1A1A;
+  --color-text-muted: #6B7280;
+  --color-text-dim: #9CA3AF;
+  --color-border: rgba(255, 255, 255, 0.5);
+  --color-border-strong: rgba(255, 255, 255, 0.7);
+  --color-red: #DC2626;
+  --color-red-dim: rgba(220, 38, 38, 0.08);
+  --shadow-glow: 0 2px 16px rgba(11, 61, 46, 0.10);
+  --shadow-glow-strong: 0 4px 30px rgba(11, 61, 46, 0.18);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 28px;
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-strong: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 }
 
 html.theme-clean-white body {
-  background: #ffffff;
-  color: #111827;
+  background: linear-gradient(135deg, #E8F5E9 0%, #F0F2F5 30%, #FFF8E1 60%, #F0F2F5 100%);
+  background-attachment: fixed;
+  color: #1A1A1A;
 }
 
 html.theme-clean-white ::-webkit-scrollbar-track {
-  background: #f7f8fa;
+  background: #F8F9FA;
 }
 
 html.theme-clean-white ::-webkit-scrollbar-thumb {
@@ -54,164 +60,587 @@ html.theme-clean-white ::-webkit-scrollbar-thumb {
 }
 
 html.theme-clean-white ::-webkit-scrollbar-thumb:hover {
-  background: #10b981;
+  background: #0B3D2E;
 }
 
-/* Fix navbar for light theme */
+/* ================================================
+   NAVBAR — Deep green bg, white text, gold "FX"
+   ================================================ */
 html.theme-clean-white .navbar {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+  background: rgba(11, 61, 46, 0.95) !important;
+  border-bottom-color: rgba(11, 61, 46, 0.3) !important;
 }
 
 html.theme-clean-white .navbar.scrolled {
-  background: rgba(255, 255, 255, 0.97) !important;
-  box-shadow: 0 1px 20px rgba(0, 0, 0, 0.06) !important;
+  background: rgba(11, 61, 46, 0.98) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
 html.theme-clean-white .nav-link {
-  color: #6b7280 !important;
+  color: rgba(255, 255, 255, 0.75) !important;
 }
 
 html.theme-clean-white .nav-link:hover {
-  color: #059669 !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .nav-link::after {
+  background: #C8A84E !important;
 }
 
 html.theme-clean-white .logo-text {
-  color: #111827 !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .logo-accent {
+  color: #C8A84E !important;
+}
+
+html.theme-clean-white .logo-img {
+  border-color: #C8A84E !important;
 }
 
 html.theme-clean-white .hamburger span {
-  background: #111827 !important;
+  background: #FFFFFF !important;
 }
 
-/* Fix CTA buttons for light theme */
+/* Language toggle on the green nav */
+html.theme-clean-white .lang-toggle {
+  color: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+html.theme-clean-white .lang-toggle:hover {
+  border-color: #C8A84E !important;
+  color: #FFFFFF !important;
+}
+
+/* ================================================
+   CTA BUTTONS — Deep green primary, gold secondary
+   ================================================ */
 html.theme-clean-white .cta-main,
 html.theme-clean-white .about-cta {
-  color: #fff !important;
+  background: #0B3D2E !important;
+  color: #FFFFFF !important;
 }
 
-/* Fix form inputs */
+html.theme-clean-white .cta-main:hover,
+html.theme-clean-white .about-cta:hover {
+  background: #0A2F22 !important;
+}
+
+/* ================================================
+   FORM INPUTS — Glass bg, frosted border, green focus
+   ================================================ */
 html.theme-clean-white .form-input,
 html.theme-clean-white .modal-input {
-  background: #f7f8fa !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #111827 !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  color: #1A1A1A !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
 html.theme-clean-white .form-input::placeholder,
 html.theme-clean-white .modal-input::placeholder {
-  color: #9ca3af !important;
+  color: #9CA3AF !important;
 }
 
-/* Fix modal overlay */
+html.theme-clean-white .form-input:focus,
+html.theme-clean-white .modal-input:focus {
+  border-color: #0B3D2E !important;
+  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ================================================
+   MODAL — Glass card, frosted effect
+   ================================================ */
 html.theme-clean-white .modal-overlay {
-  background: rgba(255, 255, 255, 0.6) !important;
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
 }
 
 html.theme-clean-white .modal-card {
-  background: #fff !important;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.75) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Fix bottom bar */
+html.theme-clean-white .modal-badge {
+  border-color: #0B3D2E !important;
+  color: #0B3D2E !important;
+}
+
+html.theme-clean-white .modal-accent {
+  background: linear-gradient(135deg, #0B3D2E, #145C43) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+html.theme-clean-white .modal-submit {
+  background: #C8A84E !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .modal-submit:hover {
+  background: #b8963e !important;
+  box-shadow: 0 4px 20px rgba(200, 168, 78, 0.35) !important;
+}
+
+html.theme-clean-white .affiliate-button {
+  background: linear-gradient(135deg, #0A2F22, #0B3D2E) !important;
+  box-shadow: 0 4px 20px rgba(11, 61, 46, 0.3) !important;
+}
+
+html.theme-clean-white .affiliate-button:hover {
+  box-shadow: 0 6px 30px rgba(11, 61, 46, 0.4) !important;
+}
+
+html.theme-clean-white .promo-slots {
+  color: #0B3D2E !important;
+}
+
+html.theme-clean-white .promo-slots strong {
+  color: #1A1A1A !important;
+}
+
+/* ================================================
+   BOTTOM BAR — Deep green bg, white/gold text
+   ================================================ */
 html.theme-clean-white .bottom-bar {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-top-color: rgba(0, 0, 0, 0.08) !important;
+  background: #0B3D2E !important;
+  border-top-color: rgba(11, 61, 46, 0.3) !important;
 }
 
-/* Fix countdown */
+html.theme-clean-white .bottom-text {
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .bottom-text strong {
+  color: #C8A84E !important;
+}
+
+html.theme-clean-white .bottom-cta {
+  border-color: #C8A84E !important;
+  color: #C8A84E !important;
+}
+
+html.theme-clean-white .bottom-cta:hover {
+  background: #C8A84E !important;
+  color: #FFFFFF !important;
+}
+
+/* ================================================
+   TICKER BAR — Deep green bg, white names
+   ================================================ */
+html.theme-clean-white .ticker-bar {
+  background: #0B3D2E !important;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.theme-clean-white .ticker-bar::before {
+  background: linear-gradient(90deg, #0B3D2E, transparent) !important;
+}
+
+html.theme-clean-white .ticker-bar::after {
+  background: linear-gradient(270deg, #0B3D2E, transparent) !important;
+}
+
+html.theme-clean-white .ticker-name {
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .ticker-price {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+html.theme-clean-white .ticker-change.up {
+  background: rgba(22, 163, 74, 0.2) !important;
+  color: #16A34A !important;
+}
+
+html.theme-clean-white .ticker-change.down {
+  background: rgba(220, 38, 38, 0.2) !important;
+  color: #DC2626 !important;
+}
+
+/* ================================================
+   COUNTDOWN WIDGET — Glass card
+   ================================================ */
 html.theme-clean-white .countdown-widget {
-  background: #fff !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Theme toggle switch — no overrides needed, self-contained */
+html.theme-clean-white .countdown-toggle {
+  background: #0B3D2E !important;
+}
 
-/* Subtle gradient for hero instead of dark bg */
+html.theme-clean-white .countdown-toggle:hover {
+  background: #0A2F22 !important;
+}
+
+html.theme-clean-white .countdown-toggle .toggle-icon {
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .countdown-icon-lucide {
+  color: #C8A84E !important;
+}
+
+html.theme-clean-white .time-unit {
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.7) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+html.theme-clean-white .perk-check-icon {
+  color: #0B3D2E !important;
+}
+
+/* ================================================
+   HERO SECTION — White bg with subtle green radial
+   ================================================ */
 html.theme-clean-white .hero-bg-gradient {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(16, 185, 129, 0.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 20%, rgba(16, 185, 129, 0.04) 0%, transparent 50%),
-    linear-gradient(180deg, #ffffff 0%, #f7f8fa 100%) !important;
+    radial-gradient(ellipse at 20% 50%, rgba(11, 61, 46, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(200, 168, 78, 0.05) 0%, transparent 50%) !important;
 }
 
+/* Gold keyword highlights in hero */
+html.theme-clean-white .hero-highlight,
+html.theme-clean-white .gold-text {
+  color: #C8A84E !important;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ============================================
+/* ================================================
    NAVBAR DROPDOWN + TOOLS PAGE THEME OVERRIDES
-   ============================================ */
+   ================================================ */
 
-/* Clean White */
+/* Dropdown on green navbar */
 html.theme-clean-white .dropdown-panel {
-  background: rgba(255, 255, 255, 0.97) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
 html.theme-clean-white .dropdown-item {
-  color: #6b7280 !important;
+  color: #6B7280 !important;
+}
+
+html.theme-clean-white .dropdown-item i,
+html.theme-clean-white .dropdown-item svg {
+  color: #0B3D2E !important;
 }
 
 html.theme-clean-white .dropdown-item:hover {
-  background: rgba(0, 0, 0, 0.04) !important;
-  color: #059669 !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: #0B3D2E !important;
 }
 
+html.theme-clean-white .lang-panel {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+html.theme-clean-white .lang-option {
+  color: #1A1A1A !important;
+}
+
+html.theme-clean-white .lang-option:hover {
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: #0B3D2E !important;
+}
+
+/* Tools sidebar + panels */
 html.theme-clean-white .tools-sidebar,
 html.theme-clean-white .tool-panel {
-  background: #fff !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
 }
 
 html.theme-clean-white .sidebar-btn {
-  color: #6b7280 !important;
+  color: #6B7280 !important;
 }
 
 html.theme-clean-white .sidebar-btn:hover {
-  background: #f0f2f5 !important;
-  color: #111827 !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  color: #1A1A1A !important;
 }
 
 html.theme-clean-white .sidebar-btn.active {
-  background: rgba(16, 185, 129, 0.08) !important;
-  color: #059669 !important;
-  border-color: rgba(16, 185, 129, 0.2) !important;
+  background: rgba(11, 61, 46, 0.08) !important;
+  color: #0B3D2E !important;
+  border-color: rgba(11, 61, 46, 0.2) !important;
 }
 
 html.theme-clean-white .form-control {
-  background: #f7f8fa !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
-  color: #111827 !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  color: #1A1A1A !important;
+}
+
+html.theme-clean-white .form-control:focus {
+  border-color: #0B3D2E !important;
+  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.10) !important;
 }
 
 html.theme-clean-white .result-item {
-  background: #f7f8fa !important;
-  border-color: rgba(0, 0, 0, 0.06) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
 }
 
 html.theme-clean-white select.form-control option {
-  background: #fff !important;
-  color: #111827 !important;
+  background: #FFFFFF !important;
+  color: #1A1A1A !important;
+}
+
+/* ================================================
+   MOBILE MENU — Glassmorphism mobile nav
+   ================================================ */
+html.theme-clean-white .mobile-menu {
+  background: rgba(11, 61, 46, 0.92) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+html.theme-clean-white .mobile-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+html.theme-clean-white .mobile-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
 }
 
 
+html.theme-clean-white .mobile-tool-link {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+html.theme-clean-white .mobile-tool-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .mobile-tools-list {
+  border-left-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ================================================
+   FOOTER — Deep green bg
+   ================================================ */
+html.theme-clean-white .footer,
+html.theme-clean-white footer {
+  background: #0B3D2E !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .footer a,
+html.theme-clean-white footer a {
+  color: #A7C4B8 !important;
+}
+
+html.theme-clean-white .footer a:hover,
+html.theme-clean-white footer a:hover {
+  color: #FFFFFF !important;
+}
+
+/* ================================================
+   SECTIONS — Glassmorphism alternating sections
+   ================================================ */
+html.theme-clean-white .section-alt,
+html.theme-clean-white .features-section,
+html.theme-clean-white .testimonials-section {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* Card styles — Glass cards on light sections */
+html.theme-clean-white .feature-card,
+html.theme-clean-white .testimonial-card,
+html.theme-clean-white .setup-card {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Stars / ratings */
+html.theme-clean-white .star,
+html.theme-clean-white .rating-star {
+  color: #C8A84E !important;
+}
+
+/* ================================================
+   PROMO / GIVEAWAY BANNER
+   ================================================ */
+html.theme-clean-white .promo-banner,
+html.theme-clean-white .giveaway-banner {
+  background: rgba(254, 249, 239, 0.6) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: rgba(232, 217, 160, 0.5) !important;
+  color: #1A1A1A !important;
+}
+
+html.theme-clean-white .promo-banner .highlight,
+html.theme-clean-white .giveaway-banner .highlight {
+  color: #C8A84E !important;
+}
+
+/* ================================================
+   TRUST BADGES
+   ================================================ */
+html.theme-clean-white .trust-badge-icon {
+  color: #C8A84E !important;
+}
+
+html.theme-clean-white .trust-check {
+  color: #0B3D2E !important;
+}
+
+/* ================================================
+   MISC COMPONENT OVERRIDES
+   ================================================ */
+
+/* Green glow boxes — frosted glass with green tint */
+html.theme-clean-white .green-glow-box {
+  background: rgba(11, 61, 46, 0.04) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ================================================
+   HERO FORM SUBMIT BUTTON — White text on green bg
+   ================================================ */
+html.theme-clean-white .form-btn {
+  background: #0B3D2E !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .form-btn:hover {
+  background: #0A2F22 !important;
+}
+
+/* ================================================
+   THEME SWITCH — White icons on green navbar
+   ================================================ */
+html.theme-clean-white .switch-track {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+html.theme-clean-white .theme-switch:hover .switch-track {
+  border-color: #C8A84E !important;
+  box-shadow: 0 0 12px rgba(200, 168, 78, 0.2) !important;
+}
+
+html.theme-clean-white .sun-icon {
+  color: #FFFFFF !important;
+  opacity: 1 !important;
+}
+
+html.theme-clean-white .moon-icon {
+  color: rgba(255, 255, 255, 0.4) !important;
+  opacity: 1 !important;
+}
+
+html.theme-clean-white .switch-thumb {
+  background: #C8A84E !important;
+  box-shadow: 0 0 8px rgba(200, 168, 78, 0.4), 0 1px 4px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ================================================
+   PARTNER CODE "734PT" — Dark text on white bg
+   ================================================ */
+html.theme-clean-white .partners-disclaimer strong {
+  color: #0B3D2E !important;
+}
+
+/* ================================================
+   LIFESTYLE BONUS BADGE — White text on green bg
+   ================================================ */
+html.theme-clean-white .bonus-badge {
+  background: #0B3D2E !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 10px rgba(11, 61, 46, 0.3) !important;
+}
+
+/* ================================================
+   MODAL PROMO BADGE CODE — Glass badge
+   ================================================ */
+html.theme-clean-white .promo-badge {
+  background: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  color: #1A1A1A !important;
+}
+
+html.theme-clean-white .promo-badge strong {
+  color: #C8A84E !important;
+}
+
+/* ================================================
+   CALC BUTTON — White text on green bg (tools page)
+   ================================================ */
+html.theme-clean-white .calc-btn {
+  background: #0B3D2E !important;
+  color: #FFFFFF !important;
+}
+
+html.theme-clean-white .calc-btn:hover {
+  background: #0A2F22 !important;
+}
+
+/* Mobile countdown bar adjustments */
+@media (max-width: 480px) {
+  html.theme-clean-white .countdown-widget {
+    background: rgba(255, 255, 255, 0.65) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom-color: rgba(255, 255, 255, 0.5) !important;
+  }
+
+  html.theme-clean-white .countdown-widget::before {
+    background: linear-gradient(to bottom, #0B3D2E, #C8A84E) !important;
+  }
+
+  html.theme-clean-white .time-value {
+    color: #0B3D2E !important;
+  }
+
+  html.theme-clean-white .time-unit {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+  }
+}
 
 
 /* ============================================

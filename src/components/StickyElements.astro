@@ -133,6 +133,26 @@
     }
   });
 
+  // Bottom bar: show on scroll, hide near footer
+  const bottomBar = document.getElementById('bottomBar');
+  if (bottomBar) {
+    bottomBar.classList.add('bar-hidden');
+
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const docHeight = document.documentElement.scrollHeight;
+      const distFromBottom = docHeight - scrollTop - windowHeight;
+
+      // Show after scrolling 300px, hide when within 200px of bottom (footer area)
+      if (scrollTop > 300 && distFromBottom > 200) {
+        bottomBar.classList.remove('bar-hidden');
+      } else {
+        bottomBar.classList.add('bar-hidden');
+      }
+    });
+  }
+
   // Broker popup - show after 3 seconds
   const isBrokerModalClosed = localStorage.getItem('brokerModalClosed');
   if (isBrokerModalClosed !== 'true') {
@@ -349,6 +369,11 @@
     border-top: 1px solid var(--color-border-strong);
     padding: 12px 24px;
     backdrop-filter: blur(10px);
+    transform: translateY(0);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .bottom-bar.bar-hidden {
+    transform: translateY(100%);
   }
   .bottom-bar-inner {
     max-width: 1360px;
