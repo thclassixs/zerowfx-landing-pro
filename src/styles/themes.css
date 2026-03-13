@@ -12,7 +12,7 @@
 
 /* ============================================================
    THEME 2: DEEP GREEN & GOLD — Premium White Mode
-   White background · Deep green (#0B3D2E) primary · Gold (#C8A84E) accent
+   White background · Deep green (#059669) primary · Gold (#C8A84E) accent
    Based on zerowfx_white_deep_green_gold_styleguide
    ============================================================ */
 html.theme-clean-white {
@@ -20,10 +20,10 @@ html.theme-clean-white {
   --color-bg-secondary: rgba(255, 255, 255, 0.5);
   --color-bg-card: rgba(255, 255, 255, 0.55);
   --color-bg-elevated: rgba(255, 255, 255, 0.7);
-  --color-green: #0B3D2E;
-  --color-green-light: #145C43;
-  --color-green-dark: #0A2F22;
-  --color-green-glow: rgba(11, 61, 46, 0.10);
+  --color-green: #059669;
+  --color-green-light: #10B981;
+  --color-green-dark: #047857;
+  --color-green-glow: rgba(5, 150, 105, 0.10);
   --color-gold: #C8A84E;
   --color-gold-light: #E8D9A0;
   --color-text: #1A1A1A;
@@ -33,8 +33,8 @@ html.theme-clean-white {
   --color-border-strong: rgba(255, 255, 255, 0.7);
   --color-red: #DC2626;
   --color-red-dim: rgba(220, 38, 38, 0.08);
-  --shadow-glow: 0 2px 16px rgba(11, 61, 46, 0.10);
-  --shadow-glow-strong: 0 4px 30px rgba(11, 61, 46, 0.18);
+  --shadow-glow: 0 2px 16px rgba(5, 150, 105, 0.10);
+  --shadow-glow-strong: 0 4px 30px rgba(5, 150, 105, 0.18);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 20px;
@@ -60,19 +60,19 @@ html.theme-clean-white ::-webkit-scrollbar-thumb {
 }
 
 html.theme-clean-white ::-webkit-scrollbar-thumb:hover {
-  background: #0B3D2E;
+  background: #059669;
 }
 
 /* ================================================
    NAVBAR — Deep green bg, white text, gold "FX"
    ================================================ */
 html.theme-clean-white .navbar {
-  background: rgba(11, 61, 46, 0.95) !important;
-  border-bottom-color: rgba(11, 61, 46, 0.3) !important;
+  background: rgba(5, 150, 105, 0.95) !important;
+  border-bottom-color: rgba(5, 150, 105, 0.3) !important;
 }
 
 html.theme-clean-white .navbar.scrolled {
-  background: rgba(11, 61, 46, 0.98) !important;
+  background: rgba(5, 150, 105, 0.98) !important;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15) !important;
 }
 
@@ -120,13 +120,13 @@ html.theme-clean-white .lang-toggle:hover {
    ================================================ */
 html.theme-clean-white .cta-main,
 html.theme-clean-white .about-cta {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   color: #FFFFFF !important;
 }
 
 html.theme-clean-white .cta-main:hover,
 html.theme-clean-white .about-cta:hover {
-  background: #0A2F22 !important;
+  background: #047857 !important;
 }
 
 /* ================================================
@@ -149,8 +149,8 @@ html.theme-clean-white .modal-input::placeholder {
 
 html.theme-clean-white .form-input:focus,
 html.theme-clean-white .modal-input:focus {
-  border-color: #0B3D2E !important;
-  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
 /* ================================================
@@ -171,12 +171,12 @@ html.theme-clean-white .modal-card {
 }
 
 html.theme-clean-white .modal-badge {
-  border-color: #0B3D2E !important;
-  color: #0B3D2E !important;
+  border-color: #059669 !important;
+  color: #059669 !important;
 }
 
 html.theme-clean-white .modal-accent {
-  background: linear-gradient(135deg, #0B3D2E, #145C43) !important;
+  background: linear-gradient(135deg, #059669, #10B981) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
   background-clip: text !important;
@@ -193,16 +193,16 @@ html.theme-clean-white .modal-submit:hover {
 }
 
 html.theme-clean-white .affiliate-button {
-  background: linear-gradient(135deg, #0A2F22, #0B3D2E) !important;
-  box-shadow: 0 4px 20px rgba(11, 61, 46, 0.3) !important;
+  background: linear-gradient(135deg, #047857, #059669) !important;
+  box-shadow: 0 4px 20px rgba(5, 150, 105, 0.3) !important;
 }
 
 html.theme-clean-white .affiliate-button:hover {
-  box-shadow: 0 6px 30px rgba(11, 61, 46, 0.4) !important;
+  box-shadow: 0 6px 30px rgba(5, 150, 105, 0.4) !important;
 }
 
 html.theme-clean-white .promo-slots {
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 html.theme-clean-white .promo-slots strong {
@@ -213,8 +213,8 @@ html.theme-clean-white .promo-slots strong {
    BOTTOM BAR — Deep green bg, white/gold text
    ================================================ */
 html.theme-clean-white .bottom-bar {
-  background: #0B3D2E !important;
-  border-top-color: rgba(11, 61, 46, 0.3) !important;
+  background: #059669 !important;
+  border-top-color: rgba(5, 150, 105, 0.3) !important;
 }
 
 html.theme-clean-white .bottom-text {
@@ -239,17 +239,17 @@ html.theme-clean-white .bottom-cta:hover {
    TICKER BAR — Deep green bg, white names
    ================================================ */
 html.theme-clean-white .ticker-bar {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   border-top-color: rgba(255, 255, 255, 0.08) !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 html.theme-clean-white .ticker-bar::before {
-  background: linear-gradient(90deg, #0B3D2E, transparent) !important;
+  background: linear-gradient(90deg, #059669, transparent) !important;
 }
 
 html.theme-clean-white .ticker-bar::after {
-  background: linear-gradient(270deg, #0B3D2E, transparent) !important;
+  background: linear-gradient(270deg, #059669, transparent) !important;
 }
 
 html.theme-clean-white .ticker-name {
@@ -282,11 +282,11 @@ html.theme-clean-white .countdown-widget {
 }
 
 html.theme-clean-white .countdown-toggle {
-  background: #0B3D2E !important;
+  background: #059669 !important;
 }
 
 html.theme-clean-white .countdown-toggle:hover {
-  background: #0A2F22 !important;
+  background: #047857 !important;
 }
 
 html.theme-clean-white .countdown-toggle .toggle-icon {
@@ -304,7 +304,7 @@ html.theme-clean-white .time-unit {
 }
 
 html.theme-clean-white .perk-check-icon {
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 /* ================================================
@@ -312,7 +312,7 @@ html.theme-clean-white .perk-check-icon {
    ================================================ */
 html.theme-clean-white .hero-bg-gradient {
   background:
-    radial-gradient(ellipse at 20% 50%, rgba(11, 61, 46, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 50%, rgba(5, 150, 105, 0.06) 0%, transparent 60%),
     radial-gradient(ellipse at 80% 20%, rgba(200, 168, 78, 0.05) 0%, transparent 50%) !important;
 }
 
@@ -341,12 +341,12 @@ html.theme-clean-white .dropdown-item {
 
 html.theme-clean-white .dropdown-item i,
 html.theme-clean-white .dropdown-item svg {
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 html.theme-clean-white .dropdown-item:hover {
   background: rgba(255, 255, 255, 0.6) !important;
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 html.theme-clean-white .lang-panel {
@@ -363,7 +363,7 @@ html.theme-clean-white .lang-option {
 
 html.theme-clean-white .lang-option:hover {
   background: rgba(255, 255, 255, 0.6) !important;
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 /* Tools sidebar + panels */
@@ -386,9 +386,9 @@ html.theme-clean-white .sidebar-btn:hover {
 }
 
 html.theme-clean-white .sidebar-btn.active {
-  background: rgba(11, 61, 46, 0.08) !important;
-  color: #0B3D2E !important;
-  border-color: rgba(11, 61, 46, 0.2) !important;
+  background: rgba(5, 150, 105, 0.08) !important;
+  color: #059669 !important;
+  border-color: rgba(5, 150, 105, 0.2) !important;
 }
 
 html.theme-clean-white .form-control {
@@ -400,8 +400,8 @@ html.theme-clean-white .form-control {
 }
 
 html.theme-clean-white .form-control:focus {
-  border-color: #0B3D2E !important;
-  box-shadow: 0 0 0 3px rgba(11, 61, 46, 0.10) !important;
+  border-color: #059669 !important;
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.10) !important;
 }
 
 html.theme-clean-white .result-item {
@@ -420,7 +420,7 @@ html.theme-clean-white select.form-control option {
    MOBILE MENU — Glassmorphism mobile nav
    ================================================ */
 html.theme-clean-white .mobile-menu {
-  background: rgba(11, 61, 46, 0.92) !important;
+  background: rgba(5, 150, 105, 0.92) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
 }
@@ -453,8 +453,13 @@ html.theme-clean-white .mobile-tools-list {
    ================================================ */
 html.theme-clean-white .footer,
 html.theme-clean-white footer {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   color: #FFFFFF !important;
+}
+
+html.theme-clean-white .footer-copyright,
+html.theme-clean-white .footer-disclaimer {
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 html.theme-clean-white .footer a,
@@ -520,7 +525,7 @@ html.theme-clean-white .trust-badge-icon {
 }
 
 html.theme-clean-white .trust-check {
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 /* ================================================
@@ -529,7 +534,7 @@ html.theme-clean-white .trust-check {
 
 /* Green glow boxes — frosted glass with green tint */
 html.theme-clean-white .green-glow-box {
-  background: rgba(11, 61, 46, 0.04) !important;
+  background: rgba(5, 150, 105, 0.04) !important;
   backdrop-filter: blur(8px) !important;
   -webkit-backdrop-filter: blur(8px) !important;
   border-color: rgba(255, 255, 255, 0.5) !important;
@@ -540,12 +545,12 @@ html.theme-clean-white .green-glow-box {
    HERO FORM SUBMIT BUTTON — White text on green bg
    ================================================ */
 html.theme-clean-white .form-btn {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   color: #FFFFFF !important;
 }
 
 html.theme-clean-white .form-btn:hover {
-  background: #0A2F22 !important;
+  background: #047857 !important;
 }
 
 /* ================================================
@@ -580,16 +585,16 @@ html.theme-clean-white .switch-thumb {
    PARTNER CODE "734PT" — Dark text on white bg
    ================================================ */
 html.theme-clean-white .partners-disclaimer strong {
-  color: #0B3D2E !important;
+  color: #059669 !important;
 }
 
 /* ================================================
    LIFESTYLE BONUS BADGE — White text on green bg
    ================================================ */
 html.theme-clean-white .bonus-badge {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 10px rgba(11, 61, 46, 0.3) !important;
+  box-shadow: 0 2px 10px rgba(5, 150, 105, 0.3) !important;
 }
 
 /* ================================================
@@ -611,12 +616,12 @@ html.theme-clean-white .promo-badge strong {
    CALC BUTTON — White text on green bg (tools page)
    ================================================ */
 html.theme-clean-white .calc-btn {
-  background: #0B3D2E !important;
+  background: #059669 !important;
   color: #FFFFFF !important;
 }
 
 html.theme-clean-white .calc-btn:hover {
-  background: #0A2F22 !important;
+  background: #047857 !important;
 }
 
 /* Mobile countdown bar adjustments */
@@ -629,11 +634,11 @@ html.theme-clean-white .calc-btn:hover {
   }
 
   html.theme-clean-white .countdown-widget::before {
-    background: linear-gradient(to bottom, #0B3D2E, #C8A84E) !important;
+    background: linear-gradient(to bottom, #059669, #C8A84E) !important;
   }
 
   html.theme-clean-white .time-value {
-    color: #0B3D2E !important;
+    color: #059669 !important;
   }
 
   html.theme-clean-white .time-unit {

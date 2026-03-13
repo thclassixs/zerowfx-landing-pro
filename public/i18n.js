@@ -63,7 +63,7 @@ window.i18nData = {
         "results.title": "Member Results",
         "results.subtitle": "Real results from real members following our strategies",
         "results.ctatext": "Want to simulate your own trading performance?",
-        "results.ctabtn": "Try ZEROWFX-Strategy Calculator",
+        "results.ctabtn": "Try Zerowfx-Strategy Calculator",
 
         // Partners
         "partners.badge": "RECOMMENDED BROKER",
@@ -144,7 +144,7 @@ window.i18nData = {
         "tools.pivot-points-calculator.name": "Pivot Points Calculator",
         "tools.leverage-calculator.name": "Leverage Calculator",
         "tools.commission-calculator.name": "Commission Calculator",
-        "tools.zero-strategy-calculator.name": "ZEROWFX-Strategy Calculator",
+        "tools.zero-strategy-calculator.name": "Zerowfx-Strategy Calculator",
 
         // Blog / Videos
         "blog.title": "Trading Videos & Market Analysis",
@@ -368,7 +368,7 @@ window.i18nData = {
         "Calculate margin requirements and buying power for different leverage ratios": "احسب متطلبات الهامش والقوة الشرائية لنسب الرافعة المالية المختلفة",
         "Commission Calculator": "حاسبة العمولة",
         "Calculate trading commissions, round-trip costs, and break-even pips": "احسب عمولات التداول، وتكاليف الذهاب والإياب، ونقاط التعادل",
-        "ZEROWFX-Strategy Calculator": "حاسبة استراتيجية ZERO",
+        "Zerowfx-Strategy Calculator": "حاسبة استراتيجية ZERO",
         "Simulate account growth based on your win rate, risk per trade, and risk:reward ratio (ZERO Strategy)": "حاكي نمو الحساب بناءً على معدل الربح، والمخاطرة لكل صفقة، ونسبة العائد للمخاطرة (استراتيجية ZERO)",
 
         // Form Fields
@@ -692,7 +692,7 @@ window.i18nData = {
         "Calculate margin requirements and buying power for different leverage ratios": "Calculez les exigences de marge et le pouvoir d'achat pour divers ratios de levier",
         "Commission Calculator": "Commissions",
         "Calculate trading commissions, round-trip costs, and break-even pips": "Calculez les commissions de trading, les coûts aller-retour et les pips d'équilibre",
-        "ZEROWFX-Strategy Calculator": "Stratégie ZEROWFX",
+        "Zerowfx-Strategy Calculator": "Stratégie ZEROWFX",
         "Simulate account growth based on your win rate, risk per trade, and risk:reward ratio (ZERO Strategy)": "Simulez la croissance du compte en fonction de votre taux de victoire, risque par trade et ratio risque:récompense (Stratégie ZERO)",
 
         // Form Fields
