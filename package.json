@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/node": "^9.5.5",
     "@astrojs/sitemap": "^3.7.0",
     "astro": "^5.17.1",
     "bcryptjs": "^3.0.3",

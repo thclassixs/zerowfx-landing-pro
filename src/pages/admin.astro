@@ -269,7 +269,9 @@ import Layout from '../layouts/Layout.astro';
   .admin-wrapper {
     min-height: 100vh;
     background: var(--color-bg);
+    overflow-x: hidden;
   }
+  body:has(.admin-wrapper) { zoom: 1 !important; }
 
   /* Login */
   .login-screen {
@@ -558,6 +560,26 @@ import Layout from '../layouts/Layout.astro';
     .dash-header {
       flex-direction: column;
       gap: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login-screen {
+      padding: 16px;
+    }
+    .login-card {
+      padding: 32px 24px;
+    }
+    .login-logo-text {
+      font-size: 1.6rem;
+    }
+    .field input {
+      padding: 10px 12px;
+      font-size: 0.9rem;
+    }
+    .login-btn {
+      padding: 12px;
+      font-size: 0.9rem;
     }
   }
 </style>

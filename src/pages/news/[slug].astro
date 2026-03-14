@@ -3,23 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 
-// Required for static builds - fetch all slugs from the DB at build time
-export async function getStaticPaths() {
-  try {
-    const API = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001';
-    const res = await fetch(`${API}/api/news/saved?page=1&limit=500`);
-    if (res.ok) {
-      const data = await res.json();
-      return (data.articles || [])
-        .filter(a => a.slug)
-        .map(a => ({ params: { slug: a.slug } }));
-    }
-  } catch (e) {
-    console.warn('Could not fetch article slugs for static paths:', e.message);
-  }
-  // Return empty array if API is unavailable (build will skip these pages)
-  return [];
-}
+// Render this page on-demand (SSR) instead of at build time.
+// This ensures /news/any-slug will always resolve to this page,
+// even for articles added after the last build.
+export const prerender = false;
 
 // Get slug from URL
 const { slug } = Astro.params;

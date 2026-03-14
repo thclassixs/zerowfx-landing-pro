@@ -4,7 +4,7 @@ import session from 'express-session';
 import cors from 'cors';
 import path from 'path';
 import bcrypt from 'bcryptjs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import db from './database.js';
 import newsRoutes from './routes/news.js';
 import financeRoutes from './routes/finance.js';
@@ -44,6 +44,21 @@ app.use(cors({
     },
     credentials: true
 }));
+
+// ── Astro SSR handler (for dynamic pages like /news/[slug]) ─
+let astroHandler = null;
+try {
+    const entryPath = path.join(__dirname, '..', 'dist', 'server', 'entry.mjs');
+    const { handler } = await import(pathToFileURL(entryPath).href);
+    astroHandler = handler;
+    console.log('✅ Astro SSR handler loaded');
+} catch (e) {
+    console.warn('⚠️  Astro SSR handler not found (run `npm run build` first):', e.message);
+}
+
+// ── Serve Astro static client assets ────────────────────────
+const clientDir = path.join(__dirname, '..', 'dist', 'client');
+app.use(express.static(clientDir, { index: false }));
 
 // ── Body parsers ────────────────────────────────────────────
 app.use(express.json({ limit: '5mb' }));
@@ -249,6 +264,19 @@ app.use('/api/finance', financeRoutes);
 app.use('/api/admin/news', requireAuth, adminNewsRoutes);
 
 // ============================================================
+//  ASTRO SSR FALLBACK (dynamic pages like /news/[slug])
+// ============================================================
+
+if (astroHandler) {
+    // Let Astro handle any non-API requests (SSR pages + static fallback)
+    app.use((req, res, next) => {
+        // Skip API routes — they should 404 normally
+        if (req.path.startsWith('/api/')) return next();
+        astroHandler(req, res, next);
+    });
+}
+
+// ============================================================
 //  GLOBAL ERROR HANDLER
 // ============================================================
 
@@ -285,6 +313,7 @@ app.listen(PORT, () => {
   News         /api/news/*
   Finance      /api/finance/*
   Health       /api/health
+  Astro SSR    ${astroHandler ? '✅' : '❌'} /news/[slug]
   Scheduler    ✅ Active
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `);

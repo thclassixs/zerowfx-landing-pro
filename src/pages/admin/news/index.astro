@@ -50,6 +50,9 @@ import Layout from '../../../layouts/Layout.astro';
         </div>
       </aside>
 
+      <!-- Mobile sidebar overlay -->
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
       <!-- Mobile top bar -->
       <div class="mobile-topbar">
         <button class="mobile-menu-btn" id="mobileMenuBtn">
@@ -172,6 +175,21 @@ import Layout from '../../../layouts/Layout.astro';
   </div>
 </Layout>
 
+<style is:global>
+  body.admin-page {
+    zoom: 1 !important;
+    overflow-x: hidden;
+  }
+  .admin-news-wrapper, .admin-news-wrapper * {
+    box-sizing: border-box;
+  }
+</style>
+
+<script is:inline>
+  document.body.classList.add('admin-page');
+  document.body.style.zoom = '1';
+</script>
+
 <script>
   const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
 
@@ -205,9 +223,12 @@ import Layout from '../../../layouts/Layout.astro';
   });
 
   // ── Mobile menu ──
-  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+  function toggleSidebar() {
     document.getElementById('sidebar')?.classList.toggle('open');
-  });
+    document.getElementById('sidebarOverlay')?.classList.toggle('open');
+  }
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', toggleSidebar);
+  document.getElementById('sidebarOverlay')?.addEventListener('click', toggleSidebar);
 
   // ── Toast ──
   function showToast(message: string, type: string = 'info') {
@@ -352,6 +373,9 @@ import Layout from '../../../layouts/Layout.astro';
   .admin-news-wrapper {
     min-height: 100vh;
     background: var(--color-bg);
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
   }
 
   /* Auth Gate */
@@ -379,6 +403,9 @@ import Layout from '../../../layouts/Layout.astro';
   .admin-dashboard {
     display: flex;
     min-height: 100vh;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   /* Sidebar */
@@ -488,11 +515,21 @@ import Layout from '../../../layouts/Layout.astro';
     color: var(--color-text-muted);
     padding: 8px;
     border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
   }
   .mobile-logo {
     font-weight: 800;
     letter-spacing: 2px;
     font-size: 1.1rem;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+    backdrop-filter: blur(2px);
   }
 
   /* Main Content */
@@ -501,6 +538,8 @@ import Layout from '../../../layouts/Layout.astro';
     margin-left: 240px;
     padding: 32px;
     max-width: 1200px;
+    min-width: 0;
+    overflow-x: hidden;
   }
   .content-header {
     margin-bottom: 28px;
@@ -765,6 +804,9 @@ import Layout from '../../../layouts/Layout.astro';
       transform: translateX(0);
       box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
     }
+    .sidebar-overlay.open {
+      display: block;
+    }
     .mobile-topbar {
       display: flex;
     }
@@ -785,11 +827,46 @@ import Layout from '../../../layouts/Layout.astro';
       width: 100%;
       justify-content: center;
     }
+    .page-title {
+      font-size: 1.3rem;
+    }
+    .panel {
+      padding: 16px;
+    }
+    .stat-card {
+      padding: 14px;
+      gap: 10px;
+    }
+    .stat-value {
+      font-size: 1.2rem;
+    }
+    .stat-icon-wrap {
+      width: 36px;
+      height: 36px;
+    }
+    .stat-icon-wrap i, .stat-icon-wrap svg {
+      width: 16px;
+      height: 16px;
+    }
+    .data-table td {
+      padding: 8px 10px;
+      font-size: 0.8rem;
+    }
+    .data-table th {
+      padding: 8px 10px;
+      font-size: 0.7rem;
+    }
   }
 
   @media (max-width: 480px) {
     .stats-grid {
       grid-template-columns: 1fr;
+    }
+    .main-content {
+      padding: 16px 12px;
+    }
+    .page-title {
+      font-size: 1.1rem;
     }
   }
 </style>
