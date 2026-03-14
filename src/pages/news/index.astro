@@ -27,11 +27,11 @@ const schemaData = JSON.stringify({
         <h1 class="news-title" data-i18n="news.title">Real-Time Market News</h1>
         <p class="news-subtitle" data-i18n="news.desc">Stay ahead of the markets with AI-powered, real-time financial news, crypto updates, and forex insights.</p>
         <div class="categories-nav" id="news-categories">
-          <button class="cat-btn active" data-cat="">All News</button>
-          <button class="cat-btn" data-cat="business">Business</button>
-          <button class="cat-btn" data-cat="politics">Politics</button>
-          <button class="cat-btn" data-cat="technology">Tech</button>
-          <button class="cat-btn" data-cat="crypto" id="crypto-cat">Crypto</button>
+          <button class="cat-btn active" data-cat="" data-i18n="news.cat.all">All News</button>
+          <button class="cat-btn" data-cat="business" data-i18n="news.cat.bus">Business</button>
+          <button class="cat-btn" data-cat="politics" data-i18n="news.cat.pol">Politics</button>
+          <button class="cat-btn" data-cat="technology" data-i18n="news.cat.tech">Tech</button>
+          <button class="cat-btn" data-cat="crypto" id="crypto-cat" data-i18n="news.cat.cry">Crypto</button>
         </div>
       </div>
     </section>
@@ -41,20 +41,20 @@ const schemaData = JSON.stringify({
       <!-- Loading State -->
       <div class="news-loading" id="news-loading">
         <div class="spinner"></div>
-        <p>Fetching latest market data...</p>
+        <p data-i18n="news.loading">Fetching latest market data...</p>
       </div>
 
       <!-- Error State -->
       <div class="news-error" id="news-error" style="display:none;">
         <i data-lucide="alert-circle" style="width:48px;height:48px;color:var(--color-red);"></i>
-        <p>Unable to load news right now. Please try again later.</p>
-        <button id="retry-btn" class="retry-btn">Retry</button>
+        <p data-i18n="news.error">Unable to load news right now. Please try again later.</p>
+        <button id="retry-btn" class="retry-btn" data-i18n="news.retry">Retry</button>
       </div>
 
       <!-- No Results -->
       <div class="no-results" id="no-results" style="display:none;">
         <i data-lucide="file-x" style="width:48px;height:48px;opacity:0.3;"></i>
-        <p>No news found for this category.</p>
+        <p data-i18n="news.empty">No news found for this category.</p>
       </div>
 
       <!-- Articles Grid -->
@@ -80,6 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentCategory = '';
   let isCrypto = false;
+
+  // Language Setup for Dynamic Content
+  const lang = localStorage.getItem('language') || 'en';
+  const t = (window.i18nData && window.i18nData[lang]) ? window.i18nData[lang] : (window.i18nData ? window.i18nData['en'] : {});
 
   async function fetchNews() {
     grid.innerHTML = '';
@@ -123,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const fallbackImg = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1000';
       const img = article.image || fallbackImg;
       
-      let sourceTag = article.source || 'Market News';
+      let sourceTag = article.source || t['news.source'] || 'Market News';
       let tagBg = 'var(--color-bg-elevated)';
 
       return `
@@ -137,9 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
               <span class="news-date">${date}</span>
             </div>
             <h2 class="news-headline">${article.title}</h2>
-            <p class="news-desc">${article.description || (typeof article.content === 'string' ? article.content.slice(0, 120) + '...' : '') || 'No description available for this market event.'}</p>
+            <p class="news-desc">${article.description || (typeof article.content === 'string' ? article.content.slice(0, 120) + '...' : '') || ''}</p>
             <a href="${article.link || article.sourceUrl || '#'}" target="_blank" rel="noopener noreferrer" class="read-more">
-              Read Full Article <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              ${t['news.readmore'] || 'Read Full Article'} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </a>
           </div>
         </article>

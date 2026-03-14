@@ -187,7 +187,22 @@ window.i18nData = {
 
         "blog.vid6.title": "Want to Start Trading in 2026? This is the Right Start - Part 1",
         "blog.vid6.article": "Do you want to start trading in 2026? This is the right beginning! Part 1 of our ultimate start guide covers everything a novice trader needs to set a solid foundation.",
-        "blog.vid6.tags": "#StartTrading #Trading2026 #ForexBeginners #Success"
+        "blog.vid6.tags": "#StartTrading #Trading2026 #ForexBeginners #Success",
+
+        // News Page
+        "news.title": "Real-Time Market News",
+        "news.desc": "Stay ahead of the markets with AI-powered, real-time financial news, crypto updates, and forex insights.",
+        "news.cat.all": "All News",
+        "news.cat.bus": "Business",
+        "news.cat.pol": "Politics",
+        "news.cat.tech": "Tech",
+        "news.cat.cry": "Crypto",
+        "news.loading": "Fetching latest market data...",
+        "news.error": "Unable to load news right now. Please try again later.",
+        "news.retry": "Retry",
+        "news.empty": "No news found for this category.",
+        "news.source": "Market News",
+        "news.readmore": "Read Full Article"
     },
 
     ar: {
@@ -512,7 +527,22 @@ window.i18nData = {
 
         "blog.vid6.title": "تريد أن تبدأ التداول في 2026؟ هذه هي البداية الصحيحة - الجزء الأول",
         "blog.vid6.article": "هل تريد البدء في التداول في عام 2026؟ هذه هي البداية الصحيحة! يغطي الجزء الأول من دليل البداية الشامل الخاص بنا كل ما يحتاجه المتداول المبتدئ لوضع أساس متين.",
-        "blog.vid6.tags": "#بدء_التداول #تداول_2026 #فوركس_للمبتدئين #نجاح"
+        "blog.vid6.tags": "#بدء_التداول #تداول_2026 #فوركس_للمبتدئين #نجاح",
+
+        // News Page
+        "news.title": "أخبار الأسواق المباشرة",
+        "news.desc": "ابق متقدماً في الأسواق مع الأخبار المالية اللحظية المدعومة بالذكاء الاصطناعي، وتحديثات العملات المشفرة، ورؤى الفوركس.",
+        "news.cat.all": "كل الأخبار",
+        "news.cat.bus": "أعمال",
+        "news.cat.pol": "سياسة",
+        "news.cat.tech": "تكنولوجيا",
+        "news.cat.cry": "عملات مشفرة",
+        "news.loading": "جاري جلب أحدث بيانات السوق...",
+        "news.error": "تعذر تحميل الأخبار في الوقت الحالي. يرجى المحاولة مرة أخرى لاحقاً.",
+        "news.retry": "إعادة المحاولة",
+        "news.empty": "لم يتم العثور على أخبار لهذه الفئة.",
+        "news.source": "أخبار السوق",
+        "news.readmore": "اقرأ المقال كاملاً"
     },
 
     fr: {
@@ -837,6 +867,21 @@ window.i18nData = {
 
         "blog.vid6.title": "Vous voulez commencer à trader en 2026 ? Voici le bon départ - P1",
         "blog.vid6.article": "Vous voulez commencer le trading en 2026 ? C'est le bon départ ! La 1ère partie couvre tout ce dont un trader débutant a besoin.",
-        "blog.vid6.tags": "#DebutTrading #Trading2026 #ForexDébutant"
+        "blog.vid6.tags": "#DebutTrading #Trading2026 #ForexDébutant",
+
+        // News Page
+        "news.title": "Actualités du Marché en Direct",
+        "news.desc": "Restez en avance sur les marchés grâce aux actualités financières en temps réel, aux cryptomonnaies et aux analyses Forex.",
+        "news.cat.all": "Toutes",
+        "news.cat.bus": "Affaires",
+        "news.cat.pol": "Politique",
+        "news.cat.tech": "Tech",
+        "news.cat.cry": "Crypto",
+        "news.loading": "Récupération des données du marché...",
+        "news.error": "Impossible de charger les actualités. Veuillez réessayer plus tard.",
+        "news.retry": "Réessayer",
+        "news.empty": "Aucune actualité trouvée pour cette catégorie.",
+        "news.source": "Actus Marché",
+        "news.readmore": "Lire l'Article Complet"
     }
 };
