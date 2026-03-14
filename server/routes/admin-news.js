@@ -235,15 +235,27 @@ router.post('/articles/bulk', async (req, res) => {
                     const rawTranslation = await callClaude(
                         `Translate the following news headline and description to ${lang}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`, 2048
                     );
-                    let translatedTitle = null;
-                    let translatedText = rawTranslation;
+                    // Merge into existing translations JSON
+                    let existingTranslations = {};
+                    let existingTitles = {};
+                    try { existingTranslations = JSON.parse(article.ai_translation || '{}'); } catch { existingTranslations = {}; }
+                    try { existingTitles = JSON.parse(article.ai_translated_title || '{}'); } catch { existingTitles = {}; }
+                    // If old data is plain text, reset
+                    if (typeof existingTranslations === 'string') existingTranslations = {};
+                    if (typeof existingTitles === 'string') existingTitles = {};
+
                     try {
                         const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
                         const parsed = JSON.parse(cleaned);
-                        translatedTitle = parsed.title || null;
-                        translatedText = parsed.text || parsed.description || rawTranslation;
-                    } catch {}
-                    db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(translatedText, translatedTitle, lang, id);
+                        existingTitles[lang] = parsed.title || '';
+                        existingTranslations[lang] = parsed.text || parsed.description || rawTranslation;
+                    } catch {
+                        existingTranslations[lang] = rawTranslation;
+                    }
+                    const allLangs = [...new Set([...Object.keys(existingTranslations), ...Object.keys(existingTitles)])].join(',');
+                    db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(
+                        JSON.stringify(existingTranslations), JSON.stringify(existingTitles), allLangs, id
+                    );
                     translated++;
                 } catch (e) {
                     console.error(`Translate article ${id} error:`, e.message);
@@ -394,7 +406,9 @@ router.post('/pipeline/run', async (req, res) => {
 
             for (const article of articles) {
                 const text = getArticleText(article);
-                let summary = null, translation = null, translatedTitle = null, rewrittenTitle = null, rewrittenContent = null;
+                let summary = null, rewrittenTitle = null, rewrittenContent = null;
+                const translations = {};    // { ar: "text", fr: "text" }
+                const translatedTitles = {}; // { ar: "title", fr: "title" }
 
                 // Summarize
                 if (autoSummary) {
@@ -403,22 +417,22 @@ router.post('/pipeline/run', async (req, res) => {
                     } catch (e) { console.error('Pipeline summarize error:', e.message); }
                 }
 
-                // Translate
+                // Translate to ALL configured languages
                 if (autoTranslate && translateTo) {
-                    const lang = translateTo.split(',')[0];
-                    if (lang && lang !== language) {
+                    const langs = translateTo.split(',').map(l => l.trim()).filter(l => l && l !== language);
+                    for (const lang of langs) {
                         try {
                             const rawTranslation = await callClaude(`Translate the following news headline and description to ${lang}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`, 2048);
                             try {
                                 const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
                                 const parsed = JSON.parse(cleaned);
-                                translatedTitle = parsed.title || null;
-                                translation = parsed.text || parsed.description || rawTranslation;
+                                translatedTitles[lang] = parsed.title || '';
+                                translations[lang] = parsed.text || parsed.description || rawTranslation;
                             } catch {
-                                translation = rawTranslation;
+                                translations[lang] = rawTranslation;
                             }
                             translatedCount++;
-                        } catch (e) { console.error('Pipeline translate error:', e.message); }
+                        } catch (e) { console.error(`Pipeline translate to ${lang} error:`, e.message); }
                     }
                 }
 
@@ -440,6 +454,8 @@ router.post('/pipeline/run', async (req, res) => {
                     } catch (e) { console.error('Pipeline rewrite error:', e.message); }
                 }
 
+                const hasTranslations = Object.keys(translations).length > 0;
+
                 // Save
                 try {
                     db.prepare(`
@@ -454,8 +470,11 @@ router.post('/pipeline/run', async (req, res) => {
                         article.link, article.image_url, article.source_name || article.source_id,
                         JSON.stringify(article.category), article.language, JSON.stringify(article.country),
                         article.pubDate, article.sentiment || null, JSON.stringify(article.keywords || []),
-                        summary, translation, translatedTitle, rewrittenTitle, rewrittenContent,
-                        translateTo ? translateTo.split(',')[0] : null,
+                        summary,
+                        hasTranslations ? JSON.stringify(translations) : null,
+                        Object.keys(translatedTitles).length > 0 ? JSON.stringify(translatedTitles) : null,
+                        rewrittenTitle, rewrittenContent,
+                        hasTranslations ? Object.keys(translations).join(',') : null,
                         (autoSummary || autoTranslate || autoRewrite) ? 1 : 0
                     );
                     fetched++;
@@ -572,15 +591,26 @@ router.post('/translate-batch', async (req, res) => {
                 const rawTranslation = await callClaude(
                     `Translate the following news headline and description to ${targetLanguage}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`, 2048
                 );
-                let translatedTitle = null;
-                let translatedText = rawTranslation;
+                // Merge into existing translations JSON
+                let existingTranslations = {};
+                let existingTitles = {};
+                try { existingTranslations = JSON.parse(article.ai_translation || '{}'); } catch { existingTranslations = {}; }
+                try { existingTitles = JSON.parse(article.ai_translated_title || '{}'); } catch { existingTitles = {}; }
+                if (typeof existingTranslations === 'string') existingTranslations = {};
+                if (typeof existingTitles === 'string') existingTitles = {};
+
                 try {
                     const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
                     const parsed = JSON.parse(cleaned);
-                    translatedTitle = parsed.title || null;
-                    translatedText = parsed.text || parsed.description || rawTranslation;
-                } catch {}
-                db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(translatedText, translatedTitle, targetLanguage, id);
+                    existingTitles[targetLanguage] = parsed.title || '';
+                    existingTranslations[targetLanguage] = parsed.text || parsed.description || rawTranslation;
+                } catch {
+                    existingTranslations[targetLanguage] = rawTranslation;
+                }
+                const allLangs = [...new Set([...Object.keys(existingTranslations), ...Object.keys(existingTitles)])].join(',');
+                db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(
+                    JSON.stringify(existingTranslations), JSON.stringify(existingTitles), allLangs, id
+                );
                 translated++;
             } catch (e) {
                 console.error(`Batch translate ${id} error:`, e.message);
@@ -657,17 +687,27 @@ router.post('/articles/:id/translate', async (req, res) => {
             `Translate the following news headline and description to ${targetLanguage}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`, 2048
         );
 
-        let translatedTitle = null;
-        let translatedText = rawTranslation;
+        // Merge into existing translations JSON
+        let existingTranslations = {};
+        let existingTitles = {};
+        try { existingTranslations = JSON.parse(article.ai_translation || '{}'); } catch { existingTranslations = {}; }
+        try { existingTitles = JSON.parse(article.ai_translated_title || '{}'); } catch { existingTitles = {}; }
+        if (typeof existingTranslations === 'string') existingTranslations = {};
+        if (typeof existingTitles === 'string') existingTitles = {};
+
         try {
             const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
             const parsed = JSON.parse(cleaned);
-            translatedTitle = parsed.title || null;
-            translatedText = parsed.text || parsed.description || rawTranslation;
-        } catch {}
-
-        db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(translatedText, translatedTitle, targetLanguage, req.params.id);
-        res.json({ success: true, translation: translatedText, translatedTitle });
+            existingTitles[targetLanguage] = parsed.title || '';
+            existingTranslations[targetLanguage] = parsed.text || parsed.description || rawTranslation;
+        } catch {
+            existingTranslations[targetLanguage] = rawTranslation;
+        }
+        const allLangs = [...new Set([...Object.keys(existingTranslations), ...Object.keys(existingTitles)])].join(',');
+        db.prepare('UPDATE news_articles SET ai_translation = ?, ai_translated_title = ?, translate_language = ? WHERE id = ?').run(
+            JSON.stringify(existingTranslations), JSON.stringify(existingTitles), allLangs, req.params.id
+        );
+        res.json({ success: true, translation: existingTranslations[targetLanguage], translatedTitle: existingTitles[targetLanguage] });
     } catch (err) {
         console.error('Translate error:', err.message);
         res.status(500).json({ error: 'Translate failed' });

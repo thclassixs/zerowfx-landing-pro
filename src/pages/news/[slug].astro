@@ -159,13 +159,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (article.ai_rewritten_title) displayTitle = article.ai_rewritten_title;
     if (article.ai_rewritten_content) displayContent = article.ai_rewritten_content;
 
-    // Use translated content if user language matches
-    if (needsTranslation && article.ai_translation && article.translate_language === lang) {
-      displayContent = article.ai_translation;
-      isTranslated = true;
-      // Use translated title if available
-      if (article.ai_translated_title) {
-        displayTitle = article.ai_translated_title;
+    // Parse JSON translations (format: {"ar":"text","fr":"text"})
+    if (needsTranslation && article.ai_translation) {
+      try {
+        const translationsMap = JSON.parse(article.ai_translation);
+        if (translationsMap && typeof translationsMap === 'object' && translationsMap[lang]) {
+          displayContent = translationsMap[lang];
+          isTranslated = true;
+        }
+      } catch {
+        // Legacy: plain text
+        if (article.translate_language === lang) {
+          displayContent = article.ai_translation;
+          isTranslated = true;
+        }
+      }
+    }
+
+    // Parse translated titles JSON
+    if (needsTranslation && article.ai_translated_title) {
+      try {
+        const titlesMap = JSON.parse(article.ai_translated_title);
+        if (titlesMap && typeof titlesMap === 'object' && titlesMap[lang]) {
+          displayTitle = titlesMap[lang];
+        }
+      } catch {
+        if (article.translate_language === lang && typeof article.ai_translated_title === 'string') {
+          displayTitle = article.ai_translated_title;
+        }
       }
     }
 
@@ -281,8 +302,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           const grid = document.getElementById('relatedGrid');
           grid.innerHTML = related.map(r => {
             let rTitle = r.ai_rewritten_title || r.title;
-            if (needsTranslation && r.ai_translation && r.translate_language === lang) {
-              rTitle = r.ai_translated_title || r.ai_rewritten_title || r.title;
+            if (needsTranslation && r.ai_translated_title) {
+              try {
+                const titlesMap = JSON.parse(r.ai_translated_title);
+                if (titlesMap && typeof titlesMap === 'object' && titlesMap[lang]) {
+                  rTitle = titlesMap[lang];
+                }
+              } catch {
+                // Legacy fallback
+                if (r.translate_language === lang) rTitle = r.ai_translated_title;
+              }
             }
             const rDate = r.published_at ? new Date(r.published_at).toLocaleDateString() : '';
             const rImg = r.image_url || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=400';

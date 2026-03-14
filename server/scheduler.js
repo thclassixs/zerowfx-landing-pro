@@ -110,7 +110,9 @@ async function runPipeline() {
 
             for (const article of articles) {
                 const text = getArticleText(article);
-                let summary = null, translation = null, translatedTitle = null, rewrittenTitle = null, rewrittenContent = null;
+                let summary = null, rewrittenTitle = null, rewrittenContent = null;
+                const translations = {};    // { ar: "text", fr: "text" }
+                const translatedTitles = {}; // { ar: "title", fr: "title" }
 
                 if (autoSummary) {
                     try {
@@ -119,20 +121,20 @@ async function runPipeline() {
                 }
 
                 if (autoTranslate && translateTo) {
-                    const lang = translateTo.split(',')[0];
-                    if (lang && lang !== language) {
+                    const langs = translateTo.split(',').map(l => l.trim()).filter(l => l && l !== language);
+                    for (const lang of langs) {
                         try {
                             const rawTranslation = await callClaude(`Translate the following news headline and description to ${lang}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`, 2048);
                             try {
                                 const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
                                 const parsed = JSON.parse(cleaned);
-                                translatedTitle = parsed.title || null;
-                                translation = parsed.text || parsed.description || rawTranslation;
+                                translatedTitles[lang] = parsed.title || '';
+                                translations[lang] = parsed.text || parsed.description || rawTranslation;
                             } catch {
-                                translation = rawTranslation;
+                                translations[lang] = rawTranslation;
                             }
                             translatedCount++;
-                        } catch (e) { console.error('[Scheduler] Translate error:', e.message); }
+                        } catch (e) { console.error(`[Scheduler] Translate to ${lang} error:`, e.message); }
                     }
                 }
 
@@ -150,6 +152,8 @@ async function runPipeline() {
                         rewrittenCount++;
                     } catch (e) { console.error('[Scheduler] Rewrite error:', e.message); }
                 }
+
+                const hasTranslations = Object.keys(translations).length > 0;
 
                 try {
                     // Generate slug from title
@@ -174,8 +178,11 @@ async function runPipeline() {
                         article.link, article.image_url, article.source_name || article.source_id,
                         JSON.stringify(article.category), article.language, JSON.stringify(article.country),
                         article.pubDate, article.sentiment || null, JSON.stringify(article.keywords || []),
-                        summary, translation, translatedTitle, rewrittenTitle, rewrittenContent,
-                        translateTo ? translateTo.split(',')[0] : null,
+                        summary,
+                        hasTranslations ? JSON.stringify(translations) : null,
+                        Object.keys(translatedTitles).length > 0 ? JSON.stringify(translatedTitles) : null,
+                        rewrittenTitle, rewrittenContent,
+                        hasTranslations ? Object.keys(translations).join(',') : null,
                         (autoSummary || autoTranslate || autoRewrite) ? 1 : 0
                     );
                     fetched++;

@@ -127,28 +127,52 @@ document.addEventListener('DOMContentLoaded', () => {
     let title = a.title;
     let description = a.description;
     let content = a.content;
+    let summary = a.ai_summary || null;
+    let isTranslated = false;
 
     // Use AI rewritten content if available (always better quality)
     if (a.ai_rewritten_title) title = a.ai_rewritten_title;
     if (a.ai_rewritten_content) content = a.ai_rewritten_content;
 
-    // Use translated content if user language matches
-    if (needsTranslation && a.ai_translation && a.translate_language === lang) {
-      // AI translation contains the translated full text
-      description = a.ai_translation;
-      content = a.ai_translation;
-      // If we have a rewritten title, check for translated title in the translation
-      // The translation typically covers the full article text
+    // Parse JSON translations (new format: {"ar":"text","fr":"text"})
+    if (needsTranslation && a.ai_translation) {
+      try {
+        const translationsMap = JSON.parse(a.ai_translation);
+        if (translationsMap && typeof translationsMap === 'object' && translationsMap[lang]) {
+          description = translationsMap[lang];
+          content = translationsMap[lang];
+          summary = translationsMap[lang]; // Show translated text as summary too
+          isTranslated = true;
+        }
+      } catch {
+        // Legacy: plain text with translate_language check
+        if (a.translate_language === lang) {
+          description = a.ai_translation;
+          content = a.ai_translation;
+          summary = a.ai_translation;
+          isTranslated = true;
+        }
+      }
     }
 
-    // If the article was translated to the user's language, also try to use translated title
-    if (needsTranslation && a.ai_translated_title && a.translate_language === lang) {
-      title = a.ai_translated_title;
+    // Parse translated titles JSON
+    if (needsTranslation && a.ai_translated_title) {
+      try {
+        const titlesMap = JSON.parse(a.ai_translated_title);
+        if (titlesMap && typeof titlesMap === 'object' && titlesMap[lang]) {
+          title = titlesMap[lang];
+        }
+      } catch {
+        // Legacy: plain text
+        if (a.translate_language === lang && typeof a.ai_translated_title === 'string') {
+          title = a.ai_translated_title;
+        }
+      }
     }
 
     return {
       title: title,
-      summary: a.ai_summary || null,
+      summary: summary,
       description: description || (typeof content === 'string' ? content.slice(0, 200) : ''),
       content: content,
       source: a.source_name || 'Market News',
@@ -159,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: a.category,
       language: a.language,
       publishedAt: a.published_at || a.created_at,
-      isTranslated: !!(a.ai_translation && a.translate_language === lang),
+      isTranslated: isTranslated,
     };
   }
 

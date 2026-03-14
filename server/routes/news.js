@@ -520,9 +520,10 @@ router.post('/pipeline/process', async (req, res) => {
             const item = {
                 original: formatArticle(article),
                 summary: null,
-                translation: null,
                 rewritten: null,
             };
+            const translations = {};    // { ar: "text", fr: "text" }
+            const translatedTitles = {}; // { ar: "title", fr: "title" }
 
             const text = getArticleText(article);
 
@@ -536,26 +537,26 @@ router.post('/pipeline/process', async (req, res) => {
                 console.error('Pipeline summarize error:', e.message);
             }
 
-            // Translate
+            // Translate to ALL requested languages
             if (translateTo && translateTo !== language) {
-                try {
-                    const rawTranslation = await callClaude(
-                        `Translate the following news headline and description to ${translateTo}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`,
-                        2048
-                    );
+                const langs = translateTo.split(',').map(l => l.trim()).filter(l => l && l !== language);
+                for (const lang of langs) {
                     try {
-                        const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
-                        const parsed = JSON.parse(cleaned);
-                        item.translatedTitle = parsed.title || null;
-                        item.translation = parsed.text || parsed.description || rawTranslation;
-                    } catch {
-                        item.translation = rawTranslation;
-                        item.translatedTitle = null;
+                        const rawTranslation = await callClaude(
+                            `Translate the following news headline and description to ${lang}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`,
+                            2048
+                        );
+                        try {
+                            const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
+                            const parsed = JSON.parse(cleaned);
+                            translatedTitles[lang] = parsed.title || '';
+                            translations[lang] = parsed.text || parsed.description || rawTranslation;
+                        } catch {
+                            translations[lang] = rawTranslation;
+                        }
+                    } catch (e) {
+                        console.error(`Pipeline translate to ${lang} error:`, e.message);
                     }
-                } catch (e) {
-                    item.translation = null;
-                    item.translatedTitle = null;
-                    console.error('Pipeline translate error:', e.message);
                 }
             }
 
@@ -575,6 +576,10 @@ router.post('/pipeline/process', async (req, res) => {
                 item.rewritten = null;
                 console.error('Pipeline rewrite error:', e.message);
             }
+
+            const hasTranslations = Object.keys(translations).length > 0;
+            item.translations = translations;
+            item.translatedTitles = translatedTitles;
 
             // Save to database
             if (save) {
@@ -602,11 +607,11 @@ router.post('/pipeline/process', async (req, res) => {
                         article.sentiment || null,
                         JSON.stringify(article.keywords || []),
                         item.summary,
-                        item.translation,
-                        item.translatedTitle || null,
+                        hasTranslations ? JSON.stringify(translations) : null,
+                        Object.keys(translatedTitles).length > 0 ? JSON.stringify(translatedTitles) : null,
                         item.rewritten?.title || null,
                         item.rewritten?.content || null,
-                        translateTo || null,
+                        hasTranslations ? Object.keys(translations).join(',') : null,
                         1
                     );
                 } catch (e) {
