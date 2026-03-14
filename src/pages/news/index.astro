@@ -3,6 +3,28 @@ import Layout from '../../layouts/Layout.astro';
 import Navbar from '../../components/Navbar.astro';
 import Footer from '../../components/Footer.astro';
 
+export const prerender = false;
+
+const category = Astro.url.searchParams.get('category') || '';
+const port = process.env.PORT || 3001;
+const API_URL = `http://127.0.0.1:${port}`;
+
+let ssrArticles = [];
+let fetchError = false;
+
+try {
+  const params = new URLSearchParams({ page: '1', limit: '20' });
+  if (category) params.append('category', category);
+  
+  const res = await fetch(`${API_URL}/api/news/saved?${params}`);
+  if (!res.ok) throw new Error('API Error');
+  const data = await res.json();
+  ssrArticles = data.articles || [];
+} catch (err) {
+  console.error('SSR Fetch Error:', err);
+  fetchError = true;
+}
+
 // Schema for News page
 const schemaData = JSON.stringify({
   "@context": "https://schema.org",
@@ -27,11 +49,11 @@ const schemaData = JSON.stringify({
         <h1 class="news-title" data-i18n="news.title">Real-Time Market News</h1>
         <p class="news-subtitle" data-i18n="news.desc">Stay ahead of the markets with AI-powered, real-time financial news, crypto updates, and forex insights.</p>
         <div class="categories-nav" id="news-categories">
-          <button class="cat-btn active" data-cat="" data-i18n="news.cat.all">All News</button>
-          <button class="cat-btn" data-cat="business" data-i18n="news.cat.bus">Business</button>
-          <button class="cat-btn" data-cat="politics" data-i18n="news.cat.pol">Politics</button>
-          <button class="cat-btn" data-cat="technology" data-i18n="news.cat.tech">Tech</button>
-          <button class="cat-btn" data-cat="crypto" id="crypto-cat" data-i18n="news.cat.cry">Crypto</button>
+          <a href="/news" class={`cat-btn ${category === '' ? 'active' : ''}`} data-i18n="news.cat.all">All News</a>
+          <a href="/news?category=business" class={`cat-btn ${category === 'business' ? 'active' : ''}`} data-i18n="news.cat.bus">Business</a>
+          <a href="/news?category=politics" class={`cat-btn ${category === 'politics' ? 'active' : ''}`} data-i18n="news.cat.pol">Politics</a>
+          <a href="/news?category=technology" class={`cat-btn ${category === 'technology' ? 'active' : ''}`} data-i18n="news.cat.tech">Tech</a>
+          <a href="/news?category=crypto" class={`cat-btn ${category === 'crypto' ? 'active' : ''}`} id="crypto-cat" data-i18n="news.cat.cry">Crypto</a>
         </div>
       </div>
     </section>
@@ -67,7 +89,7 @@ const schemaData = JSON.stringify({
   <Footer />
 </Layout>
 
-<script is:inline>
+<script is:inline define:vars={{ ssrArticles, fetchError }}>
 document.addEventListener('DOMContentLoaded', () => {
   const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
   
@@ -86,36 +108,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const needsTranslation = lang !== 'en'; // ar, fr, etc.
   const t = (window.i18nData && window.i18nData[lang]) ? window.i18nData[lang] : (window.i18nData ? window.i18nData['en'] : {});
 
-  async function fetchNews() {
+  function loadInitialNews() {
     grid.innerHTML = '';
-    loader.style.display = 'flex';
-    errorEl.style.display = 'none';
-    noResults.style.display = 'none';
+    loader.style.display = 'none';
 
-    try {
-      // ── Fetch articles exclusively from database (admin-managed) ──
-      const params = new URLSearchParams({ page: '1', limit: '20' });
-      if (currentCategory) params.append('category', currentCategory);
-
-      const res = await fetch(`${API}/api/news/saved?${params}`);
-      if (!res.ok) throw new Error('API Error');
-      const data = await res.json();
-
-      const articles = (data.articles || []).map(a => formatLocalArticle(a));
-
-      loader.style.display = 'none';
-
-      if (articles.length === 0) {
-        noResults.style.display = 'flex';
-        return;
-      }
-
-      renderArticles(articles);
-    } catch (err) {
-      console.error(err);
-      loader.style.display = 'none';
+    if (fetchError) {
       errorEl.style.display = 'flex';
+      return;
     }
+
+    const articles = (ssrArticles || []).map(a => formatLocalArticle(a));
+
+    if (articles.length === 0) {
+      noResults.style.display = 'flex';
+      return;
+    }
+
+    renderArticles(articles);
   }
 
   /**
@@ -237,20 +246,14 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = html;
   }
 
-  // Category switching
-  catBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      catBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentCategory = btn.dataset.cat || '';
-      fetchNews();
-    });
+  // Category switching is now handled natively via link navigations.
+
+  retryBtn.addEventListener('click', () => {
+    window.location.reload();
   });
 
-  retryBtn.addEventListener('click', fetchNews);
-
-  // Initial fetch
-  fetchNews();
+  // Initial fetch using SSR data
+  loadInitialNews();
 
   if (window.lucide) window.lucide.createIcons();
 });
@@ -329,6 +332,8 @@ document.addEventListener('DOMContentLoaded', () => {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
   }
 
   .cat-btn:hover {
