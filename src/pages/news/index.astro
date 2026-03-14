@@ -1,0 +1,445 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Navbar from '../../components/Navbar.astro';
+import Footer from '../../components/Footer.astro';
+
+// Schema for News page
+const schemaData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Market News - Zerowfx",
+  "description": "Real-time updates, market analysis, financial news, and economic events."
+});
+---
+
+<Layout title="Market News & Updates - Zerowfx" description="Read the latest real-time financial market news, forex updates, and economic analysis.">
+  <Fragment slot="head">
+    <script type="application/ld+json" id="news-schema" set:html={schemaData} />
+  </Fragment>
+
+  <Navbar />
+
+  <main class="news-page">
+    <!-- Header Section -->
+    <section class="news-hero">
+      <div class="hero-glow"></div>
+      <div class="news-hero-inner">
+        <h1 class="news-title" data-i18n="news.title">Real-Time Market News</h1>
+        <p class="news-subtitle" data-i18n="news.desc">Stay ahead of the markets with AI-powered, real-time financial news, crypto updates, and forex insights.</p>
+        <div class="categories-nav" id="news-categories">
+          <button class="cat-btn active" data-cat="">All News</button>
+          <button class="cat-btn" data-cat="business">Business</button>
+          <button class="cat-btn" data-cat="politics">Politics</button>
+          <button class="cat-btn" data-cat="technology">Tech</button>
+          <button class="cat-btn" data-cat="crypto" id="crypto-cat">Crypto</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="articles-section">
+      <!-- Loading State -->
+      <div class="news-loading" id="news-loading">
+        <div class="spinner"></div>
+        <p>Fetching latest market data...</p>
+      </div>
+
+      <!-- Error State -->
+      <div class="news-error" id="news-error" style="display:none;">
+        <i data-lucide="alert-circle" style="width:48px;height:48px;color:var(--color-red);"></i>
+        <p>Unable to load news right now. Please try again later.</p>
+        <button id="retry-btn" class="retry-btn">Retry</button>
+      </div>
+
+      <!-- No Results -->
+      <div class="no-results" id="no-results" style="display:none;">
+        <i data-lucide="file-x" style="width:48px;height:48px;opacity:0.3;"></i>
+        <p>No news found for this category.</p>
+      </div>
+
+      <!-- Articles Grid -->
+      <div class="articles-grid" id="news-grid">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', () => {
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+  
+  const grid = document.getElementById('news-grid');
+  const loader = document.getElementById('news-loading');
+  const errorEl = document.getElementById('news-error');
+  const noResults = document.getElementById('no-results');
+  const retryBtn = document.getElementById('retry-btn');
+  const catBtns = document.querySelectorAll('.cat-btn');
+
+  let currentCategory = '';
+  let isCrypto = false;
+
+  async function fetchNews() {
+    grid.innerHTML = '';
+    loader.style.display = 'flex';
+    errorEl.style.display = 'none';
+    noResults.style.display = 'none';
+
+    try {
+      let endpoint = `${API}/api/news/latest?language=en`;
+      if (isCrypto) {
+        endpoint = `${API}/api/news/crypto?language=en`;
+      } else if (currentCategory) {
+        endpoint += `&category=${currentCategory}`;
+      }
+
+      const res = await fetch(endpoint);
+      if (!res.ok) throw new Error('API Error');
+      const data = await res.json();
+      
+      loader.style.display = 'none';
+
+      if (!data.articles || data.articles.length === 0) {
+        noResults.style.display = 'flex';
+        return;
+      }
+
+      renderArticles(data.articles);
+    } catch (err) {
+      console.error(err);
+      loader.style.display = 'none';
+      errorEl.style.display = 'flex';
+    }
+  }
+
+  function renderArticles(articles) {
+    // Only display top 20 for performance in front-end
+    const displayList = articles.slice(0, 20);
+
+    const html = displayList.map(article => {
+      const date = article.publishedAt ? new Date(article.publishedAt).toLocaleString() : '';
+      const fallbackImg = 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=1000';
+      const img = article.image || fallbackImg;
+      
+      let sourceTag = article.source || 'Market News';
+      let tagBg = 'var(--color-bg-elevated)';
+
+      return `
+        <article class="news-card">
+          <div class="news-img-wrap">
+            <img class="news-img" src="${img}" alt="News thumbnail" onerror="this.src='${fallbackImg}'" loading="lazy" />
+            <span class="news-source" style="background: ${tagBg}">${sourceTag}</span>
+          </div>
+          <div class="news-content-wrap">
+            <div class="news-meta">
+              <span class="news-date">${date}</span>
+            </div>
+            <h2 class="news-headline">${article.title}</h2>
+            <p class="news-desc">${article.description || (typeof article.content === 'string' ? article.content.slice(0, 120) + '...' : '') || 'No description available for this market event.'}</p>
+            <a href="${article.link || article.sourceUrl || '#'}" target="_blank" rel="noopener noreferrer" class="read-more">
+              Read Full Article <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    grid.innerHTML = html;
+  }
+
+  // Category switching
+  catBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (btn.id === 'crypto-cat') {
+        isCrypto = true;
+        currentCategory = '';
+      } else {
+        isCrypto = false;
+        currentCategory = btn.dataset.cat;
+      }
+
+      fetchNews();
+    });
+  });
+
+  retryBtn.addEventListener('click', fetchNews);
+
+  // Initial fetch
+  fetchNews();
+
+  // Multi-language strings for nav placeholders
+  if (window.lucide) window.lucide.createIcons();
+});
+</script>
+
+<style>
+  /* ── General Layout ── */
+  .news-page {
+    padding-top: 64px;
+    min-height: 100vh;
+    background: var(--color-bg);
+  }
+
+  /* ── Hero ── */
+  .news-hero {
+    position: relative;
+    padding: 80px 24px 60px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-glow {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    background: radial-gradient(ellipse, var(--color-green-glow, rgba(16,185,129,0.2)) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .news-hero-inner {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .news-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 16px;
+    color: var(--color-text);
+  }
+
+  .news-subtitle {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  /* ── Categories Navigation ── */
+  .categories-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .cat-btn {
+    background: var(--color-bg-card, #111);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    padding: 10px 24px;
+    border-radius: 99px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .cat-btn:hover {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+
+  .cat-btn.active {
+    background: linear-gradient(135deg, var(--color-green-dark, #059669), var(--color-green, #10b981));
+    color: #fff;
+    border-color: transparent;
+    box-shadow: 0 4px 15px var(--color-green-glow, rgba(16,185,129,0.3));
+  }
+
+  /* ── Articles Grid ── */
+  .articles-section {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 60px 24px 100px;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+  }
+
+  .news-card {
+    background: var(--color-bg-card, #111);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg, 16px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    height: 100%;
+  }
+
+  .news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    border-color: var(--color-border-strong);
+  }
+
+  .news-img-wrap {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: var(--color-border); /* Placeholder color */
+  }
+
+  .news-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .news-card:hover .news-img {
+    transform: scale(1.05);
+  }
+
+  .news-source {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .news-content-wrap {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .news-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: var(--color-text-dim);
+  }
+
+  .news-headline {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--color-text);
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .news-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--color-green, #10b981);
+    transition: gap 0.2s ease, filter 0.2s ease;
+  }
+
+  .read-more:hover {
+    gap: 10px;
+    filter: brightness(1.2);
+  }
+
+  /* ── States (Loading, Error, No Results) ── */
+  .news-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 24px;
+    color: var(--color-text-dim);
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--color-border-strong);
+    border-top-color: var(--color-green, #10b981);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .news-error, .no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 24px;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 1.05rem;
+  }
+
+  .retry-btn {
+    margin-top: 12px;
+    padding: 10px 24px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border-strong);
+    color: var(--color-text);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .retry-btn:hover {
+    background: var(--color-bg-card);
+    border-color: var(--color-green, #10b981);
+  }
+
+  @media (max-width: 768px) {
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

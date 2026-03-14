@@ -3,7 +3,6 @@ import path from 'path';
 import bcrypt from 'bcryptjs';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,10 +70,9 @@ db.exec(`
 // Create default admin if not exists
 const adminExists = db.prepare('SELECT COUNT(*) as count FROM admins').get();
 if (adminExists.count === 0) {
-    const defaultPassword = process.env.ADMIN_PASSWORD || 'zerowfxadmin123';
-    const hashedPassword = bcrypt.hashSync(defaultPassword, 10);
+    const hashedPassword = bcrypt.hashSync('zerowfx2026', 10);
     db.prepare('INSERT INTO admins (username, password) VALUES (?, ?)').run('admin', hashedPassword);
-    console.log(`Default admin created - username: admin, password: ${process.env.ADMIN_PASSWORD ? '[HIDDEN]' : defaultPassword}`);
+    console.log('Default admin created - username: admin, password: zerowfx2026');
 }
 
 export default db;
