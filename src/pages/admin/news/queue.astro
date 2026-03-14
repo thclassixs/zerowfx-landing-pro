@@ -1,0 +1,381 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Translation Queue - Zerowfx Admin" description="Processing queue" noindex={true}>
+  <div class="admin-news-wrapper">
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading"><div class="spinner"></div><p>Checking authentication...</p></div>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">News Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
+          <a href="/admin/news" class="nav-item"><i data-lucide="newspaper" class="nav-icon"></i><span>News Pipeline</span></a>
+          <a href="/admin/news/articles" class="nav-item"><i data-lucide="file-text" class="nav-icon"></i><span>Articles</span></a>
+          <a href="/admin/news/settings" class="nav-item"><i data-lucide="settings" class="nav-icon"></i><span>Settings</span></a>
+          <a href="/admin/news/queue" class="nav-item active"><i data-lucide="list-ordered" class="nav-icon"></i><span>Queue</span></a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn"><i data-lucide="log-out" class="nav-icon"></i></button>
+        </div>
+      </aside>
+
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-lucide="menu"></i></button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> Queue</span>
+        <button class="mobile-logout" id="mobileLogoutBtn"><i data-lucide="log-out"></i></button>
+      </div>
+
+      <main class="main-content">
+        <div class="content-header">
+          <h1 class="page-title">📋 Processing Queue</h1>
+          <p class="page-subtitle">Monitor pipeline processing and logs</p>
+        </div>
+
+        <!-- Progress Panel -->
+        <div class="panel progress-panel" id="progressPanel" style="display:none">
+          <div class="progress-header">
+            <span class="progress-status" id="progressStatus">Processing...</span>
+            <span class="progress-count" id="progressCount"></span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="queue-actions">
+          <button class="btn btn-outline" id="retryFailedBtn">
+            <i data-lucide="refresh-cw"></i> Retry Failed
+          </button>
+          <button class="btn btn-outline-danger" id="clearQueueBtn">
+            <i data-lucide="trash-2"></i> Clear Queue
+          </button>
+          <button class="btn btn-outline" id="refreshBtn">
+            <i data-lucide="rotate-cw"></i> Refresh
+          </button>
+        </div>
+
+        <!-- Pipeline History -->
+        <div class="panel">
+          <h2 class="panel-title"><i data-lucide="history" class="panel-icon"></i> Pipeline History</h2>
+          <div class="table-wrapper">
+            <table class="data-table" id="historyTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Time</th>
+                  <th>Action</th>
+                  <th>Status</th>
+                  <th>Fetched</th>
+                  <th>Translated</th>
+                  <th>Rewritten</th>
+                  <th>Duration</th>
+                  <th>Error</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody">
+                <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="summary-grid">
+          <div class="summary-card">
+            <div class="summary-icon green"><i data-lucide="check-circle"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="successCount">0</span>
+              <span class="summary-label">Successful Runs</span>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon red"><i data-lucide="x-circle"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="errorCount">0</span>
+              <span class="summary-label">Failed Runs</span>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon blue"><i data-lucide="timer"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="avgDuration">0s</span>
+              <span class="summary-label">Avg Duration</span>
+            </div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-icon purple"><i data-lucide="database"></i></div>
+            <div class="summary-info">
+              <span class="summary-value" id="totalFetched">0</span>
+              <span class="summary-label">Total Fetched</span>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        loadQueue();
+      } else { window.location.href = '/admin'; }
+    } catch { window.location.href = '/admin'; }
+  }
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  async function loadQueue() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/queue`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // Check for active processing
+      const statusRes = await fetch(`${API}/api/admin/news/pipeline/status`, { credentials: 'include' });
+      const statusData = await statusRes.json();
+      
+      const progressPanel = document.getElementById('progressPanel');
+      if (progressPanel) {
+        if (statusData.running) {
+          progressPanel.style.display = 'block';
+          (document.getElementById('progressStatus') as HTMLElement).textContent = '⏳ Pipeline is running...';
+          const bar = document.getElementById('progressBar');
+          if (bar) bar.style.width = '100%';
+        } else {
+          progressPanel.style.display = 'none';
+        }
+      }
+
+      // Render history
+      const tbody = document.getElementById('historyBody');
+      if (!tbody) return;
+
+      if (!data.history?.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No pipeline history yet. Run the pipeline from the Dashboard.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.history.map((log: any, i: number) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td class="td-time">${new Date(log.created_at).toLocaleString()}</td>
+          <td>${formatAction(log.action)}</td>
+          <td>
+            <span class="status-badge ${log.status}">${log.status}</span>
+          </td>
+          <td>${log.articles_fetched || 0}</td>
+          <td>${log.articles_translated || 0}</td>
+          <td>${log.articles_rewritten || 0}</td>
+          <td>${log.duration_ms ? (log.duration_ms / 1000).toFixed(1) + 's' : '—'}</td>
+          <td class="td-error">${log.error_message ? `<span class="error-text" title="${log.error_message}">${truncate(log.error_message, 30)}</span>` : '—'}</td>
+        </tr>
+      `).join('');
+
+      // Stats
+      const successCount = data.history.filter((l: any) => l.status === 'success').length;
+      const errorCount = data.history.filter((l: any) => l.status === 'error').length;
+      const durations = data.history.filter((l: any) => l.duration_ms).map((l: any) => l.duration_ms);
+      const avgDuration = durations.length ? Math.round(durations.reduce((a: number, b: number) => a + b, 0) / durations.length / 1000) : 0;
+      const totalFetched = data.history.reduce((sum: number, l: any) => sum + (l.articles_fetched || 0), 0);
+
+      (document.getElementById('successCount') as HTMLElement).textContent = String(successCount);
+      (document.getElementById('errorCount') as HTMLElement).textContent = String(errorCount);
+      (document.getElementById('avgDuration') as HTMLElement).textContent = avgDuration + 's';
+      (document.getElementById('totalFetched') as HTMLElement).textContent = String(totalFetched);
+
+    } catch (err) {
+      console.error('Load queue error:', err);
+    }
+  }
+
+  function formatAction(action: string) {
+    const labels: Record<string, string> = {
+      auto_pipeline: '<span class="action-label auto">⚡ Auto</span>',
+      scheduled_pipeline: '<span class="action-label scheduled">🔄 Scheduled</span>',
+      manual_pipeline: '<span class="action-label manual">▶️ Manual</span>',
+    };
+    return labels[action] || `<span class="action-label">${action}</span>`;
+  }
+
+  function truncate(str: string, len: number) {
+    if (!str) return '';
+    return str.length > len ? str.slice(0, len) + '...' : str;
+  }
+
+  document.getElementById('retryFailedBtn')?.addEventListener('click', async () => {
+    try {
+      const res = await fetch(`${API}/api/admin/news/queue/retry`, { method: 'POST', credentials: 'include' });
+      const data = await res.json();
+      showToast(data.message || 'Retry queued', 'info');
+      loadQueue();
+    } catch { showToast('Connection error', 'error'); }
+  });
+
+  document.getElementById('clearQueueBtn')?.addEventListener('click', async () => {
+    if (!confirm('Clear the processing queue?')) return;
+    try {
+      await fetch(`${API}/api/admin/news/queue/clear`, { method: 'DELETE', credentials: 'include' });
+      showToast('Queue cleared', 'success');
+      loadQueue();
+    } catch { showToast('Connection error', 'error'); }
+  });
+
+  document.getElementById('refreshBtn')?.addEventListener('click', loadQueue);
+
+  checkAuth();
+
+  // Auto-refresh every 5 seconds
+  setInterval(loadQueue, 5000);
+</script>
+
+<style>
+  .admin-news-wrapper { min-height: 100vh; background: var(--color-bg); }
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-loading { text-align: center; color: var(--color-text-dim); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border-strong); border-top-color: var(--color-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .admin-dashboard { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 240px; background: var(--color-bg-card); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--color-border); }
+  .sidebar-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; display: block; }
+  .accent { color: var(--color-green); }
+  .sidebar-sub { display: block; font-size: 0.75rem; color: var(--color-text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+  .nav-item:hover { background: rgba(34, 197, 94, 0.06); color: var(--color-text); }
+  .nav-item.active { background: rgba(34, 197, 94, 0.1); color: var(--color-green); font-weight: 600; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-user { font-size: 0.85rem; color: var(--color-text-muted); }
+  .sidebar-logout { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); padding: 6px; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+  .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); }
+  .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
+
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; max-width: 1200px; }
+  .content-header { margin-bottom: 24px; }
+  .page-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+  .page-subtitle { color: var(--color-text-dim); font-size: 0.9rem; }
+
+  /* Progress */
+  .progress-panel { margin-bottom: 20px; border-color: rgba(34, 197, 94, 0.2); }
+  .progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .progress-status { font-weight: 600; font-size: 0.9rem; color: var(--color-green); }
+  .progress-count { font-size: 0.85rem; color: var(--color-text-dim); }
+  .progress-bar-wrap { height: 6px; background: var(--color-bg-elevated); border-radius: 3px; overflow: hidden; }
+  .progress-bar { height: 100%; background: linear-gradient(90deg, var(--color-green-dark), var(--color-green)); border-radius: 3px; transition: width 0.5s ease; animation: pulse-bar 1.5s infinite; }
+  @keyframes pulse-bar {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Actions */
+  .queue-actions { display: flex; gap: 10px; margin-bottom: 20px; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md); transition: var(--transition); border: none; cursor: pointer; }
+  .btn i, .btn svg { width: 16px; height: 16px; }
+  .btn-outline { background: var(--color-bg-card); border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+  .btn-outline:hover { border-color: var(--color-green); color: var(--color-green); }
+  .btn-outline-danger { background: var(--color-bg-card); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--color-red); }
+  .btn-outline-danger:hover { background: rgba(239, 68, 68, 0.1); }
+
+  /* Panel & Table */
+  .panel { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; }
+  .panel-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .panel-icon { width: 18px; height: 18px; color: var(--color-green); }
+
+  .table-wrapper { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--color-border); }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: var(--color-bg-elevated); padding: 12px 14px; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
+  .data-table td { padding: 10px 14px; font-size: 0.85rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); }
+  .data-table tr:hover td { background: rgba(34, 197, 94, 0.03); }
+  .empty-state { text-align: center !important; color: var(--color-text-dim) !important; padding: 40px 16px !important; }
+
+  .td-time { white-space: nowrap; font-size: 0.8rem; }
+  .td-error { max-width: 200px; }
+  .error-text { color: var(--color-red); font-size: 0.8rem; cursor: help; }
+
+  /* Status badges */
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .status-badge.success { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .status-badge.error { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+
+  .action-label { font-size: 0.8rem; font-weight: 500; }
+  .action-label.auto { color: var(--color-green); }
+  .action-label.scheduled { color: #3b82f6; }
+  .action-label.manual { color: #a855f7; }
+
+  /* Summary grid */
+  .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .summary-card { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; display: flex; align-items: center; gap: 14px; }
+  .summary-icon { width: 44px; height: 44px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .summary-icon i, .summary-icon svg { width: 20px; height: 20px; }
+  .summary-icon.green { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .summary-icon.red { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  .summary-icon.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .summary-icon.purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+  .summary-value { display: block; font-size: 1.4rem; font-weight: 800; }
+  .summary-label { display: block; font-size: 0.75rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* Toast */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; color: #fff; opacity: 0; transform: translateX(20px); transition: all 0.3s ease; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 10px 0 40px rgba(0,0,0,0.5); }
+    .mobile-topbar { display: flex; }
+    .main-content { margin-left: 0; padding: 16px; }
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .queue-actions { flex-wrap: wrap; }
+  }
+</style>

@@ -109,8 +109,9 @@ import Layout from '../layouts/Layout.astro';
     try {
       const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
       if (res.ok) {
-        const data = await res.json();
-        showDashboard(data.username);
+        // Already authenticated, redirect to dashboard
+        window.location.href = '/admin/dashboard';
+        return;
       }
     } catch {}
   }
@@ -150,7 +151,7 @@ import Layout from '../layouts/Layout.astro';
 
       const data = await res.json();
       if (res.ok) {
-        showDashboard(data.username);
+        window.location.href = '/admin/dashboard';
       } else {
         if (errorEl) {
           errorEl.textContent = data.error || 'Login failed';

@@ -1,0 +1,511 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="All Articles - Zerowfx Admin" description="Manage news articles" noindex={true}>
+  <div class="admin-news-wrapper">
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading"><div class="spinner"></div><p>Checking authentication...</p></div>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">News Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
+          <a href="/admin/news" class="nav-item"><i data-lucide="newspaper" class="nav-icon"></i><span>News Pipeline</span></a>
+          <a href="/admin/news/articles" class="nav-item active"><i data-lucide="file-text" class="nav-icon"></i><span>Articles</span></a>
+          <a href="/admin/news/settings" class="nav-item"><i data-lucide="settings" class="nav-icon"></i><span>Settings</span></a>
+          <a href="/admin/news/queue" class="nav-item"><i data-lucide="list-ordered" class="nav-icon"></i><span>Queue</span></a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn"><i data-lucide="log-out" class="nav-icon"></i></button>
+        </div>
+      </aside>
+
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-lucide="menu"></i></button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> Articles</span>
+        <button class="mobile-logout" id="mobileLogoutBtn"><i data-lucide="log-out"></i></button>
+      </div>
+
+      <main class="main-content">
+        <div class="content-header">
+          <h1 class="page-title">📰 All Articles</h1>
+          <p class="page-subtitle">Manage and process news articles</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-bar">
+          <div class="filter-group">
+            <input type="text" id="searchInput" class="filter-input" placeholder="Search by title or keyword..." />
+          </div>
+          <div class="filter-group">
+            <select id="filterCategory" class="filter-select">
+              <option value="">All Categories</option>
+              <option value="business">Business</option>
+              <option value="technology">Technology</option>
+              <option value="politics">Politics</option>
+              <option value="crypto">Crypto</option>
+              <option value="world">World</option>
+              <option value="science">Science</option>
+              <option value="sports">Sports</option>
+              <option value="health">Health</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Status</option>
+              <option value="translated">Translated</option>
+              <option value="not_translated">Not Translated</option>
+              <option value="rewritten">Rewritten</option>
+            </select>
+            <select id="filterLanguage" class="filter-select">
+              <option value="">All Languages</option>
+              <option value="en">English</option>
+              <option value="ar">Arabic</option>
+              <option value="fr">French</option>
+              <option value="es">Spanish</option>
+              <option value="de">German</option>
+            </select>
+            <select id="filterSort" class="filter-select">
+              <option value="newest">Newest First</option>
+              <option value="oldest">Oldest First</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-bar" id="bulkBar" style="display:none">
+          <span class="bulk-count" id="bulkCount">0 selected</span>
+          <div class="bulk-actions">
+            <button class="btn btn-sm btn-outline" id="bulkTranslateBtn"><i data-lucide="languages"></i> Translate</button>
+            <button class="btn btn-sm btn-outline" id="bulkRewriteBtn"><i data-lucide="pen-line"></i> Rewrite</button>
+            <button class="btn btn-sm btn-outline" id="bulkSummarizeBtn"><i data-lucide="file-text"></i> Summarize</button>
+            <button class="btn btn-sm btn-outline-danger" id="bulkDeleteBtn"><i data-lucide="trash-2"></i> Delete</button>
+            <button class="btn btn-sm btn-outline" id="exportCsvBtn"><i data-lucide="download"></i> Export CSV</button>
+          </div>
+        </div>
+
+        <!-- Articles Table -->
+        <div class="panel" style="padding:0;">
+          <div class="table-wrapper">
+            <table class="data-table" id="articlesTable">
+              <thead>
+                <tr>
+                  <th class="th-check"><input type="checkbox" id="selectAll" /></th>
+                  <th class="th-thumb">Image</th>
+                  <th>Title</th>
+                  <th>Source</th>
+                  <th>Category</th>
+                  <th>Lang</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="articlesBody">
+                <tr><td colspan="9" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+      </main>
+    </div>
+
+    <!-- Bulk Translate Modal -->
+    <div class="modal-overlay" id="translateModal" style="display:none">
+      <div class="modal-card">
+        <h3 class="modal-title">Translate Selected Articles</h3>
+        <div class="modal-field">
+          <label>Target Language</label>
+          <select id="bulkTargetLang" class="form-select">
+            <option value="ar">🇸🇦 Arabic</option>
+            <option value="fr">🇫🇷 French</option>
+            <option value="es">🇪🇸 Spanish</option>
+            <option value="de">🇩🇪 German</option>
+            <option value="tr">🇹🇷 Turkish</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="confirmTranslateBtn">Translate</button>
+          <button class="btn btn-ghost" id="cancelTranslateBtn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+  let currentPage = 1;
+  let selectedIds: number[] = [];
+
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        loadArticles();
+      } else { window.location.href = '/admin'; }
+    } catch { window.location.href = '/admin'; }
+  }
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  function getStatusBadges(article: any) {
+    let badges = '';
+    if (article.ai_translation) badges += '<span class="badge badge-green">Translated</span>';
+    if (article.ai_rewritten_content) badges += '<span class="badge badge-blue">Rewritten</span>';
+    if (article.ai_summary) badges += '<span class="badge badge-purple">Summarized</span>';
+    if (!article.ai_translation && !article.ai_rewritten_content && !article.ai_summary) badges = '<span class="badge badge-gray">Raw</span>';
+    return badges;
+  }
+
+  function truncate(str: string, len: number) {
+    if (!str) return '—';
+    return str.length > len ? str.slice(0, len) + '...' : str;
+  }
+
+  async function loadArticles() {
+    const search = (document.getElementById('searchInput') as HTMLInputElement).value;
+    const category = (document.getElementById('filterCategory') as HTMLSelectElement).value;
+    const status = (document.getElementById('filterStatus') as HTMLSelectElement).value;
+    const language = (document.getElementById('filterLanguage') as HTMLSelectElement).value;
+    const sort = (document.getElementById('filterSort') as HTMLSelectElement).value;
+
+    const params = new URLSearchParams({
+      page: String(currentPage),
+      limit: '20',
+      search, category, status, language, sort,
+    });
+
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles?${params}`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const tbody = document.getElementById('articlesBody');
+      if (!tbody) return;
+
+      if (!data.articles?.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No articles found</td></tr>';
+        renderPagination(0, 0);
+        return;
+      }
+
+      tbody.innerHTML = data.articles.map((a: any) => `
+        <tr data-id="${a.id}">
+          <td class="td-check">
+            <input type="checkbox" class="article-check" value="${a.id}" ${selectedIds.includes(a.id) ? 'checked' : ''} />
+          </td>
+          <td class="td-thumb">
+            ${a.image_url ? `<img src="${a.image_url}" alt="" class="thumb-img" onerror="this.style.display='none'" />` : '<div class="thumb-placeholder"><i data-lucide="image-off"></i></div>'}
+          </td>
+          <td>
+            <div class="article-title">${truncate(a.title, 60)}</div>
+            ${a.ai_rewritten_title ? `<div class="article-subtitle">${truncate(a.ai_rewritten_title, 50)}</div>` : ''}
+          </td>
+          <td class="td-source">${a.source_name || '—'}</td>
+          <td class="td-cat">${a.category ? a.category.replace(/[\[\]"]/g, '') : '—'}</td>
+          <td class="td-lang">${(a.language || 'en').toUpperCase()}</td>
+          <td class="td-status">${getStatusBadges(a)}</td>
+          <td class="td-date">${a.published_at ? new Date(a.published_at).toLocaleDateString() : '—'}</td>
+          <td class="td-actions">
+            <a href="/admin/news/article?id=${a.id}" class="action-btn" title="View"><i data-lucide="eye"></i></a>
+            <button class="action-btn danger" title="Delete" onclick="deleteArticle(${a.id})"><i data-lucide="trash-2"></i></button>
+          </td>
+        </tr>
+      `).join('');
+
+      renderPagination(data.pagination.totalPages, data.pagination.page);
+
+      // Re-initialize lucide icons
+      if (window.lucide) (window as any).lucide.createIcons();
+
+      // Checkbox listeners
+      document.querySelectorAll('.article-check').forEach(cb => {
+        cb.addEventListener('change', updateBulkBar);
+      });
+    } catch (err) {
+      console.error('Load articles error:', err);
+    }
+  }
+
+  function renderPagination(totalPages: number, current: number) {
+    const el = document.getElementById('pagination');
+    if (!el) return;
+    if (totalPages <= 1) { el.innerHTML = ''; return; }
+
+    let html = '';
+    for (let i = 1; i <= totalPages; i++) {
+      html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+    }
+    el.innerHTML = html;
+  }
+
+  function updateBulkBar() {
+    const checked = document.querySelectorAll('.article-check:checked');
+    selectedIds = Array.from(checked).map((cb: any) => parseInt(cb.value));
+    const bar = document.getElementById('bulkBar');
+    const countEl = document.getElementById('bulkCount');
+    if (bar) bar.style.display = selectedIds.length ? 'flex' : 'none';
+    if (countEl) countEl.textContent = `${selectedIds.length} selected`;
+  }
+
+  // Select all
+  document.getElementById('selectAll')?.addEventListener('change', (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    document.querySelectorAll('.article-check').forEach((cb: any) => { cb.checked = checked; });
+    updateBulkBar();
+  });
+
+  // Search debounce
+  let searchTimeout: any;
+  document.getElementById('searchInput')?.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => { currentPage = 1; loadArticles(); }, 300);
+  });
+
+  // Filter changes
+  ['filterCategory', 'filterStatus', 'filterLanguage', 'filterSort'].forEach(id => {
+    document.getElementById(id)?.addEventListener('change', () => { currentPage = 1; loadArticles(); });
+  });
+
+  // Delete
+  (window as any).deleteArticle = async (id: number) => {
+    if (!confirm('Delete this article? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${id}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) { showToast('Article deleted', 'success'); loadArticles(); }
+      else showToast('Delete failed', 'error');
+    } catch { showToast('Connection error', 'error'); }
+  };
+
+  // Page nav
+  (window as any).goToPage = (page: number) => {
+    currentPage = page;
+    loadArticles();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // Bulk actions
+  async function bulkAction(action: string, extra: any = {}) {
+    if (!selectedIds.length) return;
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/bulk`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, articleIds: selectedIds, ...extra }),
+      });
+      const data = await res.json();
+      showToast(data.message || 'Action completed', res.ok ? 'success' : 'error');
+      selectedIds = [];
+      updateBulkBar();
+      loadArticles();
+    } catch { showToast('Connection error', 'error'); }
+  }
+
+  document.getElementById('bulkTranslateBtn')?.addEventListener('click', () => {
+    (document.getElementById('translateModal') as HTMLElement).style.display = 'flex';
+  });
+  document.getElementById('cancelTranslateBtn')?.addEventListener('click', () => {
+    (document.getElementById('translateModal') as HTMLElement).style.display = 'none';
+  });
+  document.getElementById('confirmTranslateBtn')?.addEventListener('click', () => {
+    const lang = (document.getElementById('bulkTargetLang') as HTMLSelectElement).value;
+    (document.getElementById('translateModal') as HTMLElement).style.display = 'none';
+    bulkAction('translate', { targetLanguage: lang });
+  });
+
+  document.getElementById('bulkRewriteBtn')?.addEventListener('click', () => bulkAction('rewrite'));
+  document.getElementById('bulkSummarizeBtn')?.addEventListener('click', () => bulkAction('summarize'));
+  document.getElementById('bulkDeleteBtn')?.addEventListener('click', () => {
+    if (!confirm(`Delete ${selectedIds.length} articles? This cannot be undone.`)) return;
+    bulkAction('delete');
+  });
+
+  document.getElementById('exportCsvBtn')?.addEventListener('click', async () => {
+    try {
+      const res = await fetch(`${API}/api/admin/news/export/csv`, { method: 'POST', credentials: 'include' });
+      if (!res.ok) { showToast('Export failed', 'error'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'news_articles.csv'; a.click();
+      URL.revokeObjectURL(url);
+      showToast('CSV exported', 'success');
+    } catch { showToast('Export failed', 'error'); }
+  });
+
+  checkAuth();
+</script>
+
+<style>
+  .admin-news-wrapper { min-height: 100vh; background: var(--color-bg); }
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-loading { text-align: center; color: var(--color-text-dim); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border-strong); border-top-color: var(--color-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .admin-dashboard { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: 240px; background: var(--color-bg-card); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--color-border); }
+  .sidebar-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; display: block; }
+  .accent { color: var(--color-green); }
+  .sidebar-sub { display: block; font-size: 0.75rem; color: var(--color-text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+  .nav-item:hover { background: rgba(34, 197, 94, 0.06); color: var(--color-text); }
+  .nav-item.active { background: rgba(34, 197, 94, 0.1); color: var(--color-green); font-weight: 600; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-user { font-size: 0.85rem; color: var(--color-text-muted); }
+  .sidebar-logout { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); padding: 6px; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+  .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+  /* Mobile */
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); }
+  .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
+
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; }
+  .content-header { margin-bottom: 20px; }
+  .page-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+  .page-subtitle { color: var(--color-text-dim); font-size: 0.9rem; }
+
+  /* Filters */
+  .filters-bar { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+  .filter-group { display: flex; gap: 10px; flex-wrap: wrap; }
+  .filter-input {
+    flex: 1; min-width: 200px; padding: 10px 16px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text); font-size: 0.9rem;
+  }
+  .filter-input:focus { border-color: var(--color-green); outline: none; }
+  .filter-select {
+    padding: 10px 12px; background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text); font-size: 0.85rem;
+  }
+  .filter-select:focus { border-color: var(--color-green); outline: none; }
+  .filter-select option { background: var(--color-bg-card); color: var(--color-text); }
+
+  /* Bulk bar */
+  .bulk-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 16px; background: rgba(34, 197, 94, 0.06); border: 1px solid rgba(34, 197, 94, 0.15);
+    border-radius: var(--radius-md); margin-bottom: 16px;
+    animation: slideDown 0.2s ease;
+  }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+  .bulk-count { font-size: 0.85rem; font-weight: 600; color: var(--color-green); white-space: nowrap; }
+  .bulk-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* Buttons */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 0.8rem; font-weight: 600; border-radius: var(--radius-sm); transition: var(--transition); border: none; cursor: pointer; }
+  .btn i, .btn svg { width: 14px; height: 14px; }
+  .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+  .btn-primary { background: linear-gradient(135deg, var(--color-green-dark), var(--color-green)); color: #fff; }
+  .btn-outline { background: var(--color-bg-card); border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+  .btn-outline:hover { border-color: var(--color-green); color: var(--color-green); }
+  .btn-outline-danger { background: var(--color-bg-card); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--color-red); }
+  .btn-outline-danger:hover { background: rgba(239, 68, 68, 0.1); }
+  .btn-ghost { background: none; color: var(--color-text-muted); border: 1px solid var(--color-border); }
+
+  /* Panel & Table */
+  .panel { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; }
+  .table-wrapper { overflow-x: auto; }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th { background: var(--color-bg-elevated); padding: 12px 14px; text-align: left; font-size: 0.75rem; font-weight: 600; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--color-border); white-space: nowrap; }
+  .data-table td { padding: 10px 14px; font-size: 0.85rem; border-bottom: 1px solid var(--color-border); color: var(--color-text-muted); vertical-align: middle; }
+  .data-table tr:hover td { background: rgba(34, 197, 94, 0.03); }
+  .empty-state { text-align: center !important; color: var(--color-text-dim) !important; padding: 40px 16px !important; }
+
+  .th-check, .td-check { width: 40px; text-align: center; }
+  .th-thumb, .td-thumb { width: 60px; }
+  .thumb-img { width: 50px; height: 35px; object-fit: cover; border-radius: var(--radius-sm); }
+  .thumb-placeholder { width: 50px; height: 35px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--color-text-dim); }
+  .thumb-placeholder i, .thumb-placeholder svg { width: 16px; height: 16px; }
+
+  .article-title { font-weight: 600; color: var(--color-text); font-size: 0.85rem; max-width: 280px; }
+  .article-subtitle { font-size: 0.75rem; color: var(--color-green); margin-top: 2px; max-width: 280px; }
+
+  .td-source, .td-cat, .td-lang, .td-date { white-space: nowrap; font-size: 0.8rem; }
+
+  /* Badges */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-right: 4px; white-space: nowrap; }
+  .badge-green { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .badge-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .badge-purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+  .badge-gray { background: rgba(156, 163, 175, 0.12); color: #9ca3af; }
+
+  /* Actions */
+  .td-actions { white-space: nowrap; }
+  .action-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: var(--radius-sm); background: none; color: var(--color-text-dim); transition: var(--transition); border: 1px solid transparent; cursor: pointer; }
+  .action-btn:hover { background: rgba(34, 197, 94, 0.1); color: var(--color-green); border-color: rgba(34, 197, 94, 0.2); }
+  .action-btn.danger:hover { background: rgba(239, 68, 68, 0.1); color: var(--color-red); border-color: rgba(239, 68, 68, 0.2); }
+  .action-btn i, .action-btn svg { width: 14px; height: 14px; }
+
+  /* Pagination */
+  .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 8px; }
+  .pagination :global(.page-btn) { padding: 8px 14px; background: var(--color-bg-card); border: 1px solid var(--color-border); color: var(--color-text-muted); font-size: 0.85rem; border-radius: var(--radius-sm); cursor: pointer; transition: var(--transition); }
+  .pagination :global(.page-btn.active) { background: var(--color-green); color: #000; border-color: var(--color-green); font-weight: 700; }
+
+  /* Modal */
+  .modal-overlay { display: flex; position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-card { background: var(--color-bg-card); border: 1px solid var(--color-border-strong); border-radius: var(--radius-lg); padding: 28px; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+  .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 16px; }
+  .modal-field { margin-bottom: 20px; }
+  .modal-field label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted); margin-bottom: 6px; }
+  .form-select { padding: 10px 12px; background: var(--color-bg-elevated); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); color: var(--color-text); font-size: 0.9rem; width: 100%; }
+  .form-select option { background: var(--color-bg-card); color: var(--color-text); }
+  .modal-actions { display: flex; gap: 10px; }
+
+  /* Toast */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 99999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; color: #fff; opacity: 0; transform: translateX(20px); transition: all 0.3s ease; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 10px 0 40px rgba(0,0,0,0.5); }
+    .mobile-topbar { display: flex; }
+    .main-content { margin-left: 0; padding: 16px; }
+    .filter-group { flex-direction: column; }
+    .filter-select { width: 100%; }
+    .bulk-bar { flex-direction: column; align-items: flex-start; }
+    .bulk-actions { width: 100%; }
+  }
+</style>

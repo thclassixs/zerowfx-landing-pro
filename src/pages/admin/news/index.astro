@@ -1,0 +1,795 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="News Dashboard - Zerowfx Admin" description="News admin dashboard" noindex={true}>
+  <div class="admin-news-wrapper">
+    <!-- Auth Gate -->
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading">
+        <div class="spinner"></div>
+        <p>Checking authentication...</p>
+      </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">News Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/admin/news" class="nav-item active">
+            <i data-lucide="newspaper" class="nav-icon"></i>
+            <span>News Pipeline</span>
+          </a>
+          <a href="/admin/news/articles" class="nav-item">
+            <i data-lucide="file-text" class="nav-icon"></i>
+            <span>Articles</span>
+          </a>
+          <a href="/admin/news/settings" class="nav-item">
+            <i data-lucide="settings" class="nav-icon"></i>
+            <span>Settings</span>
+          </a>
+          <a href="/admin/news/queue" class="nav-item">
+            <i data-lucide="list-ordered" class="nav-icon"></i>
+            <span>Queue</span>
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn">
+            <i data-lucide="log-out" class="nav-icon"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Mobile top bar -->
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i data-lucide="menu"></i>
+        </button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> News</span>
+        <button class="mobile-logout" id="mobileLogoutBtn">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <main class="main-content">
+        <div class="content-header">
+          <h1 class="page-title">📊 News Dashboard</h1>
+          <p class="page-subtitle">Overview of your news pipeline</p>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card">
+            <div class="stat-icon-wrap blue"><i data-lucide="database"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTotal">—</span>
+              <span class="stat-label">Total Articles</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap green"><i data-lucide="languages"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTranslated">—</span>
+              <span class="stat-label">Translated</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap purple"><i data-lucide="pen-line"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statRewritten">—</span>
+              <span class="stat-label">Rewritten</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap orange"><i data-lucide="calendar-days"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statToday">—</span>
+              <span class="stat-label">Today</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon-wrap red"><i data-lucide="cpu"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statApiUsage">—</span>
+              <span class="stat-label">API Calls Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pipeline Status -->
+        <div class="panel pipeline-panel">
+          <h2 class="panel-title"><i data-lucide="activity" class="panel-icon"></i> Pipeline Status</h2>
+          <div class="pipeline-grid">
+            <div class="pipeline-item">
+              <span class="pipeline-label">Status</span>
+              <span class="pipeline-value" id="pipelineStatus">
+                <span class="status-badge idle">Idle</span>
+              </span>
+            </div>
+            <div class="pipeline-item">
+              <span class="pipeline-label">Last Run</span>
+              <span class="pipeline-value" id="pipelineLastRun">Never</span>
+            </div>
+            <div class="pipeline-item">
+              <span class="pipeline-label">Next Run</span>
+              <span class="pipeline-value" id="pipelineNextRun">—</span>
+            </div>
+            <div class="pipeline-item">
+              <span class="pipeline-label">Auto-Fetch</span>
+              <span class="pipeline-value" id="pipelineAutoFetch">
+                <span class="status-badge off">OFF</span>
+              </span>
+            </div>
+          </div>
+          <div class="pipeline-actions">
+            <button class="btn btn-primary" id="runPipelineBtn">
+              <i data-lucide="play"></i> Run Pipeline Now
+            </button>
+            <button class="btn btn-danger" id="stopPipelineBtn">
+              <i data-lucide="square"></i> Stop Auto-Fetch
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Logs -->
+        <div class="panel">
+          <h2 class="panel-title"><i data-lucide="scroll-text" class="panel-icon"></i> Recent Pipeline Logs</h2>
+          <div class="table-wrapper">
+            <table class="data-table" id="logsTable">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Action</th>
+                  <th>Status</th>
+                  <th>Fetched</th>
+                  <th>Translated</th>
+                  <th>Rewritten</th>
+                  <th>Duration</th>
+                </tr>
+              </thead>
+              <tbody id="logsBody">
+                <tr><td colspan="7" class="empty-state">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+
+  // ── Auth ──
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        loadDashboard();
+      } else {
+        window.location.href = '/admin';
+      }
+    } catch {
+      window.location.href = '/admin';
+    }
+  }
+
+  // ── Logout ──
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+
+  // ── Mobile menu ──
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  // ── Toast ──
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // ── Load Dashboard ──
+  async function loadDashboard() {
+    await Promise.all([loadStats(), loadPipelineStatus(), loadLogs()]);
+  }
+
+  async function loadStats() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/stats`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      (document.getElementById('statTotal') as HTMLElement).textContent = String(data.total);
+      (document.getElementById('statTranslated') as HTMLElement).textContent = String(data.translated);
+      (document.getElementById('statRewritten') as HTMLElement).textContent = String(data.rewritten);
+      (document.getElementById('statToday') as HTMLElement).textContent = String(data.today);
+      (document.getElementById('statApiUsage') as HTMLElement).textContent = String(data.apiUsageToday);
+    } catch (err) {
+      console.error('Load stats error:', err);
+    }
+  }
+
+  async function loadPipelineStatus() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/pipeline/status`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const statusEl = document.getElementById('pipelineStatus');
+      if (statusEl) {
+        if (data.running) {
+          statusEl.innerHTML = '<span class="status-badge running">Running</span>';
+        } else if (data.lastStatus === 'error') {
+          statusEl.innerHTML = '<span class="status-badge error">Error</span>';
+        } else {
+          statusEl.innerHTML = '<span class="status-badge idle">Idle</span>';
+        }
+      }
+
+      const lastRunEl = document.getElementById('pipelineLastRun');
+      if (lastRunEl) lastRunEl.textContent = data.lastRun ? new Date(data.lastRun).toLocaleString() : 'Never';
+
+      const nextRunEl = document.getElementById('pipelineNextRun');
+      if (nextRunEl) nextRunEl.textContent = data.nextRun ? new Date(data.nextRun).toLocaleString() : '—';
+
+      const autoEl = document.getElementById('pipelineAutoFetch');
+      if (autoEl) {
+        autoEl.innerHTML = data.autoFetchEnabled
+          ? '<span class="status-badge on">ON</span>'
+          : '<span class="status-badge off">OFF</span>';
+      }
+    } catch (err) {
+      console.error('Load pipeline status error:', err);
+    }
+  }
+
+  async function loadLogs() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/queue`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const tbody = document.getElementById('logsBody');
+      if (!tbody) return;
+
+      if (!data.history?.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No pipeline logs yet</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.history.slice(0, 20).map((log: any) => `
+        <tr>
+          <td>${new Date(log.created_at).toLocaleString()}</td>
+          <td>${log.action}</td>
+          <td><span class="status-badge ${log.status}">${log.status}</span></td>
+          <td>${log.articles_fetched || 0}</td>
+          <td>${log.articles_translated || 0}</td>
+          <td>${log.articles_rewritten || 0}</td>
+          <td>${log.duration_ms ? (log.duration_ms / 1000).toFixed(1) + 's' : '—'}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      console.error('Load logs error:', err);
+    }
+  }
+
+  // ── Pipeline Actions ──
+  document.getElementById('runPipelineBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('runPipelineBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Starting...';
+    try {
+      const res = await fetch(`${API}/api/admin/news/pipeline/run`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        showToast('Pipeline started! Fetching articles...', 'success');
+        setTimeout(loadDashboard, 3000);
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed to start pipeline', 'error');
+      }
+    } catch { showToast('Connection error', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="play"></i> Run Pipeline Now';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  document.getElementById('stopPipelineBtn')?.addEventListener('click', async () => {
+    try {
+      await fetch(`${API}/api/admin/news/pipeline/stop`, { method: 'POST', credentials: 'include' });
+      showToast('Auto-fetch stopped', 'info');
+      loadPipelineStatus();
+    } catch { showToast('Connection error', 'error'); }
+  });
+
+  // ── Init ──
+  checkAuth();
+
+  // Refresh every 30s
+  setInterval(loadDashboard, 30000);
+</script>
+
+<style>
+  /* ================================================
+     ADMIN NEWS — SHARED LAYOUT STYLES
+     ================================================ */
+  .admin-news-wrapper {
+    min-height: 100vh;
+    background: var(--color-bg);
+  }
+
+  /* Auth Gate */
+  .auth-gate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
+  .auth-loading {
+    text-align: center;
+    color: var(--color-text-dim);
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--color-border-strong);
+    border-top-color: var(--color-green);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Dashboard layout */
+  .admin-dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    width: 240px;
+    background: var(--color-bg-card);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+  }
+  .sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .sidebar-logo {
+    font-size: 1.3rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    display: block;
+  }
+  .accent { color: var(--color-green); }
+  .sidebar-sub {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+  .sidebar-nav {
+    flex: 1;
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+  }
+  .nav-item:hover {
+    background: rgba(34, 197, 94, 0.06);
+    color: var(--color-text);
+  }
+  .nav-item.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-green);
+    font-weight: 600;
+  }
+  .nav-icon {
+    width: 18px; height: 18px;
+    flex-shrink: 0;
+  }
+  .sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sidebar-user {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+  }
+  .sidebar-logout {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--color-red);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sidebar-logout:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  /* Mobile */
+  .mobile-topbar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--color-bg-card);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 90;
+  }
+  .mobile-menu-btn, .mobile-logout {
+    background: none;
+    color: var(--color-text-muted);
+    padding: 8px;
+    border-radius: var(--radius-sm);
+  }
+  .mobile-logo {
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 1.1rem;
+  }
+
+  /* Main Content */
+  .main-content {
+    flex: 1;
+    margin-left: 240px;
+    padding: 32px;
+    max-width: 1200px;
+  }
+  .content-header {
+    margin-bottom: 28px;
+  }
+  .page-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .page-subtitle {
+    color: var(--color-text-dim);
+    font-size: 0.9rem;
+  }
+
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: var(--transition);
+  }
+  .stat-card:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-2px);
+  }
+  .stat-icon-wrap {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon-wrap i, .stat-icon-wrap svg {
+    width: 20px; height: 20px;
+  }
+  .stat-icon-wrap.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .stat-icon-wrap.green { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .stat-icon-wrap.purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+  .stat-icon-wrap.orange { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+  .stat-icon-wrap.red { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  .stat-value {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--color-text);
+  }
+  .stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+
+  /* Panel */
+  .panel {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+  }
+  .panel-icon {
+    width: 18px; height: 18px;
+    color: var(--color-green);
+  }
+
+  /* Pipeline */
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .pipeline-item {
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 16px;
+  }
+  .pipeline-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .pipeline-value {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-muted);
+  }
+  .pipeline-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    transition: var(--transition);
+    border: none;
+    cursor: pointer;
+  }
+  .btn i, .btn svg { width: 16px; height: 16px; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+  }
+  .btn-primary:hover {
+    box-shadow: var(--shadow-glow-strong);
+    transform: translateY(-1px);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: var(--color-red);
+  }
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+
+  /* Status badges */
+  .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .status-badge.idle { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+  .status-badge.running { background: rgba(34, 197, 94, 0.15); color: #22c55e; animation: pulse-badge 1.5s infinite; }
+  .status-badge.success { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .status-badge.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  .status-badge.on { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .status-badge.off { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+  @keyframes pulse-badge {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* Table */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .data-table th {
+    background: var(--color-bg-elevated);
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .data-table tr:hover td {
+    background: rgba(34, 197, 94, 0.03);
+  }
+  .empty-state {
+    text-align: center !important;
+    color: var(--color-text-dim) !important;
+    padding: 40px 16px !important;
+  }
+
+  /* Toast */
+  .toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .toast {
+    padding: 12px 20px;
+    border-radius: var(--radius-md);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #fff;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s ease;
+    max-width: 360px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+
+  /* Spin animation */
+  .spin { animation: spin 1s linear infinite; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .pipeline-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+      box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5);
+    }
+    .mobile-topbar {
+      display: flex;
+    }
+    .main-content {
+      margin-left: 0;
+      padding: 20px 16px;
+    }
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .pipeline-grid {
+      grid-template-columns: 1fr;
+    }
+    .pipeline-actions {
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

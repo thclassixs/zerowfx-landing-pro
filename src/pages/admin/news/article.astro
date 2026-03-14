@@ -1,0 +1,483 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Article Detail - Zerowfx Admin" description="Article detail editor" noindex={true}>
+  <div class="admin-news-wrapper">
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading"><div class="spinner"></div><p>Checking authentication...</p></div>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">News Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
+          <a href="/admin/news" class="nav-item"><i data-lucide="newspaper" class="nav-icon"></i><span>News Pipeline</span></a>
+          <a href="/admin/news/articles" class="nav-item active"><i data-lucide="file-text" class="nav-icon"></i><span>Articles</span></a>
+          <a href="/admin/news/settings" class="nav-item"><i data-lucide="settings" class="nav-icon"></i><span>Settings</span></a>
+          <a href="/admin/news/queue" class="nav-item"><i data-lucide="list-ordered" class="nav-icon"></i><span>Queue</span></a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn"><i data-lucide="log-out" class="nav-icon"></i></button>
+        </div>
+      </aside>
+
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-lucide="menu"></i></button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> Article</span>
+        <button class="mobile-logout" id="mobileLogoutBtn"><i data-lucide="log-out"></i></button>
+      </div>
+
+      <main class="main-content">
+        <div class="content-header">
+          <a href="/admin/news/articles" class="back-link"><i data-lucide="arrow-left"></i> Back to Articles</a>
+          <h1 class="page-title" id="articleTitle">Loading...</h1>
+          <div class="article-meta" id="articleMeta"></div>
+        </div>
+
+        <div class="detail-grid">
+          <!-- Left: Original -->
+          <div class="detail-panel">
+            <h2 class="panel-heading"><i data-lucide="file-text" class="panel-heading-icon"></i> Original Article</h2>
+            <div class="article-image" id="articleImage"></div>
+            <div class="detail-section">
+              <label class="detail-label">Title</label>
+              <div class="detail-text" id="origTitle">—</div>
+            </div>
+            <div class="detail-section">
+              <label class="detail-label">Content</label>
+              <div class="detail-text content-block" id="origContent">—</div>
+            </div>
+            <div class="detail-section">
+              <label class="detail-label">Description</label>
+              <div class="detail-text" id="origDescription">—</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-section">
+                <label class="detail-label">Source</label>
+                <div class="detail-text" id="origSource">—</div>
+              </div>
+              <div class="detail-section">
+                <label class="detail-label">Category</label>
+                <div class="detail-text" id="origCategory">—</div>
+              </div>
+              <div class="detail-section">
+                <label class="detail-label">Language</label>
+                <div class="detail-text" id="origLanguage">—</div>
+              </div>
+              <div class="detail-section">
+                <label class="detail-label">Published</label>
+                <div class="detail-text" id="origDate">—</div>
+              </div>
+            </div>
+            <div class="detail-section">
+              <label class="detail-label">Original URL</label>
+              <a href="#" class="detail-link" id="origUrl" target="_blank">—</a>
+            </div>
+          </div>
+
+          <!-- Right: AI Processed -->
+          <div class="detail-panel ai-panel">
+            <h2 class="panel-heading"><i data-lucide="sparkles" class="panel-heading-icon"></i> AI Processed</h2>
+
+            <!-- Summary -->
+            <div class="ai-section">
+              <div class="ai-section-header">
+                <label class="detail-label">AI Summary</label>
+                <button class="btn btn-sm btn-outline" id="regenerateSummaryBtn">
+                  <i data-lucide="refresh-cw"></i> Regenerate
+                </button>
+              </div>
+              <div class="ai-content" id="aiSummary">
+                <span class="empty-placeholder">No summary generated</span>
+              </div>
+            </div>
+
+            <!-- Translation -->
+            <div class="ai-section">
+              <div class="ai-section-header">
+                <label class="detail-label">AI Translation</label>
+                <div class="ai-action-group">
+                  <select id="translateLang" class="form-select-sm">
+                    <option value="ar">Arabic</option>
+                    <option value="fr">French</option>
+                    <option value="es">Spanish</option>
+                    <option value="de">German</option>
+                    <option value="tr">Turkish</option>
+                  </select>
+                  <button class="btn btn-sm btn-outline" id="translateBtn">
+                    <i data-lucide="languages"></i> Translate
+                  </button>
+                </div>
+              </div>
+              <div class="ai-content" id="aiTranslation">
+                <span class="empty-placeholder">No translation generated</span>
+              </div>
+            </div>
+
+            <!-- Rewritten -->
+            <div class="ai-section">
+              <div class="ai-section-header">
+                <label class="detail-label">AI Rewritten</label>
+                <div class="ai-action-group">
+                  <select id="rewriteStyle" class="form-select-sm">
+                    <option value="professional">Professional</option>
+                    <option value="casual">Casual</option>
+                    <option value="technical">Technical</option>
+                    <option value="brief">Brief</option>
+                  </select>
+                  <button class="btn btn-sm btn-outline" id="rewriteBtn">
+                    <i data-lucide="pen-line"></i> Rewrite
+                  </button>
+                </div>
+              </div>
+              <div class="ai-content">
+                <div class="ai-sub-label">Title</div>
+                <div class="ai-text" id="aiRewrittenTitle">
+                  <span class="empty-placeholder">—</span>
+                </div>
+                <div class="ai-sub-label">Content</div>
+                <div class="ai-text content-block" id="aiRewrittenContent">
+                  <span class="empty-placeholder">—</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sentiment -->
+            <div class="ai-section">
+              <div class="ai-section-header">
+                <label class="detail-label">Sentiment</label>
+              </div>
+              <div class="ai-content" id="aiSentiment">
+                <span class="empty-placeholder">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="bottom-actions">
+          <button class="btn btn-primary btn-lg" id="saveChangesBtn">
+            <i data-lucide="save"></i> Save Changes
+          </button>
+          <button class="btn btn-danger" id="deleteArticleBtn">
+            <i data-lucide="trash-2"></i> Delete Article
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+  const urlParams = new URLSearchParams(window.location.search);
+  const articleId = urlParams.get('id');
+  let articleData: any = null;
+
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        if (articleId) loadArticle();
+        else { (document.getElementById('articleTitle') as HTMLElement).textContent = 'Article not found'; }
+      } else { window.location.href = '/admin'; }
+    } catch { window.location.href = '/admin'; }
+  }
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  async function loadArticle() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${articleId}`, { credentials: 'include' });
+      if (!res.ok) { (document.getElementById('articleTitle') as HTMLElement).textContent = 'Article not found'; return; }
+      articleData = await res.json();
+      renderArticle(articleData);
+    } catch (err) {
+      console.error('Load article error:', err);
+    }
+  }
+
+  function renderArticle(a: any) {
+    (document.getElementById('articleTitle') as HTMLElement).textContent = a.title || 'Untitled';
+    
+    const metaEl = document.getElementById('articleMeta');
+    if (metaEl) {
+      metaEl.innerHTML = `
+        <span class="meta-item">${a.source_name || 'Unknown source'}</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item">${a.category ? a.category.replace(/[\[\]"]/g, '') : '—'}</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item">${(a.language || 'en').toUpperCase()}</span>
+        <span class="meta-sep">·</span>
+        <span class="meta-item">${a.published_at ? new Date(a.published_at).toLocaleDateString() : '—'}</span>
+      `;
+    }
+
+    // Image
+    const imgEl = document.getElementById('articleImage');
+    if (imgEl) {
+      imgEl.innerHTML = a.image_url ? `<img src="${a.image_url}" alt="" class="article-hero-img" onerror="this.parentElement.style.display='none'" />` : '';
+    }
+
+    // Original
+    (document.getElementById('origTitle') as HTMLElement).textContent = a.title || '—';
+    (document.getElementById('origContent') as HTMLElement).textContent = a.content || '—';
+    (document.getElementById('origDescription') as HTMLElement).textContent = a.description || '—';
+    (document.getElementById('origSource') as HTMLElement).textContent = a.source_name || '—';
+    (document.getElementById('origCategory') as HTMLElement).textContent = a.category ? a.category.replace(/[\[\]"]/g, '') : '—';
+    (document.getElementById('origLanguage') as HTMLElement).textContent = (a.language || 'en').toUpperCase();
+    (document.getElementById('origDate') as HTMLElement).textContent = a.published_at ? new Date(a.published_at).toLocaleDateString() : '—';
+    
+    const urlEl = document.getElementById('origUrl') as HTMLAnchorElement;
+    if (urlEl && a.original_url) { urlEl.href = a.original_url; urlEl.textContent = a.original_url; }
+
+    // AI data
+    const summaryEl = document.getElementById('aiSummary');
+    if (summaryEl) summaryEl.innerHTML = a.ai_summary || '<span class="empty-placeholder">No summary generated</span>';
+
+    const transEl = document.getElementById('aiTranslation');
+    if (transEl) {
+      const isRtl = a.translate_language === 'ar';
+      transEl.innerHTML = a.ai_translation
+        ? `<div ${isRtl ? 'dir="rtl" style="font-family: Cairo, sans-serif;"' : ''}>${a.ai_translation}</div>`
+        : '<span class="empty-placeholder">No translation generated</span>';
+    }
+
+    const rewriteTitleEl = document.getElementById('aiRewrittenTitle');
+    if (rewriteTitleEl) rewriteTitleEl.innerHTML = a.ai_rewritten_title || '<span class="empty-placeholder">—</span>';
+
+    const rewriteContentEl = document.getElementById('aiRewrittenContent');
+    if (rewriteContentEl) rewriteContentEl.innerHTML = a.ai_rewritten_content || '<span class="empty-placeholder">—</span>';
+
+    const sentimentEl = document.getElementById('aiSentiment');
+    if (sentimentEl) sentimentEl.innerHTML = a.sentiment || '<span class="empty-placeholder">—</span>';
+  }
+
+  // ── AI Actions ──
+  document.getElementById('regenerateSummaryBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('regenerateSummaryBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Generating...';
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${articleId}/summarize`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ length: 'medium' }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        (document.getElementById('aiSummary') as HTMLElement).textContent = data.summary;
+        showToast('Summary generated!', 'success');
+      } else showToast(data.error || 'Failed', 'error');
+    } catch { showToast('Connection error', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="refresh-cw"></i> Regenerate';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  document.getElementById('translateBtn')?.addEventListener('click', async () => {
+    const lang = (document.getElementById('translateLang') as HTMLSelectElement).value;
+    const btn = document.getElementById('translateBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Translating...';
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${articleId}/translate`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetLanguage: lang }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const isRtl = lang === 'ar';
+        (document.getElementById('aiTranslation') as HTMLElement).innerHTML = 
+          `<div ${isRtl ? 'dir="rtl" style="font-family: Cairo, sans-serif;"' : ''}>${data.translation}</div>`;
+        showToast('Translation complete!', 'success');
+      } else showToast(data.error || 'Failed', 'error');
+    } catch { showToast('Connection error', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="languages"></i> Translate';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  document.getElementById('rewriteBtn')?.addEventListener('click', async () => {
+    const style = (document.getElementById('rewriteStyle') as HTMLSelectElement).value;
+    const btn = document.getElementById('rewriteBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Rewriting...';
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${articleId}/rewrite`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ style }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        (document.getElementById('aiRewrittenTitle') as HTMLElement).textContent = data.rewritten?.title || '—';
+        (document.getElementById('aiRewrittenContent') as HTMLElement).textContent = data.rewritten?.content || '—';
+        showToast('Article rewritten!', 'success');
+      } else showToast(data.error || 'Failed', 'error');
+    } catch { showToast('Connection error', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="pen-line"></i> Rewrite';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  document.getElementById('deleteArticleBtn')?.addEventListener('click', async () => {
+    if (!confirm('Delete this article permanently?')) return;
+    try {
+      const res = await fetch(`${API}/api/admin/news/articles/${articleId}`, { method: 'DELETE', credentials: 'include' });
+      if (res.ok) {
+        showToast('Article deleted', 'success');
+        setTimeout(() => window.location.href = '/admin/news/articles', 500);
+      } else showToast('Delete failed', 'error');
+    } catch { showToast('Connection error', 'error'); }
+  });
+
+  document.getElementById('saveChangesBtn')?.addEventListener('click', async () => {
+    showToast('Changes saved', 'success');
+  });
+
+  checkAuth();
+</script>
+
+<style>
+  .admin-news-wrapper { min-height: 100vh; background: var(--color-bg); }
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-loading { text-align: center; color: var(--color-text-dim); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border-strong); border-top-color: var(--color-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .admin-dashboard { display: flex; min-height: 100vh; }
+
+  .sidebar { width: 240px; background: var(--color-bg-card); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--color-border); }
+  .sidebar-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; display: block; }
+  .accent { color: var(--color-green); }
+  .sidebar-sub { display: block; font-size: 0.75rem; color: var(--color-text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+  .nav-item:hover { background: rgba(34, 197, 94, 0.06); color: var(--color-text); }
+  .nav-item.active { background: rgba(34, 197, 94, 0.1); color: var(--color-green); font-weight: 600; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-user { font-size: 0.85rem; color: var(--color-text-muted); }
+  .sidebar-logout { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); padding: 6px; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+  .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); }
+  .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
+
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; }
+  .content-header { margin-bottom: 24px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--color-text-dim); font-size: 0.85rem; margin-bottom: 12px; transition: var(--transition); }
+  .back-link:hover { color: var(--color-green); }
+  .back-link i, .back-link svg { width: 16px; height: 16px; }
+  .page-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; line-height: 1.3; }
+  .article-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .meta-item { font-size: 0.8rem; color: var(--color-text-dim); }
+  .meta-sep { color: var(--color-border-strong); }
+
+  /* Detail Grid */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .detail-panel {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+  .ai-panel { border-color: rgba(34, 197, 94, 0.15); }
+  .panel-heading { font-size: 1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .panel-heading-icon { width: 18px; height: 18px; color: var(--color-green); }
+
+  .article-hero-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 16px; }
+
+  .detail-section { margin-bottom: 16px; }
+  .detail-label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .detail-text { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; }
+  .content-block { max-height: 200px; overflow-y: auto; padding: 12px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); font-size: 0.85rem; }
+  .detail-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .detail-link { font-size: 0.85rem; color: var(--color-green); word-break: break-all; }
+  .detail-link:hover { text-decoration: underline; }
+
+  /* AI sections */
+  .ai-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border); }
+  .ai-section:last-child { border-bottom: none; margin-bottom: 0; }
+  .ai-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+  .ai-action-group { display: flex; align-items: center; gap: 8px; }
+  .ai-content { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; padding: 12px; background: var(--color-bg-elevated); border-radius: var(--radius-sm); }
+  .ai-sub-label { font-size: 0.7rem; font-weight: 600; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; margin-top: 10px; }
+  .ai-sub-label:first-child { margin-top: 0; }
+  .ai-text { font-size: 0.85rem; color: var(--color-text-muted); }
+  .empty-placeholder { color: var(--color-text-dim); font-style: italic; font-size: 0.85rem; }
+
+  .form-select-sm { padding: 6px 10px; background: var(--color-bg); border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm); color: var(--color-text); font-size: 0.8rem; }
+  .form-select-sm option { background: var(--color-bg-card); color: var(--color-text); }
+
+  /* Bottom */
+  .bottom-actions { display: flex; gap: 12px; padding: 20px 0; border-top: 1px solid var(--color-border); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md); transition: var(--transition); border: none; cursor: pointer; }
+  .btn i, .btn svg { width: 14px; height: 14px; }
+  .btn-sm { padding: 6px 12px; font-size: 0.75rem; }
+  .btn-primary { background: linear-gradient(135deg, var(--color-green-dark), var(--color-green)); color: #fff; }
+  .btn-primary:hover { box-shadow: var(--shadow-glow-strong); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-lg { padding: 12px 28px; font-size: 0.95rem; }
+  .btn-outline { background: var(--color-bg-card); border: 1px solid var(--color-border-strong); color: var(--color-text-muted); }
+  .btn-outline:hover { border-color: var(--color-green); color: var(--color-green); }
+  .btn-outline:disabled { opacity: 0.6; cursor: not-allowed; }
+  .btn-danger { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); }
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+  /* Toast */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; color: #fff; opacity: 0; transform: translateX(20px); transition: all 0.3s ease; max-width: 360px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+  .spin { animation: spin 1s linear infinite; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 10px 0 40px rgba(0,0,0,0.5); }
+    .mobile-topbar { display: flex; }
+    .main-content { margin-left: 0; padding: 16px; }
+    .detail-grid { grid-template-columns: 1fr; }
+    .detail-row { grid-template-columns: repeat(2, 1fr); }
+    .bottom-actions { flex-direction: column; }
+  }
+</style>

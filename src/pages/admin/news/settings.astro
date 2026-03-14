@@ -1,0 +1,491 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Pipeline Settings - Zerowfx Admin" description="News pipeline settings" noindex={true}>
+  <div class="admin-news-wrapper">
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading"><div class="spinner"></div><p>Checking authentication...</p></div>
+    </div>
+
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">News Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item"><i data-lucide="layout-dashboard" class="nav-icon"></i><span>Dashboard</span></a>
+          <a href="/admin/news" class="nav-item"><i data-lucide="newspaper" class="nav-icon"></i><span>News Pipeline</span></a>
+          <a href="/admin/news/articles" class="nav-item"><i data-lucide="file-text" class="nav-icon"></i><span>Articles</span></a>
+          <a href="/admin/news/settings" class="nav-item active"><i data-lucide="settings" class="nav-icon"></i><span>Settings</span></a>
+          <a href="/admin/news/queue" class="nav-item"><i data-lucide="list-ordered" class="nav-icon"></i><span>Queue</span></a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn"><i data-lucide="log-out" class="nav-icon"></i></button>
+        </div>
+      </aside>
+
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-lucide="menu"></i></button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> Settings</span>
+        <button class="mobile-logout" id="mobileLogoutBtn"><i data-lucide="log-out"></i></button>
+      </div>
+
+      <main class="main-content">
+        <div class="content-header">
+          <h1 class="page-title">⚙️ Pipeline Settings</h1>
+          <p class="page-subtitle">Configure auto-fetch, translation, and rewriting behavior</p>
+        </div>
+
+        <!-- Auto-Fetch Settings -->
+        <div class="panel">
+          <h2 class="panel-title"><i data-lucide="rss" class="panel-icon"></i> Auto-Fetch Settings</h2>
+          <div class="settings-grid">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label">Auto-Fetch</label>
+                <p class="setting-desc">Automatically fetch news at set intervals</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="autoFetch" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="fetchInterval">Fetch Interval</label>
+              </div>
+              <select id="fetchInterval" class="form-select">
+                <option value="900000">Every 15 minutes</option>
+                <option value="1800000">Every 30 minutes</option>
+                <option value="3600000" selected>Every 1 hour</option>
+                <option value="7200000">Every 2 hours</option>
+                <option value="21600000">Every 6 hours</option>
+                <option value="43200000">Every 12 hours</option>
+                <option value="86400000">Every 24 hours</option>
+              </select>
+            </div>
+
+            <div class="setting-row full">
+              <div class="setting-info">
+                <label class="setting-label">Categories to Fetch</label>
+              </div>
+              <div class="checkbox-group" id="categoryGroup">
+                <label class="checkbox-item"><input type="checkbox" value="business" checked /><span>Business</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="technology" /><span>Technology</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="politics" /><span>Politics</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="crypto" /><span>Crypto</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="world" /><span>World</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="science" /><span>Science</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="sports" /><span>Sports</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="health" /><span>Health</span></label>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="fetchLanguage">Source Language</label>
+              </div>
+              <select id="fetchLanguage" class="form-select">
+                <option value="en" selected>English</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="de">German</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="maxArticles">Max Articles per Fetch</label>
+              </div>
+              <input type="number" id="maxArticles" class="form-input-sm" min="1" max="20" value="5" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto-Translate Settings -->
+        <div class="panel">
+          <h2 class="panel-title"><i data-lucide="languages" class="panel-icon"></i> Auto-Translate Settings</h2>
+          <div class="settings-grid">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label">Auto-Translate</label>
+                <p class="setting-desc">Automatically translate fetched articles</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="autoTranslate" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="setting-row full">
+              <div class="setting-info">
+                <label class="setting-label">Target Languages</label>
+              </div>
+              <div class="checkbox-group" id="langGroup">
+                <label class="checkbox-item"><input type="checkbox" value="ar" /><span>🇸🇦 Arabic</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="fr" /><span>🇫🇷 French</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="es" /><span>🇪🇸 Spanish</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="de" /><span>🇩🇪 German</span></label>
+                <label class="checkbox-item"><input type="checkbox" value="tr" /><span>🇹🇷 Turkish</span></label>
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="translateStyle">Translation Style</label>
+              </div>
+              <select id="translateStyle" class="form-select">
+                <option value="professional" selected>Professional</option>
+                <option value="casual">Casual</option>
+                <option value="technical">Technical</option>
+                <option value="brief">Brief</option>
+              </select>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label">Auto-Rewrite for SEO</label>
+                <p class="setting-desc">Automatically rewrite fetched articles for SEO</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="autoRewrite" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="rewriteStyle">Rewrite Style</label>
+              </div>
+              <select id="rewriteStyle" class="form-select">
+                <option value="professional" selected>Professional</option>
+                <option value="casual">Casual</option>
+                <option value="technical">Technical</option>
+                <option value="brief">Brief</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto-Summary Settings -->
+        <div class="panel">
+          <h2 class="panel-title"><i data-lucide="file-text" class="panel-icon"></i> Auto-Summary Settings</h2>
+          <div class="settings-grid">
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label">Auto-Summary</label>
+                <p class="setting-desc">Automatically generate summaries for fetched articles</p>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" id="autoSummary" />
+                <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              </label>
+            </div>
+
+            <div class="setting-row">
+              <div class="setting-info">
+                <label class="setting-label" for="summaryLength">Summary Length</label>
+              </div>
+              <select id="summaryLength" class="form-select">
+                <option value="short" selected>Short (2-3 sentences)</option>
+                <option value="medium">Medium (4-6 sentences)</option>
+                <option value="long">Long (2-3 paragraphs)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Save -->
+        <div class="save-bar">
+          <button class="btn btn-primary btn-lg" id="saveSettingsBtn">
+            <i data-lucide="save"></i> Save Settings
+          </button>
+          <span class="save-status" id="saveStatus"></span>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        loadSettings();
+      } else {
+        window.location.href = '/admin';
+      }
+    } catch { window.location.href = '/admin'; }
+  }
+
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  async function loadSettings() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/settings`, { credentials: 'include' });
+      if (!res.ok) return;
+      const settings = await res.json();
+
+      // Auto-fetch
+      (document.getElementById('autoFetch') as HTMLInputElement).checked = settings.auto_fetch === 'true';
+      if (settings.fetch_interval) (document.getElementById('fetchInterval') as HTMLSelectElement).value = settings.fetch_interval;
+      if (settings.fetch_language) (document.getElementById('fetchLanguage') as HTMLSelectElement).value = settings.fetch_language;
+      if (settings.max_articles_per_fetch) (document.getElementById('maxArticles') as HTMLInputElement).value = settings.max_articles_per_fetch;
+
+      // Categories
+      if (settings.fetch_categories) {
+        const cats = settings.fetch_categories.split(',');
+        document.querySelectorAll('#categoryGroup input[type="checkbox"]').forEach((cb: any) => {
+          cb.checked = cats.includes(cb.value);
+        });
+      }
+
+      // Auto-translate
+      (document.getElementById('autoTranslate') as HTMLInputElement).checked = settings.auto_translate === 'true';
+      if (settings.translate_style) (document.getElementById('translateStyle') as HTMLSelectElement).value = settings.translate_style;
+
+      // Target languages
+      if (settings.translate_languages) {
+        const langs = settings.translate_languages.split(',');
+        document.querySelectorAll('#langGroup input[type="checkbox"]').forEach((cb: any) => {
+          cb.checked = langs.includes(cb.value);
+        });
+      }
+
+      // Auto-rewrite
+      (document.getElementById('autoRewrite') as HTMLInputElement).checked = settings.auto_rewrite === 'true';
+      if (settings.rewrite_style) (document.getElementById('rewriteStyle') as HTMLSelectElement).value = settings.rewrite_style;
+
+      // Auto-summary
+      (document.getElementById('autoSummary') as HTMLInputElement).checked = settings.auto_summary === 'true';
+      if (settings.summary_length) (document.getElementById('summaryLength') as HTMLSelectElement).value = settings.summary_length;
+    } catch (err) {
+      console.error('Load settings error:', err);
+    }
+  }
+
+  document.getElementById('saveSettingsBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('saveSettingsBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Saving...';
+
+    // Gather categories
+    const categories: string[] = [];
+    document.querySelectorAll('#categoryGroup input[type="checkbox"]:checked').forEach((cb: any) => {
+      categories.push(cb.value);
+    });
+
+    // Gather target languages
+    const targetLangs: string[] = [];
+    document.querySelectorAll('#langGroup input[type="checkbox"]:checked').forEach((cb: any) => {
+      targetLangs.push(cb.value);
+    });
+
+    const settings = {
+      auto_fetch: String((document.getElementById('autoFetch') as HTMLInputElement).checked),
+      fetch_interval: (document.getElementById('fetchInterval') as HTMLSelectElement).value,
+      fetch_categories: categories.join(','),
+      fetch_language: (document.getElementById('fetchLanguage') as HTMLSelectElement).value,
+      max_articles_per_fetch: (document.getElementById('maxArticles') as HTMLInputElement).value,
+      auto_translate: String((document.getElementById('autoTranslate') as HTMLInputElement).checked),
+      translate_languages: targetLangs.join(','),
+      translate_style: (document.getElementById('translateStyle') as HTMLSelectElement).value,
+      auto_rewrite: String((document.getElementById('autoRewrite') as HTMLInputElement).checked),
+      rewrite_style: (document.getElementById('rewriteStyle') as HTMLSelectElement).value,
+      auto_summary: String((document.getElementById('autoSummary') as HTMLInputElement).checked),
+      summary_length: (document.getElementById('summaryLength') as HTMLSelectElement).value,
+    };
+
+    try {
+      const res = await fetch(`${API}/api/admin/news/settings`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings }),
+      });
+      if (res.ok) {
+        showToast('Settings saved successfully!', 'success');
+      } else {
+        showToast('Failed to save settings', 'error');
+      }
+    } catch { showToast('Connection error', 'error'); }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="save"></i> Save Settings';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  checkAuth();
+</script>
+
+<style>
+  .admin-news-wrapper { min-height: 100vh; background: var(--color-bg); }
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-loading { text-align: center; color: var(--color-text-dim); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border-strong); border-top-color: var(--color-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .admin-dashboard { display: flex; min-height: 100vh; }
+  .sidebar { width: 240px; background: var(--color-bg-card); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--color-border); }
+  .sidebar-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; display: block; }
+  .accent { color: var(--color-green); }
+  .sidebar-sub { display: block; font-size: 0.75rem; color: var(--color-text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+  .nav-item:hover { background: rgba(34, 197, 94, 0.06); color: var(--color-text); }
+  .nav-item.active { background: rgba(34, 197, 94, 0.1); color: var(--color-green); font-weight: 600; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-user { font-size: 0.85rem; color: var(--color-text-muted); }
+  .sidebar-logout { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); padding: 6px; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; justify-content: center; }
+  .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); }
+  .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; max-width: 900px; }
+  .content-header { margin-bottom: 28px; }
+  .page-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+  .page-subtitle { color: var(--color-text-dim); font-size: 0.9rem; }
+
+  /* Panel */
+  .panel { background: var(--color-bg-card); border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 24px; }
+  .panel-title { font-size: 1rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  .panel-icon { width: 18px; height: 18px; color: var(--color-green); }
+
+  /* Settings */
+  .settings-grid { display: flex; flex-direction: column; gap: 20px; }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; background: var(--color-bg-elevated); border-radius: var(--radius-md); }
+  .setting-row.full { flex-direction: column; align-items: flex-start; }
+  .setting-label { font-size: 0.9rem; font-weight: 600; color: var(--color-text); display: block; }
+  .setting-desc { font-size: 0.8rem; color: var(--color-text-dim); margin-top: 2px; }
+
+  /* Toggle */
+  .toggle { position: relative; cursor: pointer; }
+  .toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+  .toggle-track { display: block; width: 48px; height: 26px; background: var(--color-bg); border: 1px solid var(--color-border-strong); border-radius: 13px; transition: var(--transition); position: relative; }
+  .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: var(--color-text-dim); border-radius: 50%; transition: var(--transition); }
+  .toggle input:checked + .toggle-track { background: rgba(34, 197, 94, 0.2); border-color: var(--color-green); }
+  .toggle input:checked + .toggle-track .toggle-thumb { left: 24px; background: var(--color-green); }
+
+  /* Form elements */
+  .form-select {
+    padding: 8px 12px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 0.85rem;
+    min-width: 200px;
+  }
+  .form-select:focus { border-color: var(--color-green); outline: none; }
+  .form-select option { background: var(--color-bg-card); color: var(--color-text); }
+
+  .form-input-sm {
+    padding: 8px 12px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    font-size: 0.85rem;
+    width: 100px;
+    text-align: center;
+  }
+  .form-input-sm:focus { border-color: var(--color-green); outline: none; }
+
+  /* Checkboxes */
+  .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; width: 100%; }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    transition: var(--transition);
+  }
+  .checkbox-item:has(input:checked) {
+    border-color: var(--color-green);
+    background: rgba(34, 197, 94, 0.08);
+    color: var(--color-green);
+  }
+  .checkbox-item input { display: none; }
+
+  /* Save bar */
+  .save-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 0;
+    position: sticky;
+    bottom: 0;
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-border);
+    margin-top: 8px;
+  }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; font-size: 0.85rem; font-weight: 600; border-radius: var(--radius-md); transition: var(--transition); border: none; cursor: pointer; }
+  .btn i, .btn svg { width: 16px; height: 16px; }
+  .btn-primary { background: linear-gradient(135deg, var(--color-green-dark), var(--color-green)); color: #fff; }
+  .btn-primary:hover { box-shadow: var(--shadow-glow-strong); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-lg { padding: 12px 28px; font-size: 0.95rem; }
+  .save-status { font-size: 0.85rem; color: var(--color-green); }
+
+  /* Toast */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; color: #fff; opacity: 0; transform: translateX(20px); transition: all 0.3s ease; max-width: 360px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+  .spin { animation: spin 1s linear infinite; }
+
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5); }
+    .mobile-topbar { display: flex; }
+    .main-content { margin-left: 0; padding: 20px 16px; }
+    .setting-row { flex-direction: column; align-items: flex-start; }
+    .form-select { width: 100%; min-width: unset; }
+    .form-input-sm { width: 100%; }
+  }
+</style>

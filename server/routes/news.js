@@ -3,6 +3,40 @@ import db from '../database.js';
 
 const router = Router();
 
+// ── Slug helper ────────────────────────────────────────────
+function generateSlug(title) {
+    if (!title) return 'untitled-' + Date.now();
+    return title
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '')     // remove special chars
+        .replace(/\s+/g, '-')         // spaces → hyphens
+        .replace(/-+/g, '-')          // collapse multiple hyphens
+        .replace(/^-+|-+$/g, '')      // trim leading/trailing hyphens
+        .slice(0, 80)                 // max length
+        + '-' + Date.now().toString(36); // unique suffix
+}
+
+// ── Migration: add slug column if missing ──────────────────
+try {
+    const cols = db.prepare("PRAGMA table_info(news_articles)").all();
+    const hasSlug = cols.some(c => c.name === 'slug');
+    if (!hasSlug) {
+        // SQLite cannot add a UNIQUE column via ALTER TABLE — add plain column first
+        db.exec('ALTER TABLE news_articles ADD COLUMN slug TEXT');
+        db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_news_slug ON news_articles(slug)');
+        console.log('Migration: added slug column to news_articles');
+        // Generate slugs for existing articles
+        const articles = db.prepare('SELECT id, title FROM news_articles WHERE slug IS NULL').all();
+        const updateSlug = db.prepare('UPDATE news_articles SET slug = ? WHERE id = ?');
+        for (const a of articles) {
+            updateSlug.run(generateSlug(a.title), a.id);
+        }
+        if (articles.length) console.log(`Generated slugs for ${articles.length} existing articles`);
+    }
+} catch (e) {
+    console.log('Slug migration skipped:', e.message);
+}
+
 // ── In-memory cache ────────────────────────────────────────
 const cache = new Map();
 
@@ -75,6 +109,22 @@ async function callClaude(prompt, maxTokens = 1024) {
 
     const data = await res.json();
     return data.content?.[0]?.text || '';
+}
+
+// ── Helper: get best available article text (free plan has no content) ──
+function getArticleText(article) {
+    // Build the best available text — free plan only has title + description
+    let text = [article.title, article.description || ''].filter(Boolean).join('. ');
+
+    // Only use content if it actually exists and isn't a "paid plan" message
+    if (article.content &&
+        !article.content.includes('paid plan') &&
+        !article.content.includes('ONLY AVAILABLE') &&
+        article.content.length > 50) {
+        text = article.content;
+    }
+
+    return text;
 }
 
 // ============================================================
@@ -239,6 +289,15 @@ router.get('/saved', (req, res) => {
             `SELECT * FROM news_articles${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`
         ).all(...params, limit, offset);
 
+        // Auto-generate slugs for articles that don't have one
+        const updateSlug = db.prepare('UPDATE news_articles SET slug = ? WHERE id = ?');
+        for (const a of articles) {
+            if (!a.slug) {
+                a.slug = generateSlug(a.title);
+                updateSlug.run(a.slug, a.id);
+            }
+        }
+
         res.json({
             articles,
             pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
@@ -246,6 +305,23 @@ router.get('/saved', (req, res) => {
     } catch (err) {
         console.error('Saved news error:', err.message);
         res.status(500).json({ error: 'Failed to get saved articles' });
+    }
+});
+
+/**
+ * GET /api/news/article/:slug
+ * Public endpoint — get a single article by slug (for /news/[slug] pages)
+ */
+router.get('/article/:slug', (req, res) => {
+    try {
+        const article = db.prepare('SELECT * FROM news_articles WHERE slug = ?').get(req.params.slug);
+        if (!article) {
+            return res.status(404).json({ error: 'Article not found' });
+        }
+        res.json(article);
+    } catch (err) {
+        console.error('Get article by slug error:', err.message);
+        res.status(500).json({ error: 'Failed to get article' });
     }
 });
 
@@ -272,17 +348,21 @@ router.delete('/saved/:id', (req, res) => {
  */
 router.post('/ai/summarize', async (req, res) => {
     try {
-        const { title, content, length = 'short' } = req.body;
-        if (!content && !title) return res.status(400).json({ error: 'Content or title is required' });
+        const { title, content, description, length = 'short' } = req.body;
+        if (!title && !content && !description) return res.status(400).json({ error: 'Title, description, or content is required' });
 
         const instructions = {
-            short: 'Summarize in 2-3 sentences. Be concise.',
-            medium: 'Summarize in 4-6 sentences. Include key details.',
+            short: 'Write a clear and informative 2-3 sentence summary.',
+            medium: 'Write a clear and informative 4-6 sentence summary.',
             long: 'Provide a comprehensive summary in 2-3 paragraphs.',
         };
 
+        // Build text using the free-plan-safe approach
+        const textObj = { title: title || '', description: description || content || '' };
+        const articleText = getArticleText(textObj);
+
         const summary = await callClaude(
-            `You are a professional news editor. ${instructions[length] || instructions.short}\n\nTitle: ${title || 'N/A'}\nContent: ${content || 'N/A'}\n\nProvide ONLY the summary, no labels.`
+            `Based on the following news headline and brief description, ${instructions[length] || instructions.short} Do NOT say you cannot see the content or that it's unavailable. Work with what is provided.\n\nHeadline: ${title || 'N/A'}\nDescription: ${description || content || 'N/A'}\n\nProvide ONLY the summary, no labels.`
         );
 
         res.json({ summary, length });
@@ -298,15 +378,28 @@ router.post('/ai/summarize', async (req, res) => {
  */
 router.post('/ai/translate', async (req, res) => {
     try {
-        const { text, targetLanguage = 'ar', sourceLanguage = 'en' } = req.body;
-        if (!text) return res.status(400).json({ error: 'Text is required' });
+        const { text, title, description, targetLanguage = 'ar', sourceLanguage = 'en' } = req.body;
+        const inputText = text || [title, description || ''].filter(Boolean).join('. ');
+        if (!inputText) return res.status(400).json({ error: 'Text, title, or description is required' });
 
-        const translation = await callClaude(
-            `Translate from ${sourceLanguage} to ${targetLanguage}. Maintain tone and style. Provide ONLY the translation:\n\n${text}`,
+        const rawTranslation = await callClaude(
+            `Translate the following news headline and description to ${targetLanguage}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${title || inputText}\nDescription: ${description || inputText}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`,
             2048
         );
 
-        res.json({ original: text, translation, sourceLanguage, targetLanguage });
+        let translatedTitle = '';
+        let translatedText = rawTranslation;
+        try {
+            const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
+            const parsed = JSON.parse(cleaned);
+            translatedTitle = parsed.title || '';
+            translatedText = parsed.text || parsed.description || rawTranslation;
+        } catch {
+            // If not valid JSON, use the raw text as translation
+            translatedText = rawTranslation;
+        }
+
+        res.json({ original: inputText, translation: translatedText, translatedTitle, sourceLanguage, targetLanguage });
     } catch (err) {
         console.error('AI translate error:', err.message);
         res.status(500).json({ error: 'Failed to translate' });
@@ -319,8 +412,8 @@ router.post('/ai/translate', async (req, res) => {
  */
 router.post('/ai/rewrite', async (req, res) => {
     try {
-        const { title, content, style = 'professional' } = req.body;
-        if (!content) return res.status(400).json({ error: 'Content is required' });
+        const { title, content, description, style = 'professional' } = req.body;
+        if (!title && !content && !description) return res.status(400).json({ error: 'Title, description, or content is required' });
 
         const styles = {
             professional: 'Write in a professional, authoritative news style.',
@@ -330,7 +423,7 @@ router.post('/ai/rewrite', async (req, res) => {
         };
 
         const result = await callClaude(
-            `You are a skilled journalist. Rewrite this article in your own words to create a unique version. ${styles[style] || styles.professional}\n\nOriginal Title: ${title || 'N/A'}\nOriginal Content: ${content}\n\nRespond in JSON: {"title":"...","content":"..."}`,
+            `Rewrite the following news item as a unique, original article in ${style} style. ${styles[style] || styles.professional} Use the headline and description to create a complete, well-written paragraph. Do NOT mention that you only have a title or description — write as if you are a journalist covering this story.\n\nHeadline: ${title || 'N/A'}\nDescription: ${description || content || 'N/A'}\n\nRespond in JSON: {"title":"...","content":"..."}`,
             2048
         );
 
@@ -431,12 +524,12 @@ router.post('/pipeline/process', async (req, res) => {
                 rewritten: null,
             };
 
-            const text = article.content || article.description || article.title;
+            const text = getArticleText(article);
 
             // Summarize
             try {
                 item.summary = await callClaude(
-                    `Summarize this news in 2-3 sentences:\n\nTitle: ${article.title}\nContent: ${text}`
+                    `Based on the following news headline and brief description, write a clear and informative 2-3 sentence summary that expands on the key points. Do NOT say you cannot see the content or that it's unavailable. Work with what is provided.\n\nHeadline: ${article.title}\nDescription: ${article.description || ''}`
                 );
             } catch (e) {
                 item.summary = null;
@@ -446,12 +539,22 @@ router.post('/pipeline/process', async (req, res) => {
             // Translate
             if (translateTo && translateTo !== language) {
                 try {
-                    item.translation = await callClaude(
-                        `Translate to ${translateTo}. Provide ONLY the translation:\n\n${item.summary || text}`,
+                    const rawTranslation = await callClaude(
+                        `Translate the following news headline and description to ${translateTo}. Return ONLY a JSON object with the translated title and text. Do NOT add any commentary about missing content.\n\nTitle: ${article.title}\nDescription: ${article.description || ''}\n\nRespond in JSON: {"title":"translated title","text":"translated description"}`,
                         2048
                     );
+                    try {
+                        const cleaned = rawTranslation.replace(/```json\n?|```/g, '').trim();
+                        const parsed = JSON.parse(cleaned);
+                        item.translatedTitle = parsed.title || null;
+                        item.translation = parsed.text || parsed.description || rawTranslation;
+                    } catch {
+                        item.translation = rawTranslation;
+                        item.translatedTitle = null;
+                    }
                 } catch (e) {
                     item.translation = null;
+                    item.translatedTitle = null;
                     console.error('Pipeline translate error:', e.message);
                 }
             }
@@ -459,7 +562,7 @@ router.post('/pipeline/process', async (req, res) => {
             // Rewrite
             try {
                 const rewriteResult = await callClaude(
-                    `Rewrite this news in a ${rewriteStyle} style. Make it unique. Return JSON {"title":"...","content":"..."}:\n\nTitle: ${article.title}\nContent: ${text}`,
+                    `Rewrite the following news item as a unique, original article in ${rewriteStyle} style. Use the headline and description to create a complete, well-written paragraph. Do NOT mention that you only have a title or description — write as if you are a journalist covering this story.\n\nHeadline: ${article.title}\nDescription: ${article.description || ''}\n\nReturn JSON {"title":"...","content":"..."}`,
                     2048
                 );
                 try {
@@ -478,13 +581,14 @@ router.post('/pipeline/process', async (req, res) => {
                 try {
                     db.prepare(`
                         INSERT OR IGNORE INTO news_articles 
-                        (source_id, title, description, content, original_url, image_url, source_name, 
+                        (source_id, slug, title, description, content, original_url, image_url, source_name, 
                          category, language, country, published_at, sentiment, keywords,
-                         ai_summary, ai_translation, ai_rewritten_title, ai_rewritten_content, 
+                         ai_summary, ai_translation, ai_translated_title, ai_rewritten_title, ai_rewritten_content, 
                          translate_language, is_processed)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `).run(
                         article.article_id,
+                        generateSlug(article.title),
                         article.title,
                         article.description,
                         article.content,
@@ -499,6 +603,7 @@ router.post('/pipeline/process', async (req, res) => {
                         JSON.stringify(article.keywords || []),
                         item.summary,
                         item.translation,
+                        item.translatedTitle || null,
                         item.rewritten?.title || null,
                         item.rewritten?.content || null,
                         translateTo || null,

@@ -1,0 +1,855 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Admin Dashboard - Zerowfx" description="Admin dashboard overview" noindex={true}>
+  <div class="admin-news-wrapper">
+    <!-- Auth Gate -->
+    <div class="auth-gate" id="authGate">
+      <div class="auth-loading"><div class="spinner"></div><p>Checking authentication...</p></div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="admin-dashboard" id="adminDashboard" style="display:none">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">ZERO<span class="accent">WFX</span></span>
+          <span class="sidebar-sub">Admin Panel</span>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="/admin/dashboard" class="nav-item active">
+            <i data-lucide="layout-dashboard" class="nav-icon"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="/admin/news" class="nav-item">
+            <i data-lucide="newspaper" class="nav-icon"></i>
+            <span>News Pipeline</span>
+          </a>
+          <a href="/admin/news/articles" class="nav-item">
+            <i data-lucide="file-text" class="nav-icon"></i>
+            <span>Articles</span>
+          </a>
+          <a href="/admin/news/settings" class="nav-item">
+            <i data-lucide="settings" class="nav-icon"></i>
+            <span>Settings</span>
+          </a>
+          <a href="/admin/news/queue" class="nav-item">
+            <i data-lucide="list-ordered" class="nav-icon"></i>
+            <span>Queue</span>
+          </a>
+        </nav>
+        <div class="sidebar-footer">
+          <span class="sidebar-user" id="sidebarUser">admin</span>
+          <button class="sidebar-logout" id="logoutBtn">
+            <i data-lucide="log-out" class="nav-icon"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Mobile top bar -->
+      <div class="mobile-topbar">
+        <button class="mobile-menu-btn" id="mobileMenuBtn"><i data-lucide="menu"></i></button>
+        <span class="mobile-logo">ZERO<span class="accent">WFX</span> Admin</span>
+        <button class="mobile-logout" id="mobileLogoutBtn"><i data-lucide="log-out"></i></button>
+      </div>
+
+      <!-- Content -->
+      <main class="main-content">
+        <div class="content-header">
+          <h1 class="page-title">📊 Admin Dashboard</h1>
+          <p class="page-subtitle">Overview of your platform</p>
+        </div>
+
+        <!-- Top-level Stats Row -->
+        <div class="overview-grid" id="overviewGrid">
+          <!-- Subscribers stats -->
+          <div class="stat-card glow-blue">
+            <div class="stat-icon-wrap blue"><i data-lucide="users"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTotalSubs">—</span>
+              <span class="stat-label">Total Subscribers</span>
+            </div>
+          </div>
+          <div class="stat-card glow-green">
+            <div class="stat-icon-wrap green"><i data-lucide="user-plus"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTodaySubs">—</span>
+              <span class="stat-label">New Today</span>
+            </div>
+          </div>
+          <div class="stat-card glow-purple">
+            <div class="stat-icon-wrap purple"><i data-lucide="globe"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statCountries">—</span>
+              <span class="stat-label">Countries</span>
+            </div>
+          </div>
+          <!-- News stats -->
+          <div class="stat-card glow-orange">
+            <div class="stat-icon-wrap orange"><i data-lucide="database"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTotalArticles">—</span>
+              <span class="stat-label">Total Articles</span>
+            </div>
+          </div>
+          <div class="stat-card glow-cyan">
+            <div class="stat-icon-wrap cyan"><i data-lucide="languages"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statTranslated">—</span>
+              <span class="stat-label">Translated</span>
+            </div>
+          </div>
+          <div class="stat-card glow-red">
+            <div class="stat-icon-wrap red"><i data-lucide="cpu"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="statApiUsage">—</span>
+              <span class="stat-label">API Calls Today</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Two Column Layout -->
+        <div class="two-col">
+          <!-- Left: Subscribers Panel -->
+          <div class="panel subscribers-panel">
+            <div class="panel-header">
+              <h2 class="panel-title"><i data-lucide="users" class="panel-icon"></i> Subscribers</h2>
+              <a href="#" class="panel-action" id="exportBtn">
+                <i data-lucide="download" class="panel-action-icon"></i> Export CSV
+              </a>
+            </div>
+            <div class="search-box">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="searchInput" placeholder="Search by email, IP, or country..." />
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table" id="subsTable">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Country</th>
+                    <th>Joined</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="subsBody">
+                  <tr><td colspan="4" class="empty-state">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+          </div>
+
+          <!-- Right Column -->
+          <div class="right-col">
+            <!-- Pipeline Status -->
+            <div class="panel pipeline-compact">
+              <h2 class="panel-title"><i data-lucide="activity" class="panel-icon"></i> Pipeline Status</h2>
+              <div class="pipeline-mini-grid">
+                <div class="pipeline-mini">
+                  <span class="mini-label">Status</span>
+                  <span id="pipelineStatus"><span class="status-badge idle">Idle</span></span>
+                </div>
+                <div class="pipeline-mini">
+                  <span class="mini-label">Auto-Fetch</span>
+                  <span id="pipelineAutoFetch"><span class="status-badge off">OFF</span></span>
+                </div>
+                <div class="pipeline-mini">
+                  <span class="mini-label">Last Run</span>
+                  <span class="mini-value" id="pipelineLastRun">Never</span>
+                </div>
+                <div class="pipeline-mini">
+                  <span class="mini-label">Next Run</span>
+                  <span class="mini-value" id="pipelineNextRun">—</span>
+                </div>
+              </div>
+              <div class="pipeline-actions">
+                <button class="btn btn-primary btn-sm" id="runPipelineBtn">
+                  <i data-lucide="play"></i> Run Now
+                </button>
+                <a href="/admin/news/settings" class="btn btn-outline btn-sm">
+                  <i data-lucide="settings"></i> Configure
+                </a>
+              </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="panel">
+              <h2 class="panel-title"><i data-lucide="scroll-text" class="panel-icon"></i> Recent Pipeline Activity</h2>
+              <div class="activity-list" id="activityList">
+                <div class="empty-state-small">Loading...</div>
+              </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div class="panel quick-links-panel">
+              <h2 class="panel-title"><i data-lucide="zap" class="panel-icon"></i> Quick Actions</h2>
+              <div class="quick-links">
+                <a href="/admin/news/articles" class="quick-link">
+                  <i data-lucide="newspaper"></i>
+                  <span>Manage Articles</span>
+                </a>
+                <a href="/admin/news/queue" class="quick-link">
+                  <i data-lucide="list-ordered"></i>
+                  <span>View Queue</span>
+                </a>
+                <a href="/admin/news/settings" class="quick-link">
+                  <i data-lucide="sliders-horizontal"></i>
+                  <span>Pipeline Settings</span>
+                </a>
+                <a href="/" class="quick-link" target="_blank">
+                  <i data-lucide="external-link"></i>
+                  <span>View Site</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+  </div>
+</Layout>
+
+<script>
+  const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3001' : '';
+  let currentPage = 1;
+  let searchQuery = '';
+
+  // ── Auth ──
+  async function checkAuth() {
+    try {
+      const res = await fetch(`${API}/api/admin/me`, { credentials: 'include' });
+      if (res.ok) {
+        const data = await res.json();
+        (document.getElementById('authGate') as HTMLElement).style.display = 'none';
+        (document.getElementById('adminDashboard') as HTMLElement).style.display = 'flex';
+        const userEl = document.getElementById('sidebarUser');
+        if (userEl) userEl.textContent = data.username;
+        const exportBtn = document.getElementById('exportBtn') as HTMLAnchorElement;
+        if (exportBtn) exportBtn.href = `${API}/api/admin/subscribers/export/csv`;
+        loadAllData();
+      } else {
+        window.location.href = '/admin';
+      }
+    } catch {
+      window.location.href = '/admin';
+    }
+  }
+
+  // ── Logout ──
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+  document.getElementById('mobileLogoutBtn')?.addEventListener('click', async () => {
+    await fetch(`${API}/api/admin/logout`, { method: 'POST', credentials: 'include' });
+    window.location.href = '/admin';
+  });
+
+  // ── Mobile menu ──
+  document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+    document.getElementById('sidebar')?.classList.toggle('open');
+  });
+
+  // ── Toast ──
+  function showToast(message: string, type: string = 'info') {
+    const container = document.getElementById('toastContainer');
+    if (!container) return;
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+  }
+
+  // ── Load All Data ──
+  async function loadAllData() {
+    await Promise.all([loadSubscribers(), loadNewsStats(), loadPipelineStatus(), loadActivity()]);
+  }
+
+  // ── Subscribers ──
+  async function loadSubscribers() {
+    try {
+      const res = await fetch(
+        `${API}/api/admin/subscribers?page=${currentPage}&limit=10&search=${encodeURIComponent(searchQuery)}`,
+        { credentials: 'include' }
+      );
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const totalEl = document.getElementById('statTotalSubs');
+      if (totalEl) totalEl.textContent = String(data.pagination.total);
+
+      // Countries
+      if (data.subscribers.length > 0) {
+        const countries = new Set(data.subscribers.map((s: any) => s.country).filter(Boolean));
+        const countriesEl = document.getElementById('statCountries');
+        if (countriesEl) countriesEl.textContent = String(countries.size);
+      }
+
+      // Today
+      const today = new Date().toISOString().split('T')[0];
+      const todayCount = data.subscribers.filter((s: any) =>
+        s.created_at && s.created_at.startsWith(today)
+      ).length;
+      const todayEl = document.getElementById('statTodaySubs');
+      if (todayEl) todayEl.textContent = String(todayCount);
+
+      const tbody = document.getElementById('subsBody');
+      if (!tbody) return;
+
+      if (data.subscribers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No subscribers found</td></tr>';
+      } else {
+        tbody.innerHTML = data.subscribers.map((s: any) => `
+          <tr>
+            <td><strong>${s.email}</strong></td>
+            <td><span class="country-tag">${s.country || 'Unknown'}</span></td>
+            <td class="date-cell">${new Date(s.created_at).toLocaleDateString()}</td>
+            <td><button class="del-btn" onclick="deleteSub(${s.id})" title="Delete"><i data-lucide="trash-2" class="del-icon"></i></button></td>
+          </tr>
+        `).join('');
+        if (window.lucide) (window as any).lucide.createIcons();
+      }
+
+      // Pagination
+      const paginationEl = document.getElementById('pagination');
+      if (paginationEl && data.pagination.totalPages > 1) {
+        let html = '';
+        for (let i = 1; i <= data.pagination.totalPages; i++) {
+          html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        paginationEl.innerHTML = html;
+      } else if (paginationEl) {
+        paginationEl.innerHTML = '';
+      }
+    } catch (err) {
+      console.error('Load subscribers error:', err);
+    }
+  }
+
+  // ── News Stats ──
+  async function loadNewsStats() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/stats`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const totalEl = document.getElementById('statTotalArticles');
+      if (totalEl) totalEl.textContent = String(data.total || 0);
+      const translatedEl = document.getElementById('statTranslated');
+      if (translatedEl) translatedEl.textContent = String(data.translated || 0);
+      const apiEl = document.getElementById('statApiUsage');
+      if (apiEl) apiEl.textContent = String(data.apiUsageToday || 0);
+    } catch (err) {
+      console.error('Load news stats error:', err);
+    }
+  }
+
+  // ── Pipeline Status ──
+  async function loadPipelineStatus() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/pipeline/status`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const statusEl = document.getElementById('pipelineStatus');
+      if (statusEl) {
+        if (data.running) {
+          statusEl.innerHTML = '<span class="status-badge running">Running</span>';
+        } else if (data.lastStatus === 'error') {
+          statusEl.innerHTML = '<span class="status-badge error">Error</span>';
+        } else {
+          statusEl.innerHTML = '<span class="status-badge idle">Idle</span>';
+        }
+      }
+
+      const lastRunEl = document.getElementById('pipelineLastRun');
+      if (lastRunEl) lastRunEl.textContent = data.lastRun ? new Date(data.lastRun).toLocaleString() : 'Never';
+
+      const nextRunEl = document.getElementById('pipelineNextRun');
+      if (nextRunEl) nextRunEl.textContent = data.nextRun ? new Date(data.nextRun).toLocaleString() : '—';
+
+      const autoEl = document.getElementById('pipelineAutoFetch');
+      if (autoEl) {
+        autoEl.innerHTML = data.autoFetchEnabled
+          ? '<span class="status-badge on">ON</span>'
+          : '<span class="status-badge off">OFF</span>';
+      }
+    } catch (err) {
+      console.error('Load pipeline status error:', err);
+    }
+  }
+
+  // ── Activity Feed ──
+  async function loadActivity() {
+    try {
+      const res = await fetch(`${API}/api/admin/news/queue`, { credentials: 'include' });
+      if (!res.ok) return;
+      const data = await res.json();
+      const container = document.getElementById('activityList');
+      if (!container) return;
+
+      if (!data.history?.length) {
+        container.innerHTML = '<div class="empty-state-small">No pipeline activity yet</div>';
+        return;
+      }
+
+      container.innerHTML = data.history.slice(0, 8).map((log: any) => `
+        <div class="activity-item">
+          <div class="activity-dot ${log.status}"></div>
+          <div class="activity-info">
+            <span class="activity-action">${log.action}</span>
+            <span class="activity-meta">
+              ${log.articles_fetched || 0} fetched · ${log.articles_translated || 0} translated
+              ${log.duration_ms ? ' · ' + (log.duration_ms / 1000).toFixed(1) + 's' : ''}
+            </span>
+          </div>
+          <span class="activity-time">${timeAgo(log.created_at)}</span>
+        </div>
+      `).join('');
+    } catch (err) {
+      console.error('Load activity error:', err);
+    }
+  }
+
+  function timeAgo(dateStr: string) {
+    const now = Date.now();
+    const then = new Date(dateStr).getTime();
+    const diff = Math.floor((now - then) / 1000);
+    if (diff < 60) return 'just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    return Math.floor(diff / 86400) + 'd ago';
+  }
+
+  // ── Pipeline Run ──
+  document.getElementById('runPipelineBtn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('runPipelineBtn') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Starting...';
+    try {
+      const res = await fetch(`${API}/api/admin/news/pipeline/run`, {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (res.ok) {
+        showToast('Pipeline started!', 'success');
+        setTimeout(loadAllData, 3000);
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Failed', 'error');
+      }
+    } catch { showToast('Connection error', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="play"></i> Run Now';
+    if (window.lucide) (window as any).lucide.createIcons();
+  });
+
+  // ── Global handlers ──
+  (window as any).deleteSub = async (id: number) => {
+    if (!confirm('Delete this subscriber?')) return;
+    await fetch(`${API}/api/admin/subscribers/${id}`, {
+      method: 'DELETE', credentials: 'include'
+    });
+    loadSubscribers();
+  };
+
+  (window as any).goToPage = (page: number) => {
+    currentPage = page;
+    loadSubscribers();
+  };
+
+  // ── Search ──
+  let searchTimeout: any;
+  document.getElementById('searchInput')?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchQuery = (e.target as HTMLInputElement).value;
+      currentPage = 1;
+      loadSubscribers();
+    }, 300);
+  });
+
+  // ── Init ──
+  checkAuth();
+  setInterval(loadAllData, 30000);
+</script>
+
+<style>
+  /* ================================================
+     ADMIN DASHBOARD — UNIFIED LAYOUT
+     ================================================ */
+  .admin-news-wrapper { min-height: 100vh; background: var(--color-bg); }
+
+  /* Auth Gate */
+  .auth-gate { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-loading { text-align: center; color: var(--color-text-dim); }
+  .spinner { width: 40px; height: 40px; border: 3px solid var(--color-border-strong); border-top-color: var(--color-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Dashboard layout */
+  .admin-dashboard { display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  .sidebar { width: 240px; background: var(--color-bg-card); border-right: 1px solid var(--color-border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; z-index: 100; transition: transform 0.3s ease; }
+  .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--color-border); }
+  .sidebar-logo { font-size: 1.3rem; font-weight: 800; letter-spacing: 2px; display: block; }
+  .accent { color: var(--color-green); }
+  .sidebar-sub { display: block; font-size: 0.75rem; color: var(--color-text-dim); letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: var(--radius-md); color: var(--color-text-muted); font-size: 0.9rem; font-weight: 500; transition: var(--transition); }
+  .nav-item:hover { background: rgba(34, 197, 94, 0.06); color: var(--color-text); }
+  .nav-item.active { background: rgba(34, 197, 94, 0.1); color: var(--color-green); font-weight: 600; }
+  .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--color-border); display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-user { font-size: 0.85rem; color: var(--color-text-muted); }
+  .sidebar-logout { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--color-red); padding: 6px; border-radius: var(--radius-sm); transition: var(--transition); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+  /* Mobile */
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); cursor: pointer; border: none; }
+  .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
+
+  /* Main Content */
+  .main-content { flex: 1; margin-left: 240px; padding: 32px; }
+  .content-header { margin-bottom: 28px; }
+  .page-title { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+  .page-subtitle { color: var(--color-text-dim); font-size: 0.9rem; }
+
+  /* ─── Overview Stats Grid ─── */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .stat-card {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .stat-card:hover { border-color: var(--color-border-strong); transform: translateY(-2px); }
+  .stat-card:hover::before { opacity: 1; }
+  .glow-blue::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+  .glow-green::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+  .glow-purple::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
+  .glow-orange::before { background: linear-gradient(90deg, #f97316, #fb923c); }
+  .glow-cyan::before { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+  .glow-red::before { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+  .stat-icon-wrap {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-md);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .stat-icon-wrap i, .stat-icon-wrap svg { width: 20px; height: 20px; }
+  .stat-icon-wrap.blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+  .stat-icon-wrap.green { background: rgba(34, 197, 94, 0.12); color: #22c55e; }
+  .stat-icon-wrap.purple { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+  .stat-icon-wrap.orange { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+  .stat-icon-wrap.cyan { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
+  .stat-icon-wrap.red { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  .stat-value { display: block; font-size: 1.5rem; font-weight: 800; color: var(--color-text); }
+  .stat-label { display: block; font-size: 0.7rem; color: var(--color-text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* ─── Two Column Layout ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* ─── Panels ─── */
+  .panel {
+    background: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+  }
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .panel-title {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text);
+    margin: 0;
+  }
+  .panel-title:only-child { margin-bottom: 16px; }
+  .panel-icon { width: 18px; height: 18px; color: var(--color-green); }
+  .panel-action {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--color-text-dim);
+    padding: 6px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    transition: var(--transition);
+  }
+  .panel-action:hover { color: var(--color-green); border-color: var(--color-green); }
+  .panel-action-icon { width: 14px; height: 14px; }
+
+  /* ─── Search ─── */
+  .search-box {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .search-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    color: var(--color-text-dim);
+    pointer-events: none;
+  }
+  .search-box input {
+    width: 100%;
+    padding: 10px 16px 10px 40px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-size: 0.85rem;
+    transition: var(--transition);
+  }
+  .search-box input:focus { border-color: var(--color-green); outline: none; }
+
+  /* ─── Table ─── */
+  .table-wrapper {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+  .data-table { width: 100%; border-collapse: collapse; }
+  .data-table th {
+    background: var(--color-bg-elevated);
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--color-border);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table tr:hover td { background: rgba(34, 197, 94, 0.03); }
+  .empty-state {
+    text-align: center !important;
+    color: var(--color-text-dim) !important;
+    padding: 32px 16px !important;
+  }
+  .country-tag {
+    display: inline-block;
+    padding: 2px 10px;
+    background: var(--color-bg-elevated);
+    border-radius: 12px;
+    font-size: 0.78rem;
+    color: var(--color-text-dim);
+  }
+  .date-cell { white-space: nowrap; font-size: 0.8rem; }
+  .del-btn {
+    background: none; border: none; cursor: pointer;
+    padding: 4px 8px; border-radius: var(--radius-sm);
+    color: var(--color-text-dim);
+    transition: var(--transition);
+  }
+  .del-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+  .del-icon { width: 15px; height: 15px; }
+
+  /* ─── Pagination ─── */
+  .pagination { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+  .pagination :global(.page-btn) {
+    padding: 6px 12px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+    font-size: 0.8rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .pagination :global(.page-btn.active) {
+    background: var(--color-green);
+    color: #000;
+    border-color: var(--color-green);
+    font-weight: 700;
+  }
+
+  /* ─── Pipeline Compact ─── */
+  .pipeline-mini-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .pipeline-mini {
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+  }
+  .mini-label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .mini-value { font-size: 0.82rem; font-weight: 600; color: var(--color-text-muted); }
+  .pipeline-actions { display: flex; gap: 10px; }
+
+  /* ─── Activity Feed ─── */
+  .activity-list { display: flex; flex-direction: column; }
+  .activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .activity-dot.success { background: #22c55e; box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+  .activity-dot.error { background: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.4); }
+  .activity-info { flex: 1; min-width: 0; }
+  .activity-action { display: block; font-size: 0.85rem; font-weight: 600; color: var(--color-text); }
+  .activity-meta { display: block; font-size: 0.75rem; color: var(--color-text-dim); margin-top: 2px; }
+  .activity-time { font-size: 0.75rem; color: var(--color-text-dim); white-space: nowrap; flex-shrink: 0; }
+  .empty-state-small {
+    text-align: center;
+    color: var(--color-text-dim);
+    padding: 20px;
+    font-size: 0.85rem;
+  }
+
+  /* ─── Quick Links ─── */
+  .quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    background: var(--color-bg-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+  .quick-link:hover {
+    border-color: var(--color-green);
+    color: var(--color-green);
+    transform: translateY(-1px);
+  }
+  .quick-link i, .quick-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  /* ─── Buttons ─── */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 600; border-radius: var(--radius-md);
+    transition: var(--transition); border: none; cursor: pointer;
+  }
+  .btn i, .btn svg { width: 16px; height: 16px; }
+  .btn-sm { padding: 8px 16px; font-size: 0.8rem; }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--color-green-dark), var(--color-green));
+    color: #fff;
+  }
+  .btn-primary:hover { box-shadow: var(--shadow-glow-strong); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+  .btn-outline:hover { border-color: var(--color-green); color: var(--color-green); }
+
+  /* ─── Status Badges ─── */
+  .status-badge {
+    display: inline-block; padding: 3px 10px;
+    border-radius: 20px; font-size: 0.72rem;
+    font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .status-badge.idle { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+  .status-badge.running { background: rgba(34, 197, 94, 0.15); color: #22c55e; animation: pulse-badge 1.5s infinite; }
+  .status-badge.success { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .status-badge.error { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  .status-badge.on { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+  .status-badge.off { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+  @keyframes pulse-badge { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  /* ─── Toast ─── */
+  .toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 500; color: #fff; opacity: 0; transform: translateX(20px); transition: all 0.3s ease; max-width: 360px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast-success { background: #16a34a; }
+  .toast-error { background: #dc2626; }
+  .toast-info { background: #2563eb; }
+  .spin { animation: spin 1s linear infinite; }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 1200px) {
+    .overview-grid { grid-template-columns: repeat(3, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); box-shadow: 10px 0 40px rgba(0, 0, 0, 0.5); }
+    .mobile-topbar { display: flex; }
+    .main-content { margin-left: 0; padding: 20px 16px; }
+    .overview-grid { grid-template-columns: repeat(2, 1fr); }
+    .quick-links { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 480px) {
+    .overview-grid { grid-template-columns: 1fr; }
+    .pipeline-mini-grid { grid-template-columns: 1fr; }
+  }
+</style>

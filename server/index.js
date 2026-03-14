@@ -8,6 +8,9 @@ import { fileURLToPath } from 'url';
 import db from './database.js';
 import newsRoutes from './routes/news.js';
 import financeRoutes from './routes/finance.js';
+import adminNewsRoutes from './routes/admin-news.js';
+import { setSchedulerControl } from './routes/admin-news.js';
+import { startScheduler } from './scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -243,22 +246,7 @@ app.get('/api/admin/subscribers/export/csv', requireAuth, (req, res) => {
 
 app.use('/api/news', newsRoutes);
 app.use('/api/finance', financeRoutes);
-
-// ── Admin: get news stats ───────────────────────────────────
-app.get('/api/admin/news/stats', requireAuth, (req, res) => {
-    try {
-        const total = db.prepare('SELECT COUNT(*) as count FROM news_articles').get().count;
-        const processed = db.prepare('SELECT COUNT(*) as count FROM news_articles WHERE is_processed = 1').get().count;
-        const today = db.prepare(
-            "SELECT COUNT(*) as count FROM news_articles WHERE date(created_at) = date('now')"
-        ).get().count;
-
-        res.json({ total, processed, unprocessed: total - processed, today });
-    } catch (err) {
-        console.error('News stats error:', err.message);
-        res.status(500).json({ error: 'Server error' });
-    }
-});
+app.use('/api/admin/news', requireAuth, adminNewsRoutes);
 
 // ============================================================
 //  GLOBAL ERROR HANDLER
@@ -281,6 +269,10 @@ app.listen(PORT, () => {
         FMP: process.env.FMP_API_KEY ? '✅' : '⚠️  optional',
     };
 
+    // Start auto-fetch scheduler
+    const schedulerCtrl = startScheduler();
+    setSchedulerControl(schedulerCtrl);
+
     console.log(`
 🚀 Zerowfx API server running on http://localhost:${PORT}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -289,9 +281,11 @@ app.listen(PORT, () => {
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   Subscribers  /api/subscribe
   Admin        /api/admin/*
+  Admin News   /api/admin/news/*
   News         /api/news/*
   Finance      /api/finance/*
   Health       /api/health
+  Scheduler    ✅ Active
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `);
 });
