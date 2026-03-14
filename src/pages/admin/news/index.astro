@@ -514,8 +514,10 @@ import Layout from '../../../layouts/Layout.astro';
     padding: 12px 16px;
     background: var(--color-bg-card);
     border-bottom: 1px solid var(--color-border);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 90;
   }
   .mobile-menu-btn, .mobile-logout {
@@ -831,7 +833,7 @@ import Layout from '../../../layouts/Layout.astro';
     }
     .main-content {
       margin-left: 0;
-      padding: 20px 16px;
+      padding: 75px 16px 20px 16px;
       width: 100%;
     }
     .stats-grid {
@@ -883,7 +885,7 @@ import Layout from '../../../layouts/Layout.astro';
       grid-template-columns: 1fr;
     }
     .main-content {
-      padding: 16px 12px;
+      padding: 75px 12px 16px 12px;
     }
     .page-title {
       font-size: 1.1rem;

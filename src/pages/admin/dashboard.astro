@@ -547,7 +547,7 @@ import Layout from '../../layouts/Layout.astro';
   .sidebar-logout:hover { background: rgba(239, 68, 68, 0.2); }
 
   /* Mobile */
-  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: sticky; top: 0; z-index: 90; }
+  .mobile-topbar { display: none; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-bg-card); border-bottom: 1px solid var(--color-border); position: fixed; top: 0; left: 0; right: 0; z-index: 90; }
   .mobile-menu-btn, .mobile-logout { background: none; color: var(--color-text-muted); padding: 8px; border-radius: var(--radius-sm); cursor: pointer; border: none; }
   .mobile-logo { font-weight: 800; letter-spacing: 2px; font-size: 1.1rem; }
   .sidebar-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); z-index: 100; backdrop-filter: blur(4px); visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
@@ -909,7 +909,7 @@ import Layout from '../../layouts/Layout.astro';
     .sidebar-logo { flex: 1; }
     .sidebar-sub { width: 100%; }
     .mobile-topbar { display: flex; order: -1; }
-    .main-content { margin-left: 0; padding: 20px 16px; width: 100%; }
+    .main-content { margin-left: 0; padding: 75px 16px 20px 16px; width: 100%; }
     .overview-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
     .quick-links { grid-template-columns: 1fr; }
     .page-title { font-size: 1.3rem; }
@@ -938,7 +938,7 @@ import Layout from '../../layouts/Layout.astro';
   @media (max-width: 480px) {
     .overview-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     .pipeline-mini-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .main-content { padding: 16px 12px; }
+    .main-content { padding: 75px 12px 16px 12px; }
     .page-title { font-size: 1.1rem; }
     .stat-card { padding: 12px 10px; gap: 8px; }
     .stat-icon-wrap { width: 32px; height: 32px; }
@@ -958,7 +958,7 @@ import Layout from '../../layouts/Layout.astro';
   @media (max-width: 360px) {
     .overview-grid { grid-template-columns: 1fr; gap: 8px; }
     .stat-card { flex-direction: row; padding: 12px; }
-    .main-content { padding: 12px 8px; }
+    .main-content { padding: 75px 8px 12px 8px; }
     .panel { padding: 12px; border-radius: var(--radius-md); }
     .pipeline-mini-grid { grid-template-columns: 1fr; }
   }

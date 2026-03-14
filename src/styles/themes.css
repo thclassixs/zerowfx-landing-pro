@@ -239,7 +239,7 @@ html.theme-clean-white .bottom-cta:hover {
    TICKER BAR — Deep green bg, white names
    ================================================ */
 html.theme-clean-white .ticker-bar {
-  background: #059669 !important;
+  background: #000000 !important;
   border-top-color: rgba(255, 255, 255, 0.08) !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
 }
