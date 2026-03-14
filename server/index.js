@@ -111,12 +111,17 @@ app.get('/api/health', (req, res) => {
 // ============================================================
 
 // Subscribe (Join the list)
-app.post('/api/subscribe', (req, res) => {
+app.post('/api/subscribe', async (req, res) => {
     try {
         const { email } = req.body;
+        const turnstileToken = req.body['cf-turnstile-response'];
 
         if (!email || !email.includes('@')) {
             return res.status(400).json({ error: 'Valid email is required' });
+        }
+
+        if (!turnstileToken) {
+            return res.status(400).json({ error: 'Security check missing' });
         }
 
         // Get real IP from Cloudflare headers
@@ -125,6 +130,22 @@ app.post('/api/subscribe', (req, res) => {
             || req.headers['x-forwarded-for']?.split(',')[0]?.trim()
             || req.socket?.remoteAddress
             || req.ip;
+
+        // Verify Turnstile
+        const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAACq8bTe7_-SRivC2eupLGekUnTU';
+        const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+            method: 'POST',
+            body: new URLSearchParams({
+                secret: TURNSTILE_SECRET,
+                response: turnstileToken,
+                remoteip: ip
+            })
+        });
+
+        const verifyResult = await verifyRes.json();
+        if (!verifyResult.success) {
+            return res.status(400).json({ error: 'Security check failed. Please try again.' });
+        }
 
         // Get country from Cloudflare header
         const country = req.headers['cf-ipcountry'] || 'Unknown';

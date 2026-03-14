@@ -33,6 +33,7 @@
             Submit
           </button>
         </div>
+        <div class="cf-turnstile" data-sitekey="0x4AAAAAACq8bYcX7B2FWM8A" style="margin-top: 10px;"></div>
         <p class="form-message" id="heroMessage"></p>
       </form>
 
@@ -112,14 +113,29 @@
     btn.textContent = 'Joining...';
     btn.setAttribute('disabled', 'true');
 
+    const turnstileToken = (document.querySelector('#heroForm [name="cf-turnstile-response"]') as HTMLInputElement)?.value;
+    if (!turnstileToken) {
+      message.textContent = '⚠️ Please complete the security check';
+      message.className = 'form-message error';
+      btn.textContent = 'Submit';
+      btn.removeAttribute('disabled');
+      return;
+    }
+
     try {
       const res = await fetch(`${API}/api/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailInput.value })
+        body: JSON.stringify({ 
+          email: emailInput.value,
+          'cf-turnstile-response': turnstileToken
+        })
       });
 
       const data = await res.json();
+      
+      // @ts-ignore
+      if (typeof turnstile !== 'undefined') turnstile.reset();
 
       if (res.ok) {
         message.textContent = '✅ ' + data.message;

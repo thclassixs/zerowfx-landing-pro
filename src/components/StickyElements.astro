@@ -74,6 +74,7 @@
         <input type="email" id="modalEmail" placeholder="Enter your best email to lock in bonus" data-i18n-placeholder="modal.placeholder" class="modal-input" required />
         <button type="submit" class="modal-submit" id="modalSubmitBtn" data-i18n="modal.submit">SUBMIT</button>
       </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAACq8bYcX7B2FWM8A" style="margin-bottom: 8px; display: flex; justify-content: center;"></div>
       <a href="https://clicks.pipaffiliates.com/c?c=1186199&l=en&p=1" target="_blank" rel="noopener noreferrer" class="affiliate-button">
         <span data-i18n="modal.cta">CLAIM MY 100% BONUS</span> <i data-lucide="arrow-right" style="width:16px;height:16px;display:inline;vertical-align:middle;margin-left:6px"></i>
       </a>
@@ -194,13 +195,25 @@
     const emailInput = document.getElementById('modalEmail') as HTMLInputElement;
     if (!emailInput) return;
 
+    const turnstileToken = (document.querySelector('#modalForm [name="cf-turnstile-response"]') as HTMLInputElement)?.value;
+    if (!turnstileToken) {
+      alert('⚠️ Please complete the security check');
+      return;
+    }
+
     try {
       const res = await fetch(`${API}/api/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailInput.value })
+        body: JSON.stringify({ 
+          email: emailInput.value,
+          'cf-turnstile-response': turnstileToken
+        })
       });
       const data = await res.json();
+
+      // @ts-ignore
+      if (typeof turnstile !== 'undefined') turnstile.reset();
       if (res.ok) {
         emailInput.value = '';
         document.getElementById('brokerModal')?.classList.remove('visible');
